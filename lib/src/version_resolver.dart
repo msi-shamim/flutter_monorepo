@@ -14,7 +14,7 @@ class VersionResolver {
     // State management
     'get': '^4.7.2',
     'get_storage': '^2.1.1',
-    'flutter_riverpod': '^2.6.1',
+    'flutter_riverpod': '^3.3.1',
     'flutter_bloc': '^9.1.0',
     'hydrated_bloc': '^10.0.0',
     // HTTP clients
