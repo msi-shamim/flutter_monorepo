@@ -7,8 +7,8 @@ void main(List<String> arguments) async {
   final parser = ArgParser()
     ..addOption('org',
         abbr: 'o',
-        defaultsTo: 'com.example',
-        help: 'Organization identifier (e.g., com.example)')
+        defaultsTo: 'com.incrementsinc',
+        help: 'Organization identifier (e.g., com.incrementsinc)')
     ..addFlag('help',
         abbr: 'h', negatable: false, help: 'Show usage information')
     ..addFlag('version',

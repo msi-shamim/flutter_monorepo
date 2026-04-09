@@ -24,7 +24,7 @@ dart pub global activate flutter_monorepo
 
 ```bash
 flutter_monorepo my_app
-flutter_monorepo my_app --org com.mycompany
+flutter_monorepo my_app --org com.incrementsinc
 ```
 
 This creates:
@@ -64,7 +64,7 @@ flutter run
 Usage: flutter_monorepo <project_name> [options]
 
 Options:
-  -o, --org     Organization identifier (default: com.example)
+  -o, --org     Organization identifier (default: com.incrementsinc)
   -h, --help    Show usage information
       --version Show version
 ```
