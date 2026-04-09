@@ -123,9 +123,18 @@ Step 3 — Export from barrels
   Widget:  packages/ui/lib/<project>_ui.dart
   State:   packages/core/lib/<project>_core.dart
 
-Step 4 — Verify
+Step 4 — Write tests (during development, not after)
+─────────────────────────────────────────────────────
+  Companion state test → packages/core/test/states/
+    Test: initial state, valid input, invalid input, clear/reset
+    Pure Dart — no mocking needed
+
+  Widget test → packages/ui/test/widgets/
+    Test: renders correctly, variants, RTL layout
+
+Step 5 — Verify
 ────────────────
-  Run: dart analyze
+  Run: dart analyze && dart test
 
 Checklist
 ─────────
@@ -135,6 +144,7 @@ Checklist
   [ ] All content via constructor
   [ ] Responsive + RTL-safe
   [ ] Exported from ui barrel
+  [ ] Widget test in packages/ui/test/widgets/
 
   Companion State (if applicable):
   [ ] Pure Dart — no Flutter imports
@@ -142,6 +152,7 @@ Checklist
   [ ] Configurable via constructor
   [ ] Unit testable
   [ ] Exported from core barrel
+  [ ] Unit test in packages/core/test/states/
 ''');
   }
 
@@ -198,9 +209,15 @@ Step 4 — Add localization strings
   Add to packages/l10n/lib/l10n/arb/app_en.arb (and other locales)
   Run: flutter gen-l10n
 
-Step 5 — Verify
+Step 5 — Write tests (during development, not after)
+─────────────────────────────────────────────────────
+  Controller test → <app>/test/screens/<name>/
+    Test: initial state, state transitions after API calls,
+    error handling, companion state wiring
+
+Step 6 — Verify
 ────────────────
-  Run: dart analyze
+  Run: dart analyze && flutter test
 
 Checklist
 ─────────
@@ -213,6 +230,7 @@ Checklist
   [ ] Route registered
   [ ] Binding registers controller and dependencies
   [ ] Responsive + RTL-safe layout
+  [ ] Controller test in <app>/test/screens/<name>/
 ''');
   }
 
@@ -267,9 +285,18 @@ Step 3 — Wire in the binding (dependency inversion)
   Binding injects concrete implementation (from network)
   Swap implementation anytime without touching business logic
 
-Step 4 — Verify
+Step 4 — Write tests (during development, not after)
+─────────────────────────────────────────────────────
+  Rule tests → packages/core/test/rules/
+    Test: every input/output combination, edge cases, boundaries
+    Pure Dart — zero mocking needed
+
+  Model tests → packages/core/test/models/
+    Test: fromJson/toJson round-trip, equality, edge values
+
+Step 5 — Verify
 ────────────────
-  Run: dart analyze
+  Run: dart analyze && dart test
 
 Checklist
 ─────────
@@ -282,6 +309,8 @@ Checklist
   [ ] Rules are unit testable without mocking
   [ ] Swapping API = changes only in packages/network/
   [ ] All exports updated in barrel files
+  [ ] Rule tests in packages/core/test/rules/
+  [ ] Model tests in packages/core/test/models/
 ''');
   }
 }
