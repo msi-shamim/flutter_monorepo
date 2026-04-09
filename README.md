@@ -1,6 +1,6 @@
 # flutter_monorepo
 
-A CLI tool that bootstraps a **production-ready Flutter GetX monorepo** in one command.
+A CLI tool that bootstraps a **production-ready Flutter monorepo** in one command — with your choice of state management, locales, and platforms.
 
 ## What you get
 
@@ -9,8 +9,8 @@ A CLI tool that bootstraps a **production-ready Flutter GetX monorepo** in one c
 | **Core** | Sealed exception hierarchy, `Result<T>`, `BaseModel`, `UseCase<T,P>`, repository contracts, string/date/list extensions |
 | **UI** | Full Material 3 theme (30+ component themes, light + dark), responsive utilities, centralized asset management |
 | **Network** | Dio `ApiClient` with `Result<T>` returns, auth + logging interceptors, automatic error mapping |
-| **L10n** | EN/AR localization, locale-aware date/number formatters, RTL `DirectionalityBuilder` |
-| **App** | GetX controllers/bindings/routing, GetStorage persistence (theme + locale), route middleware |
+| **L10n** | Dynamic locale support (12 languages built-in), date/number formatters, RTL helper |
+| **App** | State management of your choice, persistent theme + locale, route middleware, home screen demo |
 | **Linting** | `strict-casts`, `strict-raw-types`, `strict-inference` + 30 production rules |
 | **Docs** | `ARCHITECTURE.md` + `PACKAGE.md` for every package |
 
@@ -24,39 +24,10 @@ dart pub global activate flutter_monorepo
 
 ```bash
 flutter_monorepo my_app
-flutter_monorepo my_app --org com.mycompany
+flutter_monorepo my_app --state riverpod --locales en,es,fr
+flutter_monorepo my_app --state bloc --platforms android,ios,web
+flutter_monorepo my_app --state cubit --locales en --no-git
 ```
-
-This creates:
-
-```
-my_app/
-├── my_app_app/                  # Main Flutter app (GetX)
-├── packages/
-│   ├── core/                    # Business logic (framework-free)
-│   ├── ui/                      # Themes, responsive, assets
-│   ├── network/                 # Dio HTTP client
-│   └── l10n/                    # EN/AR localization
-├── pubspec.yaml                 # Workspace root
-├── analysis_options.yaml        # Strict linting
-└── ARCHITECTURE.md              # Full documentation
-```
-
-## Run your new app
-
-```bash
-cd my_app/my_app_app
-flutter run
-```
-
-## Architecture highlights
-
-- **GetX confined to app** — all shared packages are framework-agnostic
-- **Dependency inversion** — controllers depend on abstract interfaces from `core`, bindings inject implementations from `network`
-- **Sealed error handling** — `DioException` → `AppException` → `Result<T>` → pattern match in controllers
-- **Responsive design** — `Breakpoints`, `ResponsiveHelper` (BuildContext extension), `ResponsiveBuilder`
-- **Theme persistence** — GetStorage saves theme mode + locale across restarts
-- **Type-safe assets** — `AppIcons.home`, `AppImages.logo`, `AppFonts.primary` (no raw path strings)
 
 ## Options
 
@@ -64,9 +35,47 @@ flutter run
 Usage: flutter_monorepo <project_name> [options]
 
 Options:
-  -o, --org     Organization identifier (default: com.example)
-  -h, --help    Show usage information
-      --version Show version
+  -s, --state       State management: getx, riverpod, bloc, cubit (default: getx)
+  -l, --locales     Comma-separated locale codes (default: en,ar)
+  -p, --platforms   Comma-separated platforms (default: android,ios)
+  -o, --org         Organization identifier (default: com.example)
+      --[no-]git    Initialize git with first commit (default: on)
+  -h, --help        Show usage information
+      --version     Show version
+```
+
+## State Management
+
+| Option | Dependencies | Routing | Persistence |
+|--------|-------------|---------|-------------|
+| `--state getx` | get, get_storage | GetX pages | GetStorage |
+| `--state riverpod` | flutter_riverpod, go_router, shared_preferences | GoRouter | SharedPreferences |
+| `--state bloc` | flutter_bloc, hydrated_bloc, go_router | GoRouter | HydratedBloc |
+| `--state cubit` | flutter_bloc, hydrated_bloc, go_router | GoRouter | HydratedCubit |
+
+## Locales
+
+12 languages with built-in translations: **en, ar, es, fr, de, pt, zh, ja, ko, hi, tr, ru**
+
+Unknown locales get English values with TODO markers.
+
+```bash
+flutter_monorepo my_app --locales en,es,fr,de
+```
+
+## Generated Structure
+
+```
+my_app/
+├── my_app_app/                  # Main Flutter app
+├── packages/
+│   ├── core/                    # Business logic (framework-free)
+│   ├── ui/                      # Themes, responsive, assets
+│   ├── network/                 # Dio HTTP client
+│   └── l10n/                    # Localization
+├── pubspec.yaml                 # Workspace root
+├── analysis_options.yaml        # Strict linting
+└── ARCHITECTURE.md              # Documentation
 ```
 
 ## Requirements

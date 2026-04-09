@@ -3,7 +3,7 @@ description: >-
   CLI tool to bootstrap a production-ready Flutter GetX monorepo with
   Material 3 theming, responsive design, Dio networking, localization,
   sealed error handling, and complete documentation — in one command.
-version: 0.1.0
+version: 1.0.0
 homepage: https://github.com/msi-shamim/flutter_monorepo
 repository: https://github.com/msi-shamim/flutter_monorepo
 issue_tracker: https://github.com/msi-shamim/flutter_monorepo/issues

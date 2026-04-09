@@ -1,6 +1,9 @@
-import '../project_config.dart';
+import '../../project_config.dart';
+import 'app_template_strategy.dart';
 
-String appPubspec(ProjectConfig c) => '''
+class GetxTemplateStrategy implements AppTemplateStrategy {
+  @override
+  String appPubspec(ProjectConfig c) => '''
 name: ${c.app}
 description: "A ${c.pascal} Flutter application."
 publish_to: 'none'
@@ -35,7 +38,8 @@ flutter:
   uses-material-design: true
 ''';
 
-String mainDart(ProjectConfig c) => '''
+  @override
+  String mainDart(ProjectConfig c) => '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -64,7 +68,7 @@ class MainApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
+      locale: const Locale('${c.primaryLocale}'),
       initialRoute: AppPages.initial,
       getPages: AppPages.pages,
     );
@@ -72,7 +76,8 @@ class MainApp extends StatelessWidget {
 }
 ''';
 
-String initialBinding() => '''
+  @override
+  String initialBinding(ProjectConfig c) => '''
 import 'package:get/get.dart';
 
 import '../controllers/locale_controller.dart';
@@ -87,7 +92,8 @@ class InitialBinding extends Bindings {
 }
 ''';
 
-String themeController() => '''
+  @override
+  String themeController(ProjectConfig c) => '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -129,7 +135,8 @@ class ThemeController extends GetxController {
 }
 ''';
 
-String localeController() => '''
+  @override
+  String localeController(ProjectConfig c) => '''
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -137,17 +144,14 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 class LocaleController extends GetxController {
-  static const Locale english = Locale('en');
-  static const Locale arabic = Locale('ar');
-  static const List<Locale> supportedLocales = [english, arabic];
+${localeConstants(c)}
   static const _storageKey = 'locale';
 
   final _storage = GetStorage();
-  final _locale = english.obs;
+  final _locale = ${_defaultLocaleVar(c)}.obs;
 
   Locale get locale => _locale.value;
-  bool get isArabic => _locale.value.languageCode == 'ar';
-  bool get isRTL => isArabic;
+  bool get isRTL => _locale.value.languageCode == 'ar';
 
   @override
   void onInit() {
@@ -161,7 +165,7 @@ class LocaleController extends GetxController {
     _storage.write(_storageKey, locale.languageCode);
   }
 
-  void toggleLocale() => setLocale(isArabic ? english : arabic);
+${_localeToggleMethod(c)}
 
   ui.TextDirection get textDirection =>
       isRTL ? ui.TextDirection.rtl : ui.TextDirection.ltr;
@@ -171,7 +175,7 @@ class LocaleController extends GetxController {
     if (stored != null) {
       final locale = supportedLocales.firstWhere(
         (l) => l.languageCode == stored,
-        orElse: () => english,
+        orElse: () => ${_defaultLocaleVar(c)},
       );
       _locale.value = locale;
       Get.updateLocale(locale);
@@ -180,7 +184,8 @@ class LocaleController extends GetxController {
 }
 ''';
 
-String authMiddleware() => '''
+  @override
+  String authMiddleware(ProjectConfig c) => '''
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
@@ -204,13 +209,8 @@ class AuthMiddleware extends GetMiddleware {
 }
 ''';
 
-String appRoutes() => '''
-abstract final class AppRoutes {
-  static const String home = '/home';
-}
-''';
-
-String appPages() => '''
+  @override
+  String appPages(ProjectConfig c) => '''
 import 'package:get/get.dart';
 
 import '../../screens/home/home_binding.dart';
@@ -230,13 +230,18 @@ abstract final class AppPages {
 }
 ''';
 
-String homeController() => '''
+  @override
+  String appRouter(ProjectConfig c) => ''; // GetX uses appPages, not GoRouter
+
+  @override
+  String homeController(ProjectConfig c) => '''
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {}
 ''';
 
-String homeBinding() => '''
+  @override
+  String homeBinding(ProjectConfig c) => '''
 import 'package:get/get.dart';
 
 import 'home_controller.dart';
@@ -249,7 +254,8 @@ class HomeBinding extends Bindings {
 }
 ''';
 
-String homeScreen(ProjectConfig c) => '''
+  @override
+  String homeScreen(ProjectConfig c) => '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
@@ -274,11 +280,11 @@ class HomeScreen extends GetView<HomeController> {
           Obx(
             () => IconButton(
               icon: Text(
-                localeCtrl.isArabic ? 'EN' : '\\u0639',
+                localeCtrl.locale.languageCode.toUpperCase(),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               tooltip: l10n.language,
-              onPressed: localeCtrl.toggleLocale,
+              onPressed: localeCtrl.cycleLocale,
             ),
           ),
           Obx(
@@ -297,3 +303,22 @@ class HomeScreen extends GetView<HomeController> {
   }
 }
 ''';
+}
+
+String _defaultLocaleVar(ProjectConfig c) {
+  const names = {
+    'en': 'english', 'ar': 'arabic', 'es': 'spanish', 'fr': 'french',
+    'de': 'german', 'pt': 'portuguese', 'zh': 'chinese', 'ja': 'japanese',
+    'ko': 'korean', 'hi': 'hindi', 'tr': 'turkish', 'ru': 'russian',
+  };
+  return names[c.primaryLocale] ?? 'locale_${c.primaryLocale}';
+}
+
+String _localeToggleMethod(ProjectConfig c) {
+  // Always use cycleLocale for consistency
+  return '''  void cycleLocale() {
+    final idx = supportedLocales.indexOf(_locale.value);
+    final next = (idx + 1) % supportedLocales.length;
+    setLocale(supportedLocales[next]);
+  }''';
+}

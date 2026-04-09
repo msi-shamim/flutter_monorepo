@@ -6,7 +6,8 @@ import 'templates/core_templates.dart' as core;
 import 'templates/ui_templates.dart' as ui;
 import 'templates/network_templates.dart' as net;
 import 'templates/l10n_templates.dart' as l10n;
-import 'templates/app_templates.dart' as app;
+import 'templates/app/app_template_factory.dart';
+import 'templates/app/app_template_strategy.dart';
 
 class Generator {
   Generator({required this.config, required this.rootPath});
@@ -26,6 +27,7 @@ class Generator {
     await _resolveDependencies();
     await _generateL10n();
     await _analyze();
+    await _initializeGit();
 
     stdout.writeln('');
     stdout.writeln('╔══════════════════════════════════════════════════╗');
@@ -47,7 +49,7 @@ class Generator {
         '--org', config.org,
         '--project-name', config.app,
         '$rootPath/${config.app}',
-        '--platforms', 'android,ios',
+        '--platforms', config.platforms.join(','),
         '--no-pub',
       ],
       runInShell: true,
@@ -60,7 +62,9 @@ class Generator {
   // ── Directories ─────────────────────────────────────────
   void _createDirectories() {
     _log('Creating monorepo structure...');
-    final dirs = [
+
+    final dirs = <String>[
+      // Core
       'packages/core/lib/exceptions',
       'packages/core/lib/models',
       'packages/core/lib/rules',
@@ -68,6 +72,7 @@ class Generator {
       'packages/core/lib/usecases',
       'packages/core/lib/utils',
       'packages/core/lib/extensions',
+      // UI
       'packages/ui/lib/assets',
       'packages/ui/lib/responsive',
       'packages/ui/lib/theme',
@@ -75,19 +80,41 @@ class Generator {
       'packages/ui/assets/icons',
       'packages/ui/assets/fonts',
       'packages/ui/assets/images',
+      // Network
       'packages/network/lib/client',
       'packages/network/lib/interceptors',
       'packages/network/lib/repositories',
+      // L10n
       'packages/l10n/lib/formatters',
       'packages/l10n/lib/widgets',
       'packages/l10n/lib/l10n/arb',
       'packages/l10n/lib/l10n/generated',
-      '${config.app}/lib/app/bindings',
-      '${config.app}/lib/app/controllers',
-      '${config.app}/lib/app/middleware',
+      // App — routes + screens always exist
       '${config.app}/lib/app/routes',
       '${config.app}/lib/screens/home',
     ];
+
+    // State-management-specific app directories
+    switch (config.stateManagement) {
+      case StateManagement.getx:
+        dirs.addAll([
+          '${config.app}/lib/app/bindings',
+          '${config.app}/lib/app/controllers',
+          '${config.app}/lib/app/middleware',
+        ]);
+      case StateManagement.riverpod:
+        dirs.addAll([
+          '${config.app}/lib/app/providers',
+          '${config.app}/lib/app/router',
+        ]);
+      case StateManagement.bloc:
+      case StateManagement.cubit:
+        dirs.addAll([
+          '${config.app}/lib/app/blocs',
+          '${config.app}/lib/app/router',
+        ]);
+    }
+
     for (final dir in dirs) {
       Directory('$rootPath/$dir').createSync(recursive: true);
     }
@@ -163,29 +190,59 @@ class Generator {
     _log('Writing packages/l10n...');
     _write('packages/l10n/pubspec.yaml', l10n.l10nPubspec(config));
     _write('packages/l10n/PACKAGE.md', l10n.l10nPackageMd(config));
-    _write('packages/l10n/l10n.yaml', l10n.l10nYaml());
+    _write('packages/l10n/l10n.yaml', l10n.l10nYaml(config));
     _write('packages/l10n/lib/${config.l10n}.dart', l10n.l10nBarrel());
-    _write('packages/l10n/lib/l10n/arb/app_en.arb', l10n.appEnArb(config));
-    _write('packages/l10n/lib/l10n/arb/app_ar.arb', l10n.appArArb(config));
+    // Dynamic ARB generation for each locale
+    for (final locale in config.locales) {
+      _write(
+        'packages/l10n/lib/l10n/arb/app_$locale.arb',
+        l10n.arbFile(config, locale),
+      );
+    }
     _write('packages/l10n/lib/formatters/date_formatter.dart', l10n.dateFormatter());
     _write('packages/l10n/lib/formatters/number_formatter.dart', l10n.numberFormatter());
     _write('packages/l10n/lib/widgets/directionality_builder.dart', l10n.directionalityBuilder());
   }
 
-  // ── App code ────────────────────────────────────────────
+  // ── App code (strategy pattern) ─────────────────────────
   void _writeAppCode() {
-    _log('Writing app code...');
-    _write('${config.app}/pubspec.yaml', app.appPubspec(config));
-    _write('${config.app}/lib/main.dart', app.mainDart(config));
-    _write('${config.app}/lib/app/bindings/initial_binding.dart', app.initialBinding());
-    _write('${config.app}/lib/app/controllers/theme_controller.dart', app.themeController());
-    _write('${config.app}/lib/app/controllers/locale_controller.dart', app.localeController());
-    _write('${config.app}/lib/app/middleware/auth_middleware.dart', app.authMiddleware());
-    _write('${config.app}/lib/app/routes/app_routes.dart', app.appRoutes());
-    _write('${config.app}/lib/app/routes/app_pages.dart', app.appPages());
-    _write('${config.app}/lib/screens/home/home_controller.dart', app.homeController());
-    _write('${config.app}/lib/screens/home/home_binding.dart', app.homeBinding());
-    _write('${config.app}/lib/screens/home/home_screen.dart', app.homeScreen(config));
+    _log('Writing app code (${config.stateManagement.name})...');
+    final tmpl = createAppTemplates(config.stateManagement);
+
+    _write('${config.app}/pubspec.yaml', tmpl.appPubspec(config));
+    _write('${config.app}/lib/main.dart', tmpl.mainDart(config));
+    _write('${config.app}/lib/app/routes/app_routes.dart', appRoutes());
+
+    // Routing
+    _writeIfNotEmpty('${config.app}/lib/app/routes/app_pages.dart', tmpl.appPages(config));
+    _writeIfNotEmpty('${config.app}/lib/app/router/app_router.dart', tmpl.appRouter(config));
+
+    // State management — write to framework-specific directories
+    final stateDir = switch (config.stateManagement) {
+      StateManagement.getx => 'controllers',
+      StateManagement.riverpod => 'providers',
+      StateManagement.bloc || StateManagement.cubit => 'blocs',
+    };
+    final themeFile = switch (config.stateManagement) {
+      StateManagement.getx => 'theme_controller.dart',
+      StateManagement.riverpod => 'theme_provider.dart',
+      StateManagement.bloc || StateManagement.cubit => 'theme_bloc.dart',
+    };
+    final localeFile = switch (config.stateManagement) {
+      StateManagement.getx => 'locale_controller.dart',
+      StateManagement.riverpod => 'locale_provider.dart',
+      StateManagement.bloc || StateManagement.cubit => 'locale_bloc.dart',
+    };
+
+    _writeIfNotEmpty('${config.app}/lib/app/$stateDir/$themeFile', tmpl.themeController(config));
+    _writeIfNotEmpty('${config.app}/lib/app/$stateDir/$localeFile', tmpl.localeController(config));
+    _writeIfNotEmpty('${config.app}/lib/app/bindings/initial_binding.dart', tmpl.initialBinding(config));
+    _writeIfNotEmpty('${config.app}/lib/app/middleware/auth_middleware.dart', tmpl.authMiddleware(config));
+
+    // Screen
+    _writeIfNotEmpty('${config.app}/lib/screens/home/home_binding.dart', tmpl.homeBinding(config));
+    _writeIfNotEmpty('${config.app}/lib/screens/home/home_controller.dart', tmpl.homeController(config));
+    _write('${config.app}/lib/screens/home/home_screen.dart', tmpl.homeScreen(config));
 
     // Remove flutter create's default test
     final widgetTest = File('$rootPath/${config.app}/test/widget_test.dart');
@@ -230,11 +287,27 @@ class Generator {
     }
   }
 
+  Future<void> _initializeGit() async {
+    if (!config.gitInit) return;
+    _log('Initializing git repository...');
+    await Process.run('git', ['init'], workingDirectory: rootPath, runInShell: true);
+    await Process.run('git', ['add', '.'], workingDirectory: rootPath, runInShell: true);
+    await Process.run(
+      'git', ['commit', '-m', 'Initial commit: ${config.pascal} monorepo'],
+      workingDirectory: rootPath,
+      runInShell: true,
+    );
+  }
+
   // ── Helpers ─────────────────────────────────────────────
   void _write(String relativePath, String content) {
     final file = File('$rootPath/$relativePath');
     file.parent.createSync(recursive: true);
     file.writeAsStringSync(content);
+  }
+
+  void _writeIfNotEmpty(String relativePath, String content) {
+    if (content.trim().isNotEmpty) _write(relativePath, content);
   }
 
   void _log(String message) => stdout.writeln('→ $message');
