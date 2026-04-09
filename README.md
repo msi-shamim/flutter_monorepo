@@ -16,6 +16,7 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Complete documentation** — `ARCHITECTURE.md` + `PACKAGE.md` for every generated package
 - **Auto git init** — initializes repository with first commit (optional)
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
+- **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
 
 Before use, check the [CHANGELOG](CHANGELOG.md) to ensure you have the latest features.
 
@@ -81,6 +82,17 @@ flutter_monorepo doctor --fix
 ```
 
 The doctor auto-detects your project's state management, HTTP client, and locales from existing files — no flags needed. It checks all 80+ expected directories and files, then reports what's present (✓) and what's missing (✗).
+
+### Development Workflows
+
+Get step-by-step development guides right in your terminal:
+
+```bash
+flutter_monorepo workflow        # overview + quick reference
+flutter_monorepo workflow a      # Component Design Flow (widget + companion state)
+flutter_monorepo workflow b      # Screen Design Flow (controller + sections)
+flutter_monorepo workflow c      # Business Logic Flow (core + network + wiring)
+```
 
 ### Options
 

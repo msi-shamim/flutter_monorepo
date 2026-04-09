@@ -6,9 +6,13 @@ import 'package:flutter_monorepo/flutter_monorepo.dart';
 const _validPlatforms = {'android', 'ios', 'web', 'linux', 'macos', 'windows'};
 
 void main(List<String> arguments) async {
-  // ── Doctor subcommand ──────────────────────────────────
+  // ── Subcommands ────────────────────────────────────────
   if (arguments.isNotEmpty && arguments.first == 'doctor') {
     await _runDoctor(arguments.skip(1).toList());
+    return;
+  }
+  if (arguments.isNotEmpty && arguments.first == 'workflow') {
+    _runWorkflow(arguments.skip(1).toList());
     return;
   }
 
@@ -50,6 +54,15 @@ Future<void> _runDoctor(List<String> arguments) async {
 
   final allGood = await doctor.run();
   exit(allGood ? 0 : 1);
+}
+
+// ═════════════════════════════════════════════════════════
+// ── WORKFLOW ─────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════
+
+void _runWorkflow(List<String> arguments) {
+  final flow = arguments.isNotEmpty ? arguments.first : null;
+  Workflow().run(flow);
 }
 
 // ═════════════════════════════════════════════════════════
@@ -195,6 +208,7 @@ Future<void> _runCreate(List<String> arguments) async {
 void _printUsage(ArgParser parser) {
   stdout.writeln('Usage: flutter_monorepo <project_name> [options]');
   stdout.writeln('       flutter_monorepo doctor [--fix]');
+  stdout.writeln('       flutter_monorepo workflow [a|b|c]');
   stdout.writeln('');
   stdout.writeln(
       'Creates a production-ready Flutter monorepo with your chosen stack.');
@@ -204,6 +218,8 @@ void _printUsage(ArgParser parser) {
       '  <project_name>   Create a new monorepo');
   stdout.writeln(
       '  doctor            Check structure integrity of current monorepo');
+  stdout.writeln(
+      '  workflow [a|b|c]  Show development workflow guides');
   stdout.writeln('');
   stdout.writeln('Options:');
   stdout.writeln(parser.usage);
@@ -217,4 +233,6 @@ void _printUsage(ArgParser parser) {
   stdout.writeln('  flutter_monorepo my_app --state cubit --no-git');
   stdout.writeln('  flutter_monorepo doctor');
   stdout.writeln('  flutter_monorepo doctor --fix');
+  stdout.writeln('  flutter_monorepo workflow');
+  stdout.writeln('  flutter_monorepo workflow a');
 }

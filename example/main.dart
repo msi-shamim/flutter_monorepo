@@ -30,6 +30,12 @@
 //   flutter_monorepo doctor
 //   flutter_monorepo doctor --fix
 //
+// Workflow (development guides):
+//   flutter_monorepo workflow          # overview + quick reference
+//   flutter_monorepo workflow a        # Component Design Flow
+//   flutter_monorepo workflow b        # Screen Design Flow
+//   flutter_monorepo workflow c        # Business Logic Flow
+//
 // ═══════════════════════════════════════════════════════════
 // ALL OPTIONS
 // ═══════════════════════════════════════════════════════════
