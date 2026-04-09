@@ -109,6 +109,15 @@ flutter_monorepo workflow c      # Business Logic Flow (core + network + wiring)
 
 You can use `--no-git` to skip git initialization.
 
+| Command | Description |
+|---------|-------------|
+| `doctor` | Check structure integrity of current monorepo |
+| `doctor --fix` | Auto-restore missing directories and files |
+| `workflow` | Show development workflow overview + quick reference |
+| `workflow a` | Component Design Flow (widget + companion state) |
+| `workflow b` | Screen Design Flow (controller + sections) |
+| `workflow c` | Business Logic Flow (core + network + wiring) |
+
 ## State Management
 
 Each framework generates a complete, working app layer with theme switching, locale switching, persistence, and routing:

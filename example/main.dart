@@ -54,6 +54,12 @@
 //       --fix         Auto-restore missing directories and files
 //   -h, --help        Show doctor help
 //
+// Workflow:
+//   flutter_monorepo workflow          Overview + quick reference
+//   flutter_monorepo workflow a        Component Design Flow
+//   flutter_monorepo workflow b        Screen Design Flow
+//   flutter_monorepo workflow c        Business Logic Flow
+//
 // ═══════════════════════════════════════════════════════════
 // GENERATED STRUCTURE
 // ═══════════════════════════════════════════════════════════
@@ -160,9 +166,21 @@ void main() async {
   //   cd my_app && flutter_monorepo doctor
   //   cd my_app && flutter_monorepo doctor --fix
 
+  // 7. Workflow — show development guides programmatically:
+  // Workflow().run(null);   // overview
+  // Workflow().run('a');    // component design flow
+  // Workflow().run('b');    // screen design flow
+  // Workflow().run('c');    // business logic flow
+  //
+  // Or just use the CLI:
+  //   flutter_monorepo workflow a
+
   print('To generate a project, run:');
   print('  flutter_monorepo my_app --state riverpod --locales en,es,fr');
   print('');
   print('To check an existing project:');
   print('  cd my_app && flutter_monorepo doctor');
+  print('');
+  print('To see development workflows:');
+  print('  flutter_monorepo workflow a');
 }
