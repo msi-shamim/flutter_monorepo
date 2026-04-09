@@ -18,6 +18,7 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 - **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
 - **Test-during-development** — every workflow includes a test step; test directories are pre-created so tests are written alongside code, not bolted on later
+- **AI Agent Skills** — generates `.claude/skills/` with 4 ready-to-use skills for Claude Code (component design, screen design, business logic, monorepo doctor) that auto-adapt to your chosen state management framework
 
 Before use, check the [CHANGELOG](CHANGELOG.md) to ensure you have the latest features.
 
@@ -82,17 +83,19 @@ flutter_monorepo doctor
 flutter_monorepo doctor --fix
 ```
 
-The doctor auto-detects your project's state management, HTTP client, and locales from existing files — no flags needed. It checks all 80+ expected directories and files, then reports what's present (✓) and what's missing (✗).
+The doctor auto-detects your project's state management, HTTP client, and locales from existing files — no flags needed. It checks all 95+ expected directories and files, then reports what's present (✓) and what's missing (✗).
 
 ### Development Workflows
 
-Get step-by-step development guides right in your terminal:
+Get step-by-step development guides right in your terminal. When run from inside a generated project, workflows auto-detect your state management framework and show tailored instructions:
 
 ```bash
+cd my_app                        # run from inside your project for tailored output
+
 flutter_monorepo workflow        # overview + quick reference
 flutter_monorepo workflow a      # Component Design Flow (widget + companion state)
-flutter_monorepo workflow b      # Screen Design Flow (controller + sections)
-flutter_monorepo workflow c      # Business Logic Flow (core + network + wiring)
+flutter_monorepo workflow b      # Screen Design Flow (adapts to GetX/Riverpod/Bloc/Cubit)
+flutter_monorepo workflow c      # Business Logic Flow (core + network + framework wiring)
 ```
 
 Each workflow includes a **test step** — tests are written during development, not after. The generated project comes with pre-created test directories:
@@ -122,11 +125,11 @@ You can use `--no-git` to skip git initialization.
 | Command | Description |
 |---------|-------------|
 | `doctor` | Check structure integrity of current monorepo |
-| `doctor --fix` | Auto-restore missing directories and files |
+| `doctor --fix` | Auto-restore missing items (skill files restored with full content) |
 | `workflow` | Show development workflow overview + quick reference |
 | `workflow a` | Component Design Flow (widget + companion state) |
-| `workflow b` | Screen Design Flow (controller + sections) |
-| `workflow c` | Business Logic Flow (core + network + wiring) |
+| `workflow b` | Screen Design Flow (adapts to GetX/Riverpod/Bloc/Cubit) |
+| `workflow c` | Business Logic Flow (adapts wiring step per framework) |
 
 ## State Management
 
@@ -217,10 +220,32 @@ my_app/
 │           ├── l10n/arb/        # ARB files per locale
 │           ├── formatters/      # Date + number formatters
 │           └── widgets/         # RTL DirectionalityBuilder
+├── .claude/                     # AI agent skills
+│   ├── settings.json            # Pre-approved tools
+│   └── skills/
+│       ├── component-design/    # Workflow A skill
+│       ├── screen-design/       # Workflow B skill (adapts per framework)
+│       ├── business-logic/      # Workflow C skill
+│       └── monorepo-doctor/     # Structure check skill
 ├── pubspec.yaml                 # Workspace root
 ├── analysis_options.yaml        # Strict production linting
 └── ARCHITECTURE.md              # Full architecture documentation
 ```
+
+## AI Agent Skills
+
+Every generated project includes `.claude/skills/` — pre-configured skills for [Claude Code](https://claude.ai/code) that teach the AI agent your project's architecture and workflows:
+
+| Skill | Trigger phrases | What it does |
+|-------|----------------|-------------|
+| `component-design` | "Build a component", "Convert this Figma" | Workflow A — widget + companion state + tests |
+| `screen-design` | "Build this screen", "Create a page" | Workflow B — controller + sections + tests |
+| `business-logic` | "Implement this rule", "Add business logic" | Workflow C — core rules + network repo + wiring + tests |
+| `monorepo-doctor` | "Check structure", "What's missing" | Run doctor to verify integrity |
+
+The `screen-design` skill automatically adapts to your chosen state management (GetX controllers, Riverpod providers, Bloc events, or Cubit methods).
+
+Skills are auto-discovered by Claude Code — no setup needed. Just open the project and start building.
 
 ## Programmatic Usage
 

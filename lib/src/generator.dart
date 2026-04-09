@@ -9,6 +9,7 @@ import 'templates/network_templates.dart' as net;
 import 'templates/l10n_templates.dart' as l10n;
 import 'templates/app/app_template_factory.dart';
 import 'templates/app/app_template_strategy.dart';
+import 'templates/skills_templates.dart' as skills;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -35,6 +36,7 @@ class Generator {
     _writeNetworkPackage();
     _writeL10nPackage();
     _writeAppCode();
+    _writeSkills();
     await _resolveDependencies();
     await _generateL10n();
     await _analyze();
@@ -274,6 +276,16 @@ class Generator {
     // Remove flutter create's default test
     final widgetTest = File('$rootPath/${config.app}/test/widget_test.dart');
     if (widgetTest.existsSync()) widgetTest.deleteSync();
+  }
+
+  // ── AI Agent Skills ──────────────────────────────────────
+  void _writeSkills() {
+    _log('Writing AI agent skills...');
+    _write('.claude/settings.json', skills.claudeSettings());
+    _write('.claude/skills/component-design/SKILL.md', skills.componentDesignSkill(config));
+    _write('.claude/skills/screen-design/SKILL.md', skills.screenDesignSkill(config));
+    _write('.claude/skills/business-logic/SKILL.md', skills.businessLogicSkill(config));
+    _write('.claude/skills/monorepo-doctor/SKILL.md', skills.monrepoDoctorSkill(config));
   }
 
   // ── Post-generation commands ────────────────────────────

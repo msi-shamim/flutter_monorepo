@@ -30,11 +30,12 @@
 //   flutter_monorepo doctor
 //   flutter_monorepo doctor --fix
 //
-// Workflow (development guides):
+// Workflow (development guides — auto-detects your framework):
+//   cd my_app                          # run from inside project for tailored output
 //   flutter_monorepo workflow          # overview + quick reference
 //   flutter_monorepo workflow a        # Component Design Flow
-//   flutter_monorepo workflow b        # Screen Design Flow
-//   flutter_monorepo workflow c        # Business Logic Flow
+//   flutter_monorepo workflow b        # Screen Design Flow (adapts to framework)
+//   flutter_monorepo workflow c        # Business Logic Flow (adapts wiring step)
 //
 // Each workflow includes a TEST STEP — tests are written during
 // development, not after. Test directories are pre-created:
@@ -58,7 +59,7 @@
 //       --version     Show version
 //
 // Doctor:
-//       --fix         Auto-restore missing directories and files
+//       --fix         Auto-restore missing items (skill files restored with full content)
 //   -h, --help        Show doctor help
 //
 // Workflow:
@@ -110,6 +111,13 @@
 //   │           ├── l10n/arb/        # ARB files per locale
 //   │           ├── formatters/      # Date + number formatters
 //   │           └── widgets/         # RTL DirectionalityBuilder
+//   ├── .claude/                     # AI agent skills
+//   │   ├── settings.json            # Pre-approved tools
+//   │   └── skills/
+//   │       ├── component-design/    # Workflow A skill
+//   │       ├── screen-design/       # Workflow B skill (adapts per framework)
+//   │       ├── business-logic/      # Workflow C skill
+//   │       └── monorepo-doctor/     # Structure check skill
 //   ├── pubspec.yaml                 # Workspace root
 //   ├── analysis_options.yaml        # Strict production linting
 //   └── ARCHITECTURE.md              # Full documentation
@@ -174,13 +182,23 @@ void main() async {
   //   cd my_app && flutter_monorepo doctor --fix
 
   // 7. Workflow — show development guides programmatically:
-  // Workflow().run(null);   // overview
-  // Workflow().run('a');    // component design flow
-  // Workflow().run('b');    // screen design flow
-  // Workflow().run('c');    // business logic flow
+  // Auto-detects framework when config is provided:
+  // final detected = detectProjectConfig('/path/to/my_app');
+  // Workflow().run(null, config: detected);   // overview
+  // Workflow().run('a');                       // component design flow
+  // Workflow().run('b', config: detected);     // screen design flow (adapts to framework)
+  // Workflow().run('c', config: detected);     // business logic flow (adapts wiring)
   //
-  // Or just use the CLI:
-  //   flutter_monorepo workflow a
+  // Or just use the CLI (auto-detects when run from inside a project):
+  //   cd my_app && flutter_monorepo workflow a
+
+  // 8. AI Agent Skills — generated automatically in .claude/skills/
+  // Skills teach Claude Code your project's architecture and workflows:
+  //   .claude/skills/component-design/SKILL.md  — Workflow A
+  //   .claude/skills/screen-design/SKILL.md     — Workflow B (adapts per framework)
+  //   .claude/skills/business-logic/SKILL.md    — Workflow C
+  //   .claude/skills/monorepo-doctor/SKILL.md   — Structure check
+  // No setup needed — Claude Code auto-discovers skills from .claude/skills/
 
   print('To generate a project, run:');
   print('  flutter_monorepo my_app --state riverpod --locales en,es,fr');

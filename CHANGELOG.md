@@ -1,3 +1,12 @@
+## 1.2.0
+
+- **Framework-aware workflows** — `workflow` command auto-detects your state management (GetX/Riverpod/Bloc/Cubit) and shows framework-specific instructions for screen design and business logic wiring
+- **AI Agent Skills** — generates `.claude/skills/` with 4 Claude Code skills (component-design, screen-design, business-logic, monorepo-doctor) that auto-adapt to your chosen state management framework
+- **`.claude/settings.json`** — pre-approves common tools (Read, Glob, Grep, dart analyze, dart test, flutter test) for seamless AI-assisted development
+- **Smart doctor fix** — `doctor --fix` restores missing skill files and settings.json with **full content**, not empty placeholders
+- Doctor now checks `.claude/skills/` directories and files (4 additional checks)
+- Extracted `detectProjectConfig()` as a shared utility (used by both doctor and workflow)
+
 ## 1.1.0
 
 - **`doctor`**: Structure integrity checker — auto-detects config, reports 89 dirs/files, `--fix` to restore

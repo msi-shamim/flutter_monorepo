@@ -62,7 +62,11 @@ Future<void> _runDoctor(List<String> arguments) async {
 
 void _runWorkflow(List<String> arguments) {
   final flow = arguments.isNotEmpty ? arguments.first : null;
-  Workflow().run(flow);
+  final config = detectProjectConfig(Directory.current.path);
+  if (config != null) {
+    stdout.writeln('→ Detected: ${config.stateManagement.name}');
+  }
+  Workflow().run(flow, config: config);
 }
 
 // ═════════════════════════════════════════════════════════
@@ -112,7 +116,7 @@ Future<void> _runCreate(List<String> arguments) async {
   }
 
   if (args['version'] as bool) {
-    stdout.writeln('flutter_monorepo 1.1.0');
+    stdout.writeln('flutter_monorepo 1.2.0');
     exit(0);
   }
 

@@ -1,3 +1,4 @@
+export 'src/config_detector.dart';
 export 'src/doctor.dart';
 export 'src/generator.dart';
 export 'src/workflow.dart';

@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'config_detector.dart';
 import 'project_config.dart';
+import 'templates/skills_templates.dart' as skills;
 
 /// Diagnoses a generated monorepo's structure integrity.
 ///
@@ -19,12 +21,29 @@ class Doctor {
   int _passed = 0;
   int _missing = 0;
 
+  /// Maps relative file paths to content generators for smart restoration.
+  /// Files in this map get their full content restored instead of empty files.
+  late final Map<String, String> _restorableFiles;
+
   /// Runs the full diagnostic.
   ///
   /// Returns `true` if all checks pass, `false` if anything is missing.
   Future<bool> run() async {
     final config = _detectConfig();
     if (config == null) return false;
+
+    // Build map of files that can be fully restored
+    _restorableFiles = {
+      '.claude/settings.json': skills.claudeSettings(),
+      '.claude/skills/component-design/SKILL.md':
+          skills.componentDesignSkill(config),
+      '.claude/skills/screen-design/SKILL.md':
+          skills.screenDesignSkill(config),
+      '.claude/skills/business-logic/SKILL.md':
+          skills.businessLogicSkill(config),
+      '.claude/skills/monorepo-doctor/SKILL.md':
+          skills.monrepoDoctorSkill(config),
+    };
 
     stdout.writeln('');
     stdout.writeln(
@@ -73,110 +92,40 @@ class Doctor {
       stdout.writeln('  ✗ $relativePath  ← MISSING');
       _missing++;
       if (fix) {
-        _restore(fullPath, isDirectory: isDirectory);
+        _restore(relativePath, fullPath, isDirectory: isDirectory);
       }
     }
   }
 
-  void _restore(String fullPath, {required bool isDirectory}) {
+  void _restore(String relativePath, String fullPath,
+      {required bool isDirectory}) {
     if (isDirectory) {
       Directory(fullPath).createSync(recursive: true);
       stdout.writeln('    → Created directory');
     } else {
       final file = File(fullPath);
       file.parent.createSync(recursive: true);
-      file.writeAsStringSync('');
-      stdout.writeln('    → Created empty file (populate manually)');
+      final content = _restorableFiles[relativePath];
+      if (content != null) {
+        file.writeAsStringSync(content);
+        stdout.writeln('    → Restored with full content');
+      } else {
+        file.writeAsStringSync('');
+        stdout.writeln('    → Created empty file (populate manually)');
+      }
     }
   }
 
   // ── Detection ──────────────────────────────────────────
 
   ProjectConfig? _detectConfig() {
-    // Read root pubspec to get project name
-    final rootPubspec = File('$rootPath/pubspec.yaml');
-    if (!rootPubspec.existsSync()) {
+    final config = detectProjectConfig(rootPath);
+    if (config == null) {
       stderr.writeln(
-          'Error: No pubspec.yaml found. Are you in a flutter_monorepo project root?');
-      return null;
+          'Error: Could not detect project config. '
+          'Are you in a flutter_monorepo project root?');
     }
-
-    final rootContent = rootPubspec.readAsStringSync();
-    final name = _extractYamlValue(rootContent, 'name')
-        ?.replaceAll('_workspace', '');
-    if (name == null) {
-      stderr.writeln('Error: Could not detect project name from pubspec.yaml.');
-      return null;
-    }
-
-    // Detect state management from app pubspec
-    final appPubspecFile = File('$rootPath/${name}_app/pubspec.yaml');
-    final stateManagement = _detectStateManagement(appPubspecFile, name);
-
-    // Detect HTTP client from network pubspec
-    final netPubspecFile = File('$rootPath/packages/network/pubspec.yaml');
-    final httpClient = _detectHttpClient(netPubspecFile);
-
-    // Detect locales from ARB files
-    final locales = _detectLocales();
-
-    return ProjectConfig(
-      name: name,
-      org: 'com.example', // not detectable, not needed for structure check
-      stateManagement: stateManagement,
-      httpClient: httpClient,
-      locales: locales,
-    );
-  }
-
-  StateManagement _detectStateManagement(File pubspecFile, String name) {
-    if (!pubspecFile.existsSync()) return StateManagement.getx;
-    final content = pubspecFile.readAsStringSync();
-
-    if (content.contains('flutter_riverpod:')) return StateManagement.riverpod;
-    if (content.contains('flutter_bloc:')) {
-      // Distinguish Bloc vs Cubit by checking for Cubit usage in app code
-      final blocsDir = Directory('$rootPath/${name}_app/lib/app/blocs');
-      if (blocsDir.existsSync()) {
-        final files = blocsDir.listSync().whereType<File>();
-        for (final f in files) {
-          if (f.readAsStringSync().contains('HydratedCubit')) {
-            return StateManagement.cubit;
-          }
-        }
-      }
-      return StateManagement.bloc;
-    }
-    return StateManagement.getx;
-  }
-
-  HttpClient _detectHttpClient(File pubspecFile) {
-    if (!pubspecFile.existsSync()) return HttpClient.dio;
-    final content = pubspecFile.readAsStringSync();
-
-    if (content.contains('chopper:')) return HttpClient.chopper;
-    if (content.contains('  http:')) return HttpClient.http;
-    return HttpClient.dio;
-  }
-
-  List<String> _detectLocales() {
-    final arbDir = Directory('$rootPath/packages/l10n/lib/l10n/arb');
-    if (!arbDir.existsSync()) return ['en', 'ar'];
-
-    final locales = <String>[];
-    for (final entity in arbDir.listSync()) {
-      if (entity is File) {
-        final name = entity.uri.pathSegments.last;
-        final match = RegExp(r'^app_(\w+)\.arb$').firstMatch(name);
-        if (match != null) locales.add(match.group(1)!);
-      }
-    }
-    return locales.isEmpty ? ['en', 'ar'] : locales;
-  }
-
-  String? _extractYamlValue(String content, String key) {
-    final match = RegExp('^$key:\\s*(.+)', multiLine: true).firstMatch(content);
-    return match?.group(1)?.trim();
+    return config;
   }
 
   // ── Expected structure ─────────────────────────────────
@@ -224,6 +173,11 @@ class Doctor {
       'packages/ui/test/widgets',
       'packages/network/test',
       '${c.app}/test/screens',
+      // AI agent skills
+      '.claude/skills/component-design',
+      '.claude/skills/screen-design',
+      '.claude/skills/business-logic',
+      '.claude/skills/monorepo-doctor',
     ];
 
     switch (c.stateManagement) {
@@ -254,6 +208,12 @@ class Doctor {
       // Root
       'pubspec.yaml',
       'analysis_options.yaml',
+      // AI agent skills
+      '.claude/settings.json',
+      '.claude/skills/component-design/SKILL.md',
+      '.claude/skills/screen-design/SKILL.md',
+      '.claude/skills/business-logic/SKILL.md',
+      '.claude/skills/monorepo-doctor/SKILL.md',
       // Core
       'packages/core/pubspec.yaml',
       'packages/core/PACKAGE.md',
