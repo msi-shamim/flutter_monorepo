@@ -86,6 +86,7 @@ class Generator {
       'packages/core/lib/exceptions',
       'packages/core/lib/models',
       'packages/core/lib/rules',
+      'packages/core/lib/states',
       'packages/core/lib/repositories',
       'packages/core/lib/usecases',
       'packages/core/lib/utils',
@@ -140,6 +141,7 @@ class Generator {
     // .gitkeep for empty dirs
     for (final path in [
       'packages/core/lib/rules/.gitkeep',
+      'packages/core/lib/states/.gitkeep',
       'packages/ui/lib/widgets/.gitkeep',
       'packages/ui/assets/icons/.gitkeep',
       'packages/ui/assets/fonts/.gitkeep',

@@ -243,6 +243,7 @@ Shared business logic, models, and utilities — **framework-free**, **UI-free**
 - Repository interfaces (abstract)
 - Use cases (`UseCase<T,P>`, `NoParamUseCase<T>`)
 - Business rules in `rules/`
+- Companion states for UI components in `states/` (validation, selection, upload progress)
 - Extensions (String, DateTime, List)
 
 ## What is PROHIBITED

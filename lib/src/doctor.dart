@@ -193,6 +193,7 @@ class Doctor {
       'packages/core/lib/exceptions',
       'packages/core/lib/models',
       'packages/core/lib/rules',
+      'packages/core/lib/states',
       'packages/core/lib/repositories',
       'packages/core/lib/usecases',
       'packages/core/lib/utils',
