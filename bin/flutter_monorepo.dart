@@ -112,7 +112,7 @@ Future<void> _runCreate(List<String> arguments) async {
   }
 
   if (args['version'] as bool) {
-    stdout.writeln('flutter_monorepo 1.0.0');
+    stdout.writeln('flutter_monorepo 1.1.0');
     exit(0);
   }
 

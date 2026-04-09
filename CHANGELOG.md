@@ -1,17 +1,22 @@
+## 1.1.0
+
+- **`doctor`**: Structure integrity checker — auto-detects config, reports 89 dirs/files, `--fix` to restore
+- **`workflow`**: Built-in development guides (A: component, B: screen, C: business logic) with test steps and checklists
+- **`--http`**: Choose HTTP client — Dio, http, or Chopper
+- **Test-during-development**: Every workflow includes a test step; 6 test directories pre-created in generated projects
+- **Companion states**: `packages/core/lib/states/` directory for reusable component state logic
+- Auto version resolution from pub.dev — always gets latest compatible versions at generation time
+- Comprehensive README with all features, tables, and examples
+
 ## 1.0.0
 
-- **`doctor`**: Structure integrity checker — auto-detects config, reports missing dirs/files, `--fix` to restore
-- **`workflow`**: Built-in development guides (A: component, B: screen, C: business logic) with test steps and checklists
-- **Test-during-development**: Every workflow includes a test step; test directories pre-created in generated projects
 - **`--state`**: Choose state management — GetX, Riverpod, Bloc, or Cubit
 - **`--locales`**: Dynamic locale support with 12 built-in languages (en, ar, es, fr, de, pt, zh, ja, ko, hi, tr, ru)
-- **`--http`**: Choose HTTP client — Dio, http, or Chopper
 - **`--platforms`**: Target any Flutter platform (android, ios, web, linux, macos, windows)
 - **`--git`**: Auto git init with first commit (on by default)
 - Strategy pattern architecture for clean framework-specific templates
 - GoRouter for Riverpod/Bloc/Cubit, GetX router for GetX
 - SharedPreferences for Riverpod, HydratedBloc for Bloc/Cubit, GetStorage for GetX
-- Auto version resolution from pub.dev — always gets latest compatible versions at generation time
 
 ## 0.1.0
 
