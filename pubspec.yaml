@@ -1,9 +1,7 @@
 name: flutter_monorepo
 description: >-
-  CLI tool to bootstrap a production-ready Flutter monorepo with your choice
-  of state management (GetX, Riverpod, Bloc, Cubit), HTTP client (Dio, http,
-  Chopper), locales, and platforms — in one command. Auto-resolves latest
-  compatible dependency versions from pub.dev.
+  Bootstrap a production-ready Flutter monorepo in one command. Choose state
+  management (GetX/Riverpod/Bloc/Cubit), HTTP client, locales, and platforms.
 version: 1.0.0
 homepage: https://github.com/msi-shamim/flutter_monorepo
 repository: https://github.com/msi-shamim/flutter_monorepo
