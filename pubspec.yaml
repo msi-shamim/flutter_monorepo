@@ -5,6 +5,8 @@ description: >-
   sealed error handling, and complete documentation — in one command.
 version: 0.1.0
 homepage: https://github.com/msi-shamim/flutter_monorepo
+repository: https://github.com/msi-shamim/flutter_monorepo
+issue_tracker: https://github.com/msi-shamim/flutter_monorepo/issues
 license: MIT
 
 environment:
