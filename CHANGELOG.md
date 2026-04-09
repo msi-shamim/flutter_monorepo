@@ -1,7 +1,8 @@
 ## 1.0.0
 
 - **`doctor`**: Structure integrity checker — auto-detects config, reports missing dirs/files, `--fix` to restore
-- **`workflow`**: Built-in development guides (A: component, B: screen, C: business logic) with checklists
+- **`workflow`**: Built-in development guides (A: component, B: screen, C: business logic) with test steps and checklists
+- **Test-during-development**: Every workflow includes a test step; test directories pre-created in generated projects
 - **`--state`**: Choose state management — GetX, Riverpod, Bloc, or Cubit
 - **`--locales`**: Dynamic locale support with 12 built-in languages (en, ar, es, fr, de, pt, zh, ja, ko, hi, tr, ru)
 - **`--http`**: Choose HTTP client — Dio, http, or Chopper

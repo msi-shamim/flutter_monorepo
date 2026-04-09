@@ -217,6 +217,13 @@ class Doctor {
       // App
       '${c.app}/lib/app/routes',
       '${c.app}/lib/screens/home',
+      // Test directories
+      'packages/core/test/states',
+      'packages/core/test/rules',
+      'packages/core/test/models',
+      'packages/ui/test/widgets',
+      'packages/network/test',
+      '${c.app}/test/screens',
     ];
 
     switch (c.stateManagement) {

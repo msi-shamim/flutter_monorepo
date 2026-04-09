@@ -17,6 +17,7 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Auto git init** — initializes repository with first commit (optional)
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 - **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
+- **Test-during-development** — every workflow includes a test step; test directories are pre-created so tests are written alongside code, not bolted on later
 
 Before use, check the [CHANGELOG](CHANGELOG.md) to ensure you have the latest features.
 
@@ -92,6 +93,15 @@ flutter_monorepo workflow        # overview + quick reference
 flutter_monorepo workflow a      # Component Design Flow (widget + companion state)
 flutter_monorepo workflow b      # Screen Design Flow (controller + sections)
 flutter_monorepo workflow c      # Business Logic Flow (core + network + wiring)
+```
+
+Each workflow includes a **test step** — tests are written during development, not after. The generated project comes with pre-created test directories:
+
+```
+packages/core/test/{states, rules, models}/   # companion state + business logic tests
+packages/ui/test/widgets/                      # widget render tests
+packages/network/test/                         # API client tests
+<app>/test/screens/                            # controller tests
 ```
 
 ### Options

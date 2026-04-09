@@ -111,6 +111,13 @@ class Generator {
       // App — routes + screens always exist
       '${config.app}/lib/app/routes',
       '${config.app}/lib/screens/home',
+      // Test directories (tests written during development)
+      'packages/core/test/states',
+      'packages/core/test/rules',
+      'packages/core/test/models',
+      'packages/ui/test/widgets',
+      'packages/network/test',
+      '${config.app}/test/screens',
     ];
 
     // State-management-specific app directories

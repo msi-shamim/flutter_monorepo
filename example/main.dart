@@ -36,6 +36,13 @@
 //   flutter_monorepo workflow b        # Screen Design Flow
 //   flutter_monorepo workflow c        # Business Logic Flow
 //
+// Each workflow includes a TEST STEP — tests are written during
+// development, not after. Test directories are pre-created:
+//   packages/core/test/{states, rules, models}/
+//   packages/ui/test/widgets/
+//   packages/network/test/
+//   <app>/test/screens/
+//
 // ═══════════════════════════════════════════════════════════
 // ALL OPTIONS
 // ═══════════════════════════════════════════════════════════
