@@ -6,6 +6,57 @@ import 'package:flutter_monorepo/flutter_monorepo.dart';
 const _validPlatforms = {'android', 'ios', 'web', 'linux', 'macos', 'windows'};
 
 void main(List<String> arguments) async {
+  // ── Doctor subcommand ──────────────────────────────────
+  if (arguments.isNotEmpty && arguments.first == 'doctor') {
+    await _runDoctor(arguments.skip(1).toList());
+    return;
+  }
+
+  // ── Create (default) ───────────────────────────────────
+  await _runCreate(arguments);
+}
+
+// ═════════════════════════════════════════════════════════
+// ── DOCTOR ───────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════
+
+Future<void> _runDoctor(List<String> arguments) async {
+  final parser = ArgParser()
+    ..addFlag('fix',
+        defaultsTo: false,
+        negatable: false,
+        help: 'Auto-fix missing directories and files')
+    ..addFlag('help',
+        abbr: 'h', negatable: false, help: 'Show doctor usage');
+
+  final args = parser.parse(arguments);
+
+  if (args['help'] as bool) {
+    stdout.writeln('Usage: flutter_monorepo doctor [options]');
+    stdout.writeln('');
+    stdout.writeln(
+        'Checks the current monorepo structure and reports missing items.');
+    stdout.writeln('Run this from inside a generated monorepo root directory.');
+    stdout.writeln('');
+    stdout.writeln('Options:');
+    stdout.writeln(parser.usage);
+    exit(0);
+  }
+
+  final doctor = Doctor(
+    rootPath: Directory.current.path,
+    fix: args['fix'] as bool,
+  );
+
+  final allGood = await doctor.run();
+  exit(allGood ? 0 : 1);
+}
+
+// ═════════════════════════════════════════════════════════
+// ── CREATE ───────────────────────────────────────────────
+// ═════════════════════════════════════════════════════════
+
+Future<void> _runCreate(List<String> arguments) async {
   final parser = ArgParser()
     ..addOption('org',
         abbr: 'o',
@@ -143,9 +194,16 @@ void main(List<String> arguments) async {
 
 void _printUsage(ArgParser parser) {
   stdout.writeln('Usage: flutter_monorepo <project_name> [options]');
+  stdout.writeln('       flutter_monorepo doctor [--fix]');
   stdout.writeln('');
   stdout.writeln(
       'Creates a production-ready Flutter monorepo with your chosen stack.');
+  stdout.writeln('');
+  stdout.writeln('Commands:');
+  stdout.writeln(
+      '  <project_name>   Create a new monorepo');
+  stdout.writeln(
+      '  doctor            Check structure integrity of current monorepo');
   stdout.writeln('');
   stdout.writeln('Options:');
   stdout.writeln(parser.usage);
@@ -157,4 +215,6 @@ void _printUsage(ArgParser parser) {
   stdout.writeln(
       '  flutter_monorepo my_app --state bloc --platforms android,ios,web');
   stdout.writeln('  flutter_monorepo my_app --state cubit --no-git');
+  stdout.writeln('  flutter_monorepo doctor');
+  stdout.writeln('  flutter_monorepo doctor --fix');
 }

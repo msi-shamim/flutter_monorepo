@@ -65,6 +65,22 @@ flutter_monorepo my_app \
   --org com.mycompany
 ```
 
+### Doctor (Structure Check)
+
+After generating a project and sharing it with your team, use `doctor` to verify the monorepo structure is intact:
+
+```bash
+cd my_app
+
+# Check structure — reports missing dirs/files
+flutter_monorepo doctor
+
+# Auto-fix missing items
+flutter_monorepo doctor --fix
+```
+
+The doctor auto-detects your project's state management, HTTP client, and locales from existing files — no flags needed. It checks all 80+ expected directories and files, then reports what's present (✓) and what's missing (✗).
+
 ### Options
 
 | Option | Short | Default | Description |
