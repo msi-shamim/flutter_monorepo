@@ -547,6 +547,7 @@ missing directories or files.
 
 ### Files
 
+- Root: README.md, LICENSE, CONTRIBUTING.md
 - All pubspec.yaml, PACKAGE.md, barrel exports
 - Core: app_exception, base_model, base_repository, use_case, result, extensions
 - UI: app_icons, app_images, app_fonts, breakpoints, responsive, theme files
@@ -554,6 +555,7 @@ missing directories or files.
 - L10n: l10n.yaml, formatters, directionality_builder, ARB files per locale
 - App: main.dart, routes, home screen + framework-specific files
 - Skills: .claude/settings.json + 4 SKILL.md files
+- GitHub: .github/ files (if --github was used)
 
 ## Fixing issues
 

@@ -25,6 +25,12 @@
 // Custom org:
 //   flutter_monorepo my_app --org com.mycompany
 //
+// MIT license:
+//   flutter_monorepo my_app --license mit
+//
+// Full GitHub setup (MIT + community files):
+//   flutter_monorepo my_app --license mit --github
+//
 // Doctor (check structure integrity of existing project):
 //   cd my_app
 //   flutter_monorepo doctor
@@ -53,8 +59,10 @@
 //   -l, --locales     en,ar (default) — comma-separated locale codes
 //   -p, --platforms   android,ios (default) — comma-separated platforms
 //       --http        dio (default), http, chopper
+//       --license     proprietary (default) — license type (mit, apache-2.0, etc.)
 //   -o, --org         com.example (default)
 //       --[no-]git    on by default — auto git init + first commit
+//       --[no-]github off by default — generate GitHub community files
 //   -h, --help        Show help
 //       --version     Show version
 //
@@ -120,7 +128,14 @@
 //   │       └── monorepo-doctor/     # Structure check skill
 //   ├── pubspec.yaml                 # Workspace root
 //   ├── analysis_options.yaml        # Strict production linting
-//   └── ARCHITECTURE.md              # Full documentation
+//   ├── ARCHITECTURE.md              # Full documentation
+//   ├── README.md                    # Project overview + getting started
+//   ├── LICENSE                      # License file (--license option)
+//   ├── CONTRIBUTING.md              # Contribution guidelines
+//   └── .github/                     # (opt-in via --github)
+//       ├── ISSUE_TEMPLATE/          # Bug report + feature request templates
+//       ├── pull_request_template.md # PR checklist
+//       └── workflows/ci.yml        # GitHub Actions CI pipeline
 //
 // ═══════════════════════════════════════════════════════════
 // PROGRAMMATIC USAGE
@@ -135,9 +150,11 @@ void main() async {
     org: 'com.example',
     stateManagement: StateManagement.riverpod,
     httpClient: HttpClient.dio,
+    licenseType: LicenseType.mit,
     locales: ['en', 'es', 'fr'],
     platforms: ['android', 'ios', 'web'],
     gitInit: true,
+    githubFiles: true,
   );
 
   // 2. Print derived names

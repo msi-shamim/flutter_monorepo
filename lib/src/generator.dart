@@ -10,6 +10,8 @@ import 'templates/l10n_templates.dart' as l10n;
 import 'templates/app/app_template_factory.dart';
 import 'templates/app/app_template_strategy.dart';
 import 'templates/skills_templates.dart' as skills;
+import 'templates/license_templates.dart' as license;
+import 'templates/github_templates.dart' as github;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -31,6 +33,7 @@ class Generator {
     await _createFlutterProject();
     _createDirectories();
     _writeRootFiles();
+    _writeGithubFiles();
     _writeCorePackage();
     _writeUiPackage();
     _writeNetworkPackage();
@@ -167,6 +170,24 @@ class Generator {
     _write('pubspec.yaml', root.rootPubspec(config));
     _write('.gitignore', root.rootGitignore());
     _write('analysis_options.yaml', root.analysisOptions());
+    _write('README.md', root.readmeMd(config));
+    _write('LICENSE', license.licenseText(config));
+    _write('CONTRIBUTING.md', root.contributingMd(config));
+  }
+
+  // ── GitHub community files ─────────────────────────────
+  void _writeGithubFiles() {
+    if (!config.githubFiles) return;
+    _log('Writing GitHub community files...');
+    _write('CODE_OF_CONDUCT.md', github.codeOfConduct(config));
+    _write('.github/FUNDING.yml', github.fundingYml(config));
+    _write('.github/ISSUE_TEMPLATE/bug_report.md',
+        github.bugReportTemplate(config));
+    _write('.github/ISSUE_TEMPLATE/feature_request.md',
+        github.featureRequestTemplate(config));
+    _write('.github/pull_request_template.md',
+        github.pullRequestTemplate(config));
+    _write('.github/workflows/ci.yml', github.ciWorkflow(config));
   }
 
   // ── Core package ────────────────────────────────────────

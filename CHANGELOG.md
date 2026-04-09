@@ -1,3 +1,10 @@
+## 1.3.0
+
+- **README.md, LICENSE, CONTRIBUTING.md** — auto-generated for every new monorepo with project-specific content
+- **`--license` option** — choose from 11 GitHub-supported license types (proprietary, mit, apache-2.0, bsd-2-clause, bsd-3-clause, gpl-2.0, gpl-3.0, lgpl-2.1, mpl-2.0, unlicense, isc); defaults to `proprietary`
+- **`--github` flag** — opt-in generation of GitHub community files: issue templates (bug report, feature request), PR template, CI workflow, code of conduct, and funding placeholder
+- **Doctor** checks for README.md, LICENSE, and CONTRIBUTING.md; conditionally checks `.github/` files when present, with full-content restoration via `--fix`
+
 ## 1.2.0
 
 - **Framework-aware workflows** — `workflow` command auto-detects your state management (GetX/Riverpod/Bloc/Cubit) and shows framework-specific instructions for screen design and business logic wiring

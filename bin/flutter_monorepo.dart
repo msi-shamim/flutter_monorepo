@@ -96,6 +96,14 @@ Future<void> _runCreate(List<String> arguments) async {
         defaultsTo: 'dio',
         allowed: ['dio', 'http', 'chopper'],
         help: 'HTTP client library')
+    ..addOption('license',
+        defaultsTo: 'proprietary',
+        allowed: LicenseType.values.map((e) => e.cliName).toList(),
+        help: 'License type for the project')
+    ..addFlag('github',
+        defaultsTo: false,
+        negatable: true,
+        help: 'Generate GitHub community files (.github/ templates, CI)')
     ..addFlag('git',
         defaultsTo: true,
         negatable: true,
@@ -116,7 +124,7 @@ Future<void> _runCreate(List<String> arguments) async {
   }
 
   if (args['version'] as bool) {
-    stdout.writeln('flutter_monorepo 1.2.0');
+    stdout.writeln('flutter_monorepo 1.3.0');
     exit(0);
   }
 
@@ -166,15 +174,18 @@ Future<void> _runCreate(List<String> arguments) async {
   final stateManagement =
       StateManagement.values.byName(args['state'] as String);
   final httpClient = HttpClient.values.byName(args['http'] as String);
+  final licenseType = LicenseType.fromCliName(args['license'] as String);
 
   final config = ProjectConfig(
     name: projectName,
     org: args['org'] as String,
     stateManagement: stateManagement,
     httpClient: httpClient,
+    licenseType: licenseType,
     locales: locales,
     platforms: platforms,
     gitInit: args['git'] as bool,
+    githubFiles: args['github'] as bool,
   );
 
   final targetDir = Directory('${Directory.current.path}/$projectName');
@@ -193,7 +204,9 @@ Future<void> _runCreate(List<String> arguments) async {
   stdout.writeln('║  Locales:    ${config.locales.join(', ')}');
   stdout.writeln('║  Platforms:  ${config.platforms.join(', ')}');
   stdout.writeln('║  Org:        ${config.org}');
+  stdout.writeln('║  License:    ${config.licenseType.displayName}');
   stdout.writeln('║  Git:        ${config.gitInit ? 'yes' : 'no'}');
+  stdout.writeln('║  GitHub:     ${config.githubFiles ? 'yes' : 'no'}');
   stdout.writeln('║  Path:       ${targetDir.path}');
   stdout.writeln('╚══════════════════════════════════════════════════╝');
   stdout.writeln('');
@@ -235,6 +248,7 @@ void _printUsage(ArgParser parser) {
   stdout.writeln(
       '  flutter_monorepo my_app --state bloc --platforms android,ios,web');
   stdout.writeln('  flutter_monorepo my_app --state cubit --no-git');
+  stdout.writeln('  flutter_monorepo my_app --license mit --github');
   stdout.writeln('  flutter_monorepo doctor');
   stdout.writeln('  flutter_monorepo doctor --fix');
   stdout.writeln('  flutter_monorepo workflow');

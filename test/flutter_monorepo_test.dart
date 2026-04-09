@@ -1,4 +1,9 @@
 import 'package:flutter_monorepo/flutter_monorepo.dart';
+import 'package:flutter_monorepo/src/templates/license_templates.dart'
+    as license;
+import 'package:flutter_monorepo/src/templates/root_templates.dart' as root;
+import 'package:flutter_monorepo/src/templates/github_templates.dart'
+    as github;
 import 'package:test/test.dart';
 
 void main() {
@@ -31,9 +36,11 @@ void main() {
       final config = ProjectConfig(name: 'test', org: 'com.example');
       expect(config.stateManagement, StateManagement.getx);
       expect(config.httpClient, HttpClient.dio);
+      expect(config.licenseType, LicenseType.proprietary);
       expect(config.locales, ['en', 'ar']);
       expect(config.platforms, ['android', 'ios']);
       expect(config.gitInit, isTrue);
+      expect(config.githubFiles, isFalse);
     });
 
     test('primaryLocale returns first locale', () {
@@ -377,6 +384,190 @@ void main() {
       expect(routes, isNot(contains('GetX')));
       expect(routes, isNot(contains('Riverpod')));
       expect(routes, isNot(contains('Bloc')));
+    });
+  });
+
+  group('LicenseType', () {
+    test('cliName returns correct identifiers', () {
+      expect(LicenseType.proprietary.cliName, 'proprietary');
+      expect(LicenseType.mit.cliName, 'mit');
+      expect(LicenseType.apache2.cliName, 'apache-2.0');
+      expect(LicenseType.bsd2clause.cliName, 'bsd-2-clause');
+      expect(LicenseType.bsd3clause.cliName, 'bsd-3-clause');
+      expect(LicenseType.gpl2.cliName, 'gpl-2.0');
+      expect(LicenseType.gpl3.cliName, 'gpl-3.0');
+      expect(LicenseType.lgpl21.cliName, 'lgpl-2.1');
+      expect(LicenseType.mpl2.cliName, 'mpl-2.0');
+      expect(LicenseType.unlicense.cliName, 'unlicense');
+      expect(LicenseType.isc.cliName, 'isc');
+    });
+
+    test('displayName returns human-readable names', () {
+      expect(LicenseType.proprietary.displayName, 'Proprietary');
+      expect(LicenseType.mit.displayName, 'MIT');
+      expect(LicenseType.apache2.displayName, 'Apache 2.0');
+    });
+
+    test('fromCliName round-trips all values', () {
+      for (final type in LicenseType.values) {
+        expect(LicenseType.fromCliName(type.cliName), type);
+      }
+    });
+
+    test('fromCliName throws on unknown value', () {
+      expect(
+        () => LicenseType.fromCliName('unknown'),
+        throwsStateError,
+      );
+    });
+  });
+
+  group('License templates', () {
+    test('proprietary contains All Rights Reserved', () {
+      final c = ProjectConfig(
+        name: 'my_app',
+        org: 'com.test',
+        licenseType: LicenseType.proprietary,
+      );
+      final text = license.licenseText(c);
+      expect(text, contains('All Rights Reserved'));
+      expect(text, contains('MyApp'));
+    });
+
+    test('MIT contains MIT License heading', () {
+      final c = ProjectConfig(
+        name: 'my_app',
+        org: 'com.test',
+        licenseType: LicenseType.mit,
+      );
+      final text = license.licenseText(c);
+      expect(text, contains('MIT License'));
+      expect(text, contains('Permission is hereby granted'));
+    });
+
+    test('all licenses contain current year', () {
+      final year = '${DateTime.now().year}';
+      for (final type in LicenseType.values) {
+        final c = ProjectConfig(
+          name: 'test',
+          org: 'com.test',
+          licenseType: type,
+        );
+        final text = license.licenseText(c);
+        // unlicense and mpl2 don't have year/copyright lines
+        if (type != LicenseType.unlicense && type != LicenseType.mpl2) {
+          expect(text, contains(year),
+              reason: '${type.cliName} should contain year');
+        }
+      }
+    });
+
+    test('each license type returns non-empty content', () {
+      for (final type in LicenseType.values) {
+        final c = ProjectConfig(
+          name: 'test',
+          org: 'com.test',
+          licenseType: type,
+        );
+        expect(license.licenseText(c).trim(), isNotEmpty,
+            reason: '${type.cliName} should return non-empty text');
+      }
+    });
+  });
+
+  group('README and CONTRIBUTING templates', () {
+    late ProjectConfig config;
+
+    setUp(() {
+      config = ProjectConfig(
+        name: 'my_app',
+        org: 'com.test',
+        locales: ['en', 'ar'],
+      );
+    });
+
+    test('readmeMd contains project name and structure', () {
+      final readme = root.readmeMd(config);
+      expect(readme, contains('# MyApp'));
+      expect(readme, contains('packages/'));
+      expect(readme, contains('core'));
+      expect(readme, contains('my_app_app'));
+    });
+
+    test('readmeMd reflects state management choice', () {
+      final readme = root.readmeMd(config);
+      expect(readme, contains('getx'));
+    });
+
+    test('readmeMd reflects license type', () {
+      final c = ProjectConfig(
+        name: 'test',
+        org: 'com.test',
+        licenseType: LicenseType.mit,
+      );
+      final readme = root.readmeMd(c);
+      expect(readme, contains('MIT'));
+    });
+
+    test('contributingMd contains contribution guidelines', () {
+      final contributing = root.contributingMd(config);
+      expect(contributing, contains('Contributing'));
+      expect(contributing, contains('feature/'));
+      expect(contributing, contains('fix/'));
+      expect(contributing, contains('dart analyze'));
+      expect(contributing, contains('analysis_options.yaml'));
+    });
+
+    test('contributingMd references correct app package', () {
+      final contributing = root.contributingMd(config);
+      expect(contributing, contains('my_app_app'));
+    });
+  });
+
+  group('GitHub templates', () {
+    late ProjectConfig config;
+
+    setUp(() {
+      config = ProjectConfig(name: 'my_app', org: 'com.test');
+    });
+
+    test('codeOfConduct contains Contributor Covenant', () {
+      final coc = github.codeOfConduct(config);
+      expect(coc, contains('Contributor Covenant'));
+      expect(coc, contains('Code of Conduct'));
+    });
+
+    test('bugReportTemplate contains issue frontmatter', () {
+      final tmpl = github.bugReportTemplate(config);
+      expect(tmpl, contains('name: Bug Report'));
+      expect(tmpl, contains('labels: bug'));
+      expect(tmpl, contains('MyApp'));
+    });
+
+    test('featureRequestTemplate contains issue frontmatter', () {
+      final tmpl = github.featureRequestTemplate(config);
+      expect(tmpl, contains('name: Feature Request'));
+      expect(tmpl, contains('labels: enhancement'));
+    });
+
+    test('pullRequestTemplate contains checklist', () {
+      final tmpl = github.pullRequestTemplate(config);
+      expect(tmpl, contains('- [ ]'));
+      expect(tmpl, contains('dart analyze'));
+      expect(tmpl, contains('dart test'));
+    });
+
+    test('ciWorkflow contains analyze and test jobs', () {
+      final ci = github.ciWorkflow(config);
+      expect(ci, contains('dart analyze'));
+      expect(ci, contains('flutter test'));
+      expect(ci, contains('dart test'));
+      expect(ci, contains('my_app_app'));
+    });
+
+    test('fundingYml contains placeholder comments', () {
+      final funding = github.fundingYml(config);
+      expect(funding, contains('github:'));
     });
   });
 }

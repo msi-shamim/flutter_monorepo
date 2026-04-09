@@ -15,6 +15,8 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Production linting** — `strict-casts`, `strict-raw-types`, `strict-inference` + 30 lint rules
 - **Complete documentation** — `ARCHITECTURE.md` + `PACKAGE.md` for every generated package
 - **Auto git init** — initializes repository with first commit (optional)
+- **Project metadata** — auto-generated `README.md`, `LICENSE`, and `CONTRIBUTING.md` with 11 license types via `--license` (default: proprietary)
+- **GitHub community setup** — opt-in `--github` flag generates issue templates, PR template, CI workflow, code of conduct, and funding placeholder
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 - **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
 - **Test-during-development** — every workflow includes a test step; test directories are pre-created so tests are written alongside code, not bolted on later
@@ -60,13 +62,21 @@ flutter_monorepo my_app --state bloc --http http --platforms android,ios,web
 # Cubit + Chopper + single locale + custom org + no git
 flutter_monorepo my_app --state cubit --http chopper --locales en --org com.mycompany --no-git
 
+# MIT license
+flutter_monorepo my_app --license mit
+
+# Full GitHub setup (MIT license + community files)
+flutter_monorepo my_app --license mit --github
+
 # Full example with all options
 flutter_monorepo my_app \
   --state riverpod \
   --http dio \
+  --license mit \
   --locales en,es,fr,de \
   --platforms android,ios,web \
-  --org com.mycompany
+  --org com.mycompany \
+  --github
 ```
 
 ### Doctor (Structure Check)
@@ -113,14 +123,16 @@ packages/network/test/                         # API client tests
 |--------|-------|---------|-------------|
 | `--state` | `-s` | `getx` | State management: `getx`, `riverpod`, `bloc`, `cubit` |
 | `--http` | | `dio` | HTTP client: `dio`, `http`, `chopper` |
+| `--license` | | `proprietary` | License type: `proprietary`, `mit`, `apache-2.0`, `bsd-2-clause`, `bsd-3-clause`, `gpl-2.0`, `gpl-3.0`, `lgpl-2.1`, `mpl-2.0`, `unlicense`, `isc` |
 | `--locales` | `-l` | `en,ar` | Comma-separated locale codes |
 | `--platforms` | `-p` | `android,ios` | Comma-separated platforms |
 | `--org` | `-o` | `com.example` | Organization identifier for Android/iOS bundle |
 | `--[no-]git` | | on | Initialize git repository with first commit |
+| `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, CI, code of conduct) |
 | `--help` | `-h` | | Show help message |
 | `--version` | | | Show version |
 
-You can use `--no-git` to skip git initialization.
+You can use `--no-git` to skip git initialization, or `--github` to include GitHub community files.
 
 | Command | Description |
 |---------|-------------|
@@ -229,7 +241,14 @@ my_app/
 │       └── monorepo-doctor/     # Structure check skill
 ├── pubspec.yaml                 # Workspace root
 ├── analysis_options.yaml        # Strict production linting
-└── ARCHITECTURE.md              # Full architecture documentation
+├── ARCHITECTURE.md              # Full architecture documentation
+├── README.md                    # Project overview + getting started
+├── LICENSE                      # License file (configurable via --license)
+├── CONTRIBUTING.md              # Contribution guidelines
+└── .github/                     # (opt-in via --github)
+    ├── ISSUE_TEMPLATE/          # Bug report + feature request templates
+    ├── pull_request_template.md # PR checklist
+    └── workflows/ci.yml        # GitHub Actions CI pipeline
 ```
 
 ## AI Agent Skills

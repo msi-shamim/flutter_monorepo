@@ -27,6 +27,76 @@ enum HttpClient {
   chopper,
 }
 
+/// Supported license types (GitHub-compatible).
+enum LicenseType {
+  /// Proprietary — All Rights Reserved.
+  proprietary,
+
+  /// MIT License.
+  mit,
+
+  /// Apache License 2.0.
+  apache2,
+
+  /// BSD 2-Clause "Simplified" License.
+  bsd2clause,
+
+  /// BSD 3-Clause "New" or "Revised" License.
+  bsd3clause,
+
+  /// GNU General Public License v2.0.
+  gpl2,
+
+  /// GNU General Public License v3.0.
+  gpl3,
+
+  /// GNU Lesser General Public License v2.1.
+  lgpl21,
+
+  /// Mozilla Public License 2.0.
+  mpl2,
+
+  /// The Unlicense.
+  unlicense,
+
+  /// ISC License.
+  isc;
+
+  /// CLI-friendly identifier used in `--license` flag.
+  String get cliName => switch (this) {
+        proprietary => 'proprietary',
+        mit => 'mit',
+        apache2 => 'apache-2.0',
+        bsd2clause => 'bsd-2-clause',
+        bsd3clause => 'bsd-3-clause',
+        gpl2 => 'gpl-2.0',
+        gpl3 => 'gpl-3.0',
+        lgpl21 => 'lgpl-2.1',
+        mpl2 => 'mpl-2.0',
+        unlicense => 'unlicense',
+        isc => 'isc',
+      };
+
+  /// Display name for summary output.
+  String get displayName => switch (this) {
+        proprietary => 'Proprietary',
+        mit => 'MIT',
+        apache2 => 'Apache 2.0',
+        bsd2clause => 'BSD 2-Clause',
+        bsd3clause => 'BSD 3-Clause',
+        gpl2 => 'GPL 2.0',
+        gpl3 => 'GPL 3.0',
+        lgpl21 => 'LGPL 2.1',
+        mpl2 => 'MPL 2.0',
+        unlicense => 'Unlicense',
+        isc => 'ISC',
+      };
+
+  /// Parse from CLI string.
+  static LicenseType fromCliName(String name) =>
+      values.firstWhere((e) => e.cliName == name);
+}
+
 /// Holds all derived names and user choices for a project.
 ///
 /// All package names are automatically derived from [name]:
@@ -43,7 +113,9 @@ class ProjectConfig {
     this.locales = const ['en', 'ar'],
     this.platforms = const ['android', 'ios'],
     this.httpClient = HttpClient.dio,
+    this.licenseType = LicenseType.proprietary,
     this.gitInit = true,
+    this.githubFiles = false,
   })  : app = '${name}_app',
         core = '${name}_core',
         ui = '${name}_ui',
@@ -69,8 +141,14 @@ class ProjectConfig {
   /// Chosen HTTP client library.
   final HttpClient httpClient;
 
+  /// Chosen license type for the generated project.
+  final LicenseType licenseType;
+
   /// Whether to auto-initialize git with a first commit.
   final bool gitInit;
+
+  /// Whether to generate GitHub community files (.github/ directory).
+  final bool githubFiles;
 
   /// Populated by [VersionResolver] before template generation.
   late final VersionResolver versions;

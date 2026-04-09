@@ -3,6 +3,9 @@ import 'dart:io';
 import 'config_detector.dart';
 import 'project_config.dart';
 import 'templates/skills_templates.dart' as skills;
+import 'templates/root_templates.dart' as root;
+import 'templates/license_templates.dart' as license;
+import 'templates/github_templates.dart' as github;
 
 /// Diagnoses a generated monorepo's structure integrity.
 ///
@@ -43,7 +46,25 @@ class Doctor {
           skills.businessLogicSkill(config),
       '.claude/skills/monorepo-doctor/SKILL.md':
           skills.monrepoDoctorSkill(config),
+      'README.md': root.readmeMd(config),
+      'LICENSE': license.licenseText(config),
+      'CONTRIBUTING.md': root.contributingMd(config),
     };
+
+    // Add GitHub community files if .github/ directory exists
+    if (Directory('$rootPath/.github').existsSync()) {
+      _restorableFiles.addAll({
+        'CODE_OF_CONDUCT.md': github.codeOfConduct(config),
+        '.github/FUNDING.yml': github.fundingYml(config),
+        '.github/ISSUE_TEMPLATE/bug_report.md':
+            github.bugReportTemplate(config),
+        '.github/ISSUE_TEMPLATE/feature_request.md':
+            github.featureRequestTemplate(config),
+        '.github/pull_request_template.md':
+            github.pullRequestTemplate(config),
+        '.github/workflows/ci.yml': github.ciWorkflow(config),
+      });
+    }
 
     stdout.writeln('');
     stdout.writeln(
@@ -200,6 +221,15 @@ class Doctor {
         ]);
     }
 
+    // GitHub community directories (only if .github/ exists)
+    if (Directory('$rootPath/.github').existsSync()) {
+      dirs.addAll([
+        '.github',
+        '.github/ISSUE_TEMPLATE',
+        '.github/workflows',
+      ]);
+    }
+
     return dirs;
   }
 
@@ -208,6 +238,9 @@ class Doctor {
       // Root
       'pubspec.yaml',
       'analysis_options.yaml',
+      'README.md',
+      'LICENSE',
+      'CONTRIBUTING.md',
       // AI agent skills
       '.claude/settings.json',
       '.claude/skills/component-design/SKILL.md',
@@ -292,6 +325,18 @@ class Doctor {
           '${c.app}/lib/app/blocs/theme_bloc.dart',
           '${c.app}/lib/app/blocs/locale_bloc.dart',
         ]);
+    }
+
+    // GitHub community files (only if .github/ exists)
+    if (Directory('$rootPath/.github').existsSync()) {
+      files.addAll([
+        'CODE_OF_CONDUCT.md',
+        '.github/FUNDING.yml',
+        '.github/ISSUE_TEMPLATE/bug_report.md',
+        '.github/ISSUE_TEMPLATE/feature_request.md',
+        '.github/pull_request_template.md',
+        '.github/workflows/ci.yml',
+      ]);
     }
 
     return files;
