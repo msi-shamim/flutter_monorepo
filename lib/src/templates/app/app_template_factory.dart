@@ -5,6 +5,7 @@ import 'cubit_templates.dart';
 import 'getx_templates.dart';
 import 'riverpod_templates.dart';
 
+/// Returns the [AppTemplateStrategy] for the given [sm] framework.
 AppTemplateStrategy createAppTemplates(StateManagement sm) => switch (sm) {
       StateManagement.getx => GetxTemplateStrategy(),
       StateManagement.riverpod => RiverpodTemplateStrategy(),

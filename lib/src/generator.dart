@@ -10,12 +10,21 @@ import 'templates/l10n_templates.dart' as l10n;
 import 'templates/app/app_template_factory.dart';
 import 'templates/app/app_template_strategy.dart';
 
+/// Orchestrates the generation of a complete Flutter monorepo.
+///
+/// Creates the Flutter project, writes all package templates,
+/// resolves dependencies, and optionally initializes git.
 class Generator {
+  /// Creates a generator for the given [config] at [rootPath].
   Generator({required this.config, required this.rootPath});
 
+  /// The project configuration with all user choices.
   final ProjectConfig config;
+
+  /// Absolute path where the monorepo will be created.
   final String rootPath;
 
+  /// Runs the full generation pipeline.
   Future<void> run() async {
     await _resolveVersions();
     await _createFlutterProject();

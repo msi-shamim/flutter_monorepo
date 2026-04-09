@@ -8,6 +8,11 @@ repository: https://github.com/msi-shamim/flutter_monorepo
 issue_tracker: https://github.com/msi-shamim/flutter_monorepo/issues
 license: MIT
 
+platforms:
+  linux:
+  macos:
+  windows:
+
 environment:
   sdk: ^3.10.4
 
