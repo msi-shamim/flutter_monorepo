@@ -26,7 +26,7 @@ dart pub global activate flutter_monorepo
 flutter_monorepo my_app
 flutter_monorepo my_app --state riverpod --locales en,es,fr
 flutter_monorepo my_app --state bloc --platforms android,ios,web
-flutter_monorepo my_app --state cubit --locales en --no-git
+flutter_monorepo my_app --state cubit --http http --no-git
 ```
 
 ## Options
@@ -38,6 +38,7 @@ Options:
   -s, --state       State management: getx, riverpod, bloc, cubit (default: getx)
   -l, --locales     Comma-separated locale codes (default: en,ar)
   -p, --platforms   Comma-separated platforms (default: android,ios)
+      --http        HTTP client: dio, http, chopper (default: dio)
   -o, --org         Organization identifier (default: com.example)
       --[no-]git    Initialize git with first commit (default: on)
   -h, --help        Show usage information
@@ -52,6 +53,14 @@ Options:
 | `--state riverpod` | flutter_riverpod, go_router, shared_preferences | GoRouter | SharedPreferences |
 | `--state bloc` | flutter_bloc, hydrated_bloc, go_router | GoRouter | HydratedBloc |
 | `--state cubit` | flutter_bloc, hydrated_bloc, go_router | GoRouter | HydratedCubit |
+
+## HTTP Client
+
+| Option | Package | Interceptor Pattern |
+|--------|---------|-------------------|
+| `--http dio` | `dio: ^5.8.0` | Dio `Interceptor` class |
+| `--http http` | `http: ^1.3.0` | `BaseClient` wrapper pattern |
+| `--http chopper` | `chopper: ^8.0.0` | Chopper `Interceptor` interface |
 
 ## Locales
 

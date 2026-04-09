@@ -181,8 +181,8 @@ class Generator {
     _write('packages/network/PACKAGE.md', net.networkPackageMd(config));
     _write('packages/network/lib/${config.network}.dart', net.networkBarrel());
     _write('packages/network/lib/client/api_client.dart', net.apiClient(config));
-    _write('packages/network/lib/interceptors/auth_interceptor.dart', net.authInterceptor());
-    _write('packages/network/lib/interceptors/logging_interceptor.dart', net.loggingInterceptor());
+    _write('packages/network/lib/interceptors/auth_interceptor.dart', net.authInterceptor(config));
+    _write('packages/network/lib/interceptors/logging_interceptor.dart', net.loggingInterceptor(config));
   }
 
   // ── L10n package ────────────────────────────────────────

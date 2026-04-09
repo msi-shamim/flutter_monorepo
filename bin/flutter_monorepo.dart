@@ -24,6 +24,10 @@ void main(List<String> arguments) async {
         abbr: 'p',
         defaultsTo: 'android,ios',
         help: 'Comma-separated platforms (android,ios,web,linux,macos,windows)')
+    ..addOption('http',
+        defaultsTo: 'dio',
+        allowed: ['dio', 'http', 'chopper'],
+        help: 'HTTP client library')
     ..addFlag('git',
         defaultsTo: true,
         negatable: true,
@@ -93,11 +97,13 @@ void main(List<String> arguments) async {
 
   final stateManagement =
       StateManagement.values.byName(args['state'] as String);
+  final httpClient = HttpClient.values.byName(args['http'] as String);
 
   final config = ProjectConfig(
     name: projectName,
     org: args['org'] as String,
     stateManagement: stateManagement,
+    httpClient: httpClient,
     locales: locales,
     platforms: platforms,
     gitInit: args['git'] as bool,
@@ -115,6 +121,7 @@ void main(List<String> arguments) async {
   stdout.writeln('╠══════════════════════════════════════════════════╣');
   stdout.writeln('║  Project:    ${config.name}');
   stdout.writeln('║  State:      ${config.stateManagement.name}');
+  stdout.writeln('║  HTTP:       ${config.httpClient.name}');
   stdout.writeln('║  Locales:    ${config.locales.join(', ')}');
   stdout.writeln('║  Platforms:  ${config.platforms.join(', ')}');
   stdout.writeln('║  Org:        ${config.org}');

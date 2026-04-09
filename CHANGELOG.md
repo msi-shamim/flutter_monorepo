@@ -2,6 +2,7 @@
 
 - **`--state`**: Choose state management — GetX, Riverpod, Bloc, or Cubit
 - **`--locales`**: Dynamic locale support with 12 built-in languages (en, ar, es, fr, de, pt, zh, ja, ko, hi, tr, ru)
+- **`--http`**: Choose HTTP client — Dio, http, or Chopper
 - **`--platforms`**: Target any Flutter platform (android, ios, web, linux, macos, windows)
 - **`--git`**: Auto git init with first commit (on by default)
 - Strategy pattern architecture for clean framework-specific templates

@@ -1,6 +1,9 @@
 /// Supported state management frameworks.
 enum StateManagement { getx, riverpod, bloc, cubit }
 
+/// Supported HTTP client libraries.
+enum HttpClient { dio, http, chopper }
+
 /// Holds all derived names and user choices for a project.
 class ProjectConfig {
   ProjectConfig({
@@ -9,6 +12,7 @@ class ProjectConfig {
     this.stateManagement = StateManagement.getx,
     this.locales = const ['en', 'ar'],
     this.platforms = const ['android', 'ios'],
+    this.httpClient = HttpClient.dio,
     this.gitInit = true,
   })  : app = '${name}_app',
         core = '${name}_core',
@@ -22,6 +26,7 @@ class ProjectConfig {
   final StateManagement stateManagement;
   final List<String> locales;
   final List<String> platforms;
+  final HttpClient httpClient;
   final bool gitInit;
 
   final String app;
