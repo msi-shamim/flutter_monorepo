@@ -25,10 +25,16 @@
 // Custom org:
 //   flutter_monorepo my_app --org com.mycompany
 //
+// Doctor (check structure integrity of existing project):
+//   cd my_app
+//   flutter_monorepo doctor
+//   flutter_monorepo doctor --fix
+//
 // ═══════════════════════════════════════════════════════════
 // ALL OPTIONS
 // ═══════════════════════════════════════════════════════════
 //
+// Create:
 //   -s, --state       getx (default), riverpod, bloc, cubit
 //   -l, --locales     en,ar (default) — comma-separated locale codes
 //   -p, --platforms   android,ios (default) — comma-separated platforms
@@ -37,6 +43,10 @@
 //       --[no-]git    on by default — auto git init + first commit
 //   -h, --help        Show help
 //       --version     Show version
+//
+// Doctor:
+//       --fix         Auto-restore missing directories and files
+//   -h, --help        Show doctor help
 //
 // ═══════════════════════════════════════════════════════════
 // GENERATED STRUCTURE
@@ -136,6 +146,17 @@ void main() async {
   // Or just use the CLI:
   //   flutter_monorepo my_app --state riverpod --locales en,es,fr
 
+  // 6. Doctor — check structure integrity programmatically:
+  // final doctor = Doctor(rootPath: '/path/to/my_app', fix: false);
+  // final allGood = await doctor.run();
+  //
+  // Or just use the CLI:
+  //   cd my_app && flutter_monorepo doctor
+  //   cd my_app && flutter_monorepo doctor --fix
+
   print('To generate a project, run:');
   print('  flutter_monorepo my_app --state riverpod --locales en,es,fr');
+  print('');
+  print('To check an existing project:');
+  print('  cd my_app && flutter_monorepo doctor');
 }

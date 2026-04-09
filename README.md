@@ -15,6 +15,7 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Production linting** — `strict-casts`, `strict-raw-types`, `strict-inference` + 30 lint rules
 - **Complete documentation** — `ARCHITECTURE.md` + `PACKAGE.md` for every generated package
 - **Auto git init** — initializes repository with first commit (optional)
+- **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 
 Before use, check the [CHANGELOG](CHANGELOG.md) to ensure you have the latest features.
 
