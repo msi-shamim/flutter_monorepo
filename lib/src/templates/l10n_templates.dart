@@ -15,12 +15,12 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  intl: ^0.20.2
+  intl: ${c.versions['intl']}
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ${c.versions['flutter_lints']}
 
 flutter:
   generate: true

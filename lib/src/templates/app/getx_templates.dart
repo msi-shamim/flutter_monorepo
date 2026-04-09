@@ -18,8 +18,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  get: ^4.7.2
-  get_storage: ^2.1.1
+  get: ${c.versions['get']}
+  get_storage: ${c.versions['get_storage']}
   ${c.core}:
     path: ../packages/core
   ${c.ui}:
@@ -32,7 +32,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ${c.versions['flutter_lints']}
 
 flutter:
   uses-material-design: true

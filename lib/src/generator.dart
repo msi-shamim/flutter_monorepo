@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'project_config.dart';
+import 'version_resolver.dart';
 import 'templates/root_templates.dart' as root;
 import 'templates/core_templates.dart' as core;
 import 'templates/ui_templates.dart' as ui;
@@ -16,6 +17,7 @@ class Generator {
   final String rootPath;
 
   Future<void> run() async {
+    await _resolveVersions();
     await _createFlutterProject();
     _createDirectories();
     _writeRootFiles();
@@ -37,6 +39,13 @@ class Generator {
     stdout.writeln('║  cd ${config.app} && flutter run');
     stdout.writeln('╚══════════════════════════════════════════════════╝');
     stdout.writeln('');
+  }
+
+  // ── Version resolution ───────────────────────────────────
+  Future<void> _resolveVersions() async {
+    final resolver = VersionResolver();
+    await resolver.resolveAll(config.requiredPackages);
+    config.versions = resolver;
   }
 
   // ── Flutter create ──────────────────────────────────────

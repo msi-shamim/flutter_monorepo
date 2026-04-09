@@ -1,11 +1,12 @@
 import '../project_config.dart';
 
 String networkPubspec(ProjectConfig c) {
-  final dep = switch (c.httpClient) {
-    HttpClient.dio => 'dio: ^5.8.0+1',
-    HttpClient.http => 'http: ^1.3.0',
-    HttpClient.chopper => 'chopper: ^8.0.0+1',
+  final depName = switch (c.httpClient) {
+    HttpClient.dio => 'dio',
+    HttpClient.http => 'http',
+    HttpClient.chopper => 'chopper',
   };
+  final dep = '$depName: ${c.versions[depName]}';
   return '''
 name: ${c.network}
 description: Network layer for ${c.pascal} — HTTP clients, interceptors, API services.
@@ -26,7 +27,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ${c.versions['flutter_lints']}
 ''';
 }
 

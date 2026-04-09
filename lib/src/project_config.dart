@@ -1,3 +1,5 @@
+import 'version_resolver.dart';
+
 /// Supported state management frameworks.
 enum StateManagement { getx, riverpod, bloc, cubit }
 
@@ -29,6 +31,9 @@ class ProjectConfig {
   final HttpClient httpClient;
   final bool gitInit;
 
+  /// Populated by [VersionResolver] before template generation.
+  late final VersionResolver versions;
+
   final String app;
   final String core;
   final String ui;
@@ -41,6 +46,31 @@ class ProjectConfig {
 
   /// Whether the chosen state management uses GoRouter.
   bool get usesGoRouter => stateManagement != StateManagement.getx;
+
+  /// Returns the list of pub.dev packages needed for this configuration.
+  List<String> get requiredPackages {
+    final pkgs = <String>['flutter_lints', 'intl'];
+    // HTTP client
+    switch (httpClient) {
+      case HttpClient.dio:
+        pkgs.add('dio');
+      case HttpClient.http:
+        pkgs.add('http');
+      case HttpClient.chopper:
+        pkgs.add('chopper');
+    }
+    // State management
+    switch (stateManagement) {
+      case StateManagement.getx:
+        pkgs.addAll(['get', 'get_storage']);
+      case StateManagement.riverpod:
+        pkgs.addAll(['flutter_riverpod', 'go_router', 'shared_preferences']);
+      case StateManagement.bloc:
+      case StateManagement.cubit:
+        pkgs.addAll(['flutter_bloc', 'hydrated_bloc', 'go_router', 'path_provider']);
+    }
+    return pkgs;
+  }
 
   static String _toPascalCase(String input) {
     return input

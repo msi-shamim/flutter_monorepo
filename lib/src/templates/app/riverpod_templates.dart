@@ -18,9 +18,9 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_riverpod: ^2.6.1
-  go_router: ^14.8.1
-  shared_preferences: ^2.5.3
+  flutter_riverpod: ${c.versions['flutter_riverpod']}
+  go_router: ${c.versions['go_router']}
+  shared_preferences: ${c.versions['shared_preferences']}
   ${c.core}:
     path: ../packages/core
   ${c.ui}:
@@ -33,7 +33,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ${c.versions['flutter_lints']}
 
 flutter:
   uses-material-design: true

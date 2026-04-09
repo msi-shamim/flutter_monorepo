@@ -18,10 +18,10 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  flutter_bloc: ^9.1.0
-  hydrated_bloc: ^10.0.0
-  go_router: ^14.8.1
-  path_provider: ^2.1.5
+  flutter_bloc: ${c.versions['flutter_bloc']}
+  hydrated_bloc: ${c.versions['hydrated_bloc']}
+  go_router: ${c.versions['go_router']}
+  path_provider: ${c.versions['path_provider']}
   ${c.core}:
     path: ../packages/core
   ${c.ui}:
@@ -34,7 +34,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ${c.versions['flutter_lints']}
 
 flutter:
   uses-material-design: true
