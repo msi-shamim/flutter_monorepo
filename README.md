@@ -58,9 +58,9 @@ Options:
 
 | Option | Package | Interceptor Pattern |
 |--------|---------|-------------------|
-| `--http dio` | `dio: ^5.8.0` | Dio `Interceptor` class |
+| `--http dio` | `dio: ^5.8.0+1` | Dio `Interceptor` class |
 | `--http http` | `http: ^1.3.0` | `BaseClient` wrapper pattern |
-| `--http chopper` | `chopper: ^8.0.0` | Chopper `Interceptor` interface |
+| `--http chopper` | `chopper: ^8.0.0+1` | Chopper `Interceptor` interface |
 
 ## Locales
 

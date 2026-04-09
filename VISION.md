@@ -123,17 +123,20 @@ Generates test directory structure, mock helpers, and example tests for each pac
 
 ---
 
-## Current State (v0.1.0)
+## Current State (v1.0.0)
 
 Shipped with:
-- GetX monorepo (4 shared packages: core, ui, network, l10n)
+- Multi-framework support: GetX, Riverpod, Bloc, Cubit (`--state`)
+- Multi-HTTP client: Dio, http, Chopper (`--http`)
+- Dynamic locale support: 12 built-in languages (`--locales`)
+- Platform flexibility: any Flutter platform combination (`--platforms`)
+- Auto git init with first commit (`--git`)
+- 4 shared packages (core, ui, network, l10n) — all framework-agnostic
 - Full Material 3 theme (light + dark, 30+ component themes)
 - Responsive design utilities
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>
-- Dio HTTP client with error mapping
-- EN/AR localization with formatters + RTL helpers
-- GetStorage persistence (theme + locale)
+- Persistent theme + locale (GetStorage / SharedPreferences / HydratedBloc)
 - Route middleware/guards pattern
 - Strict production linting
 - Complete documentation (ARCHITECTURE.md + PACKAGE.md per package)
