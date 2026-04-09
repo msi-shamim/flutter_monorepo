@@ -137,6 +137,7 @@ Shipped with:
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>
 - Persistent theme + locale (GetStorage / SharedPreferences / HydratedBloc)
+- Auto version resolution from pub.dev (latest compatible within same major)
 - Route middleware/guards pattern
 - Strict production linting
 - Complete documentation (ARCHITECTURE.md + PACKAGE.md per package)

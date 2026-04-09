@@ -8,7 +8,7 @@ A CLI tool that bootstraps a **production-ready Flutter monorepo** in one comman
 |-------|----------|
 | **Core** | Sealed exception hierarchy, `Result<T>`, `BaseModel`, `UseCase<T,P>`, repository contracts, string/date/list extensions |
 | **UI** | Full Material 3 theme (30+ component themes, light + dark), responsive utilities, centralized asset management |
-| **Network** | Dio `ApiClient` with `Result<T>` returns, auth + logging interceptors, automatic error mapping |
+| **Network** | HTTP client of your choice (Dio/http/Chopper), `ApiClient` with `Result<T>` returns, auth + logging interceptors |
 | **L10n** | Dynamic locale support (12 languages built-in), date/number formatters, RTL helper |
 | **App** | State management of your choice, persistent theme + locale, route middleware, home screen demo |
 | **Linting** | `strict-casts`, `strict-raw-types`, `strict-inference` + 30 production rules |
@@ -58,9 +58,21 @@ Options:
 
 | Option | Package | Interceptor Pattern |
 |--------|---------|-------------------|
-| `--http dio` | `dio: ^5.8.0+1` | Dio `Interceptor` class |
-| `--http http` | `http: ^1.3.0` | `BaseClient` wrapper pattern |
-| `--http chopper` | `chopper: ^8.0.0+1` | Chopper `Interceptor` interface |
+| `--http dio` | `dio` | Dio `Interceptor` class |
+| `--http http` | `http` | `BaseClient` wrapper pattern |
+| `--http chopper` | `chopper` | Chopper `Interceptor` interface |
+
+> Versions are auto-resolved from pub.dev at generation time — you always get the latest compatible release.
+
+## Auto Version Resolution
+
+When you run the tool, it queries **pub.dev** to fetch the latest compatible version of every dependency before generating files. It stays within the same major version as our tested templates to ensure API compatibility, and falls back to hardcoded versions if you're offline.
+
+```
+→ Fetching latest package versions from pub.dev...
+```
+
+Example: `dio ^5.8.0+1` (fallback) resolves to `^5.9.2` (latest in major 5).
 
 ## Locales
 
@@ -80,7 +92,7 @@ my_app/
 ├── packages/
 │   ├── core/                    # Business logic (framework-free)
 │   ├── ui/                      # Themes, responsive, assets
-│   ├── network/                 # Dio HTTP client
+│   ├── network/                 # HTTP client (Dio/http/Chopper)
 │   └── l10n/                    # Localization
 ├── pubspec.yaml                 # Workspace root
 ├── analysis_options.yaml        # Strict linting

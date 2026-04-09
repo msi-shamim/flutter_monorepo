@@ -8,6 +8,7 @@
 - Strategy pattern architecture for clean framework-specific templates
 - GoRouter for Riverpod/Bloc/Cubit, GetX router for GetX
 - SharedPreferences for Riverpod, HydratedBloc for Bloc/Cubit, GetStorage for GetX
+- Auto version resolution from pub.dev — always gets latest compatible versions at generation time
 
 ## 0.1.0
 
