@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>flutter_monorepo — Documentation</title>
+  <meta name="description" content="Generate production-ready Flutter monorepos in one command. 4 state managers, 3 HTTP clients, 12 languages, 6 platforms.">
+  <style>
+    :root {
+      --bg: #FAFAF8;
+      --bg-code: #F0EFEB;
+      --bg-card: #FFFFFF;
+      --bg-nav: #1A1A1A;
+      --text: #1A1A1A;
+      --text-secondary: #5A5A58;
+      --text-muted: #8A8A88;
+      --text-nav: #E8E5E0;
+      --accent: #D4A27F;
+      --accent-hover: #C4896A;
+      --border: #E5E3DE;
+      --border-light: #EDEBE6;
+      --success: #4A8C6F;
+      --info: #5B7FA5;
+      --warning: #C4956A;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+      --max-width: 780px;
+      --radius: 8px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1A1A1A; --bg-code: #252525; --bg-card: #222222; --bg-nav: #111111;
+        --text: #E8E5E0; --text-secondary: #B0AEA8; --text-muted: #7A7A78;
+        --border: #333330; --border-light: #2A2A28;
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body { font-family: var(--font-sans); color: var(--text); background: var(--bg); line-height: 1.7; font-size: 16px; -webkit-font-smoothing: antialiased; }
+    nav { position: fixed; top: 0; left: 0; right: 0; background: var(--bg-nav); color: var(--text-nav); z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    nav .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    nav .logo { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; color: var(--text-nav); text-decoration: none; }
+    nav .logo span { color: var(--accent); }
+    nav .nav-links { display: flex; gap: 28px; list-style: none; }
+    nav .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 450; transition: color 0.2s; }
+    nav .nav-links a:hover { color: var(--text-nav); }
+    .layout { max-width: 1200px; margin: 0 auto; padding: 80px 24px 60px; display: flex; gap: 48px; }
+    .sidebar { position: sticky; top: 80px; width: 220px; flex-shrink: 0; height: calc(100vh - 100px); overflow-y: auto; padding: 20px 0; }
+    .sidebar h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; }
+    .sidebar ul { list-style: none; margin-bottom: 24px; }
+    .sidebar ul li a { display: block; padding: 5px 0; font-size: 13.5px; color: var(--text-secondary); text-decoration: none; border-left: 2px solid transparent; padding-left: 12px; transition: all 0.15s; }
+    .sidebar ul li a:hover { color: var(--text); border-left-color: var(--accent); }
+    .content { flex: 1; min-width: 0; max-width: var(--max-width); }
+    .hero { padding: 60px 0 48px; border-bottom: 1px solid var(--border-light); margin-bottom: 48px; }
+    .hero .badge { display: inline-block; background: var(--bg-code); color: var(--accent); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; letter-spacing: 0.5px; }
+    .hero h1 { font-size: 38px; font-weight: 700; line-height: 1.2; letter-spacing: -0.8px; margin-bottom: 16px; }
+    .hero p { font-size: 18px; color: var(--text-secondary); line-height: 1.6; max-width: 600px; }
+    .hero .hero-install { margin-top: 28px; background: var(--bg-nav); color: #E8E5E0; padding: 16px 24px; border-radius: var(--radius); font-family: var(--font-mono); font-size: 15px; display: inline-block; user-select: all; }
+    .hero .hero-install span { color: var(--accent); }
+    section { margin-bottom: 56px; }
+    h2 { font-size: 26px; font-weight: 650; letter-spacing: -0.4px; margin-bottom: 8px; padding-top: 8px; }
+    h2 .section-number { color: var(--accent); font-weight: 500; margin-right: 4px; }
+    h3 { font-size: 19px; font-weight: 600; margin-top: 32px; margin-bottom: 8px; letter-spacing: -0.2px; }
+    p { margin-bottom: 16px; color: var(--text-secondary); }
+    strong { color: var(--text); font-weight: 600; }
+    pre { background: var(--bg-code); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 18px 22px; overflow-x: auto; margin: 16px 0 20px; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.65; }
+    code { font-family: var(--font-mono); font-size: 0.9em; background: var(--bg-code); padding: 2px 6px; border-radius: 4px; }
+    pre code { background: none; padding: 0; font-size: inherit; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+    th { text-align: left; padding: 10px 14px; background: var(--bg-code); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); }
+    tr:last-child td { border-bottom: none; }
+    .callout { padding: 16px 20px; border-radius: var(--radius); margin: 20px 0; border-left: 3px solid; font-size: 14px; }
+    .callout.tip { background: rgba(74, 140, 111, 0.08); border-color: var(--success); }
+    .callout.info { background: rgba(91, 127, 165, 0.08); border-color: var(--info); }
+    .callout.warning { background: rgba(196, 149, 106, 0.08); border-color: var(--warning); }
+    .callout strong { display: block; margin-bottom: 4px; color: var(--text); }
+    hr { border: none; border-top: 1px solid var(--border-light); margin: 48px 0; }
+    ul, ol { margin: 8px 0 16px 20px; color: var(--text-secondary); }
+    li { margin-bottom: 6px; }
+    footer { border-top: 1px solid var(--border-light); padding: 40px 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
+    footer a { color: var(--accent); text-decoration: none; }
+    @media (max-width: 900px) { .sidebar { display: none; } .layout { padding: 72px 16px 40px; } .hero h1 { font-size: 28px; } .hero { padding: 40px 0 36px; } }
+    @media (max-width: 600px) { nav .nav-links { display: none; } }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo"><span>flutter_monorepo</span></a>
+    <ul class="nav-links">
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#options">All Options</a></li>
+      <li><a href="https://pub.dev/packages/flutter_monorepo" target="_blank">pub.dev</a></li>
+      <li><a href="https://github.com/msi-shamim/flutter_monorepo" target="_blank">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h4>Getting Started</h4>
+  <ul>
+    <li><a href="#why">Why This Tool?</a></li>
+    <li><a href="#getting-started">Quick Start</a></li>
+    <li><a href="#project-structure">Project Structure</a></li>
+  </ul>
+  <h4>Features</h4>
+  <ul>
+    <li><a href="#feat-state">1. State Management</a></li>
+    <li><a href="#feat-http">2. HTTP Clients</a></li>
+    <li><a href="#feat-l10n">3. Localization</a></li>
+    <li><a href="#feat-platforms">4. Multi-Platform</a></li>
+    <li><a href="#feat-theme">5. Material 3 Theme</a></li>
+    <li><a href="#feat-arch">6. Clean Architecture</a></li>
+    <li><a href="#feat-errors">7. Error Handling</a></li>
+    <li><a href="#feat-versions">8. Auto Versions</a></li>
+    <li><a href="#feat-doctor">9. Doctor</a></li>
+    <li><a href="#feat-workflow">10. Workflows</a></li>
+    <li><a href="#feat-testing">11. Test Structure</a></li>
+    <li><a href="#feat-skills">12. AI Skills</a></li>
+    <li><a href="#feat-github">13. GitHub Files</a></li>
+    <li><a href="#feat-docs">14. Auto Documentation</a></li>
+    <li><a href="#feat-license">15. License Types</a></li>
+    <li><a href="#feat-linting">16. Production Linting</a></li>
+  </ul>
+  <h4>Reference</h4>
+  <ul>
+    <li><a href="#options">All Options Table</a></li>
+    <li><a href="#examples">Example Combos</a></li>
+    <li><a href="#credits">Credits</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<div class="hero" id="top">
+  <div class="badge">v1.3.0 &middot; 4 State Managers &middot; 3 HTTP Clients &middot; 12 Languages</div>
+  <h1>Production-ready Flutter<br>monorepos in one command.</h1>
+  <p>Generate a complete Flutter monorepo with your choice of state management, HTTP client, localization, and platforms &mdash; fully configured with Material 3 theming, clean architecture, and production linting.</p>
+  <div class="hero-install"><span>dart pub global activate</span> flutter_monorepo</div>
+</div>
+
+<section id="why">
+  <h2>Why This Tool?</h2>
+  <p>Setting up a Flutter monorepo with proper architecture takes days: configuring workspaces, choosing state management, wiring DI, setting up localization with RTL support, building a design system, writing base classes. This tool does it all in <strong>one command</strong>.</p>
+  <p>You pick your stack (GetX or Riverpod? Dio or Chopper?) and get a production-grade monorepo with 5 packages, sealed error handling, Material 3 theming, 12-language support, and 95+ structure checks via the doctor command.</p>
+</section>
+
+<hr>
+
+<section id="getting-started">
+  <h2>Getting Started</h2>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li><strong>Flutter SDK</strong> (stable channel)</li>
+    <li><strong>Dart SDK</strong> ^3.10.4</li>
+  </ul>
+
+  <h3>Step 1: Install the CLI</h3>
+  <pre><code>dart pub global activate flutter_monorepo</code></pre>
+
+  <h3>Step 2: Generate your monorepo</h3>
+  <p>With all defaults (GetX, Dio, English + Arabic):</p>
+  <pre><code>flutter_monorepo my_app</code></pre>
+
+  <h3>Step 3: Run the app</h3>
+  <pre><code>cd my_app/my_app_app
+flutter run</code></pre>
+
+  <div class="callout info">
+    <strong>That's it!</strong>
+    With zero flags, you get a complete monorepo with GetX, Dio, English + Arabic localization, Android + iOS platforms, Material 3 theming, and production linting. Everything below is optional customization.
+  </div>
+</section>
+
+<hr>
+
+<section id="project-structure">
+  <h2>Project Structure</h2>
+  <pre><code>my_app/
+├── my_app_app/                  # Main Flutter app
+│   ├── lib/
+│   │   ├── main.dart            # Entry point with Material 3
+│   │   ├── app/
+│   │   │   ├── routes/          # Route constants
+│   │   │   ├── controllers/     # GetX controllers (or providers/blocs)
+│   │   │   ├── bindings/        # GetX DI (or router/ for others)
+│   │   │   └── middleware/      # Auth middleware (GetX only)
+│   │   └── screens/home/        # Demo home screen
+│   └── test/
+│
+├── packages/
+│   ├── core/                    # Business logic (pure Dart, zero deps)
+│   │   ├── exceptions/          # Sealed AppException hierarchy
+│   │   ├── models/              # BaseModel with equality
+│   │   ├── repositories/        # Abstract interfaces
+│   │   ├── usecases/            # UseCase&lt;T,P&gt; base classes
+│   │   ├── utils/               # Result&lt;T&gt; (Success | Failure)
+│   │   └── extensions/          # String, DateTime, List extensions
+│   │
+│   ├── ui/                      # Design system (framework-agnostic)
+│   │   ├── assets/              # Icons, images, fonts
+│   │   ├── responsive/          # Breakpoints, ResponsiveBuilder
+│   │   ├── theme/               # Colors, spacing, typography, 30+ themes
+│   │   └── widgets/             # Reusable stateless widgets
+│   │
+│   ├── network/                 # HTTP layer (Dio/http/Chopper)
+│   │   ├── client/              # ApiClient returning Result&lt;T&gt;
+│   │   ├── interceptors/        # Auth + logging
+│   │   └── repositories/        # API implementations
+│   │
+│   └── l10n/                    # Localization
+│       ├── l10n/arb/            # ARB files per locale
+│       ├── formatters/          # Date + number formatters
+│       └── widgets/             # DirectionalityBuilder (RTL)
+│
+├── .claude/skills/              # 4 AI agent skills
+├── pubspec.yaml                 # Workspace root
+├── analysis_options.yaml        # Strict linting (30+ rules)
+├── README.md, LICENSE, CONTRIBUTING.md
+└── .gitignore</code></pre>
+</section>
+
+<hr>
+
+<section id="features"><h2>Features</h2></section>
+
+<section id="feat-state">
+  <h2><span class="section-number">01.</span> State Management</h2>
+  <p>Choose from four battle-tested Flutter state management frameworks. Each generates framework-specific controllers, routing, DI, and screen patterns.</p>
+
+  <table>
+    <tr><th>Flag</th><th>Values</th><th>Default</th></tr>
+    <tr><td><code>--state</code> or <code>-s</code></td><td><code>getx</code>, <code>riverpod</code>, <code>bloc</code>, <code>cubit</code></td><td><code>getx</code></td></tr>
+  </table>
+
+  <h3>GetX (default)</h3>
+  <pre><code>flutter_monorepo my_app --state getx</code></pre>
+  <p>Generates <code>GetxController</code> with <code>.obs</code> reactive fields, <code>GetView</code> screens, <code>GetPage</code> routing, <code>Binding</code> for DI, and <code>GetStorage</code> persistence.</p>
+
+  <h3>Riverpod</h3>
+  <pre><code>flutter_monorepo my_app --state riverpod</code></pre>
+  <p>Generates <code>Notifier</code> with state classes, <code>ConsumerWidget</code> screens, <code>GoRouter</code> routing, provider declarations, and <code>SharedPreferences</code> persistence.</p>
+
+  <h3>Bloc</h3>
+  <pre><code>flutter_monorepo my_app --state bloc</code></pre>
+  <p>Generates <code>Bloc</code> with sealed events and states, <code>BlocBuilder</code> screens, <code>GoRouter</code> routing, <code>BlocProvider</code> DI, and <code>HydratedBloc</code> persistence.</p>
+
+  <h3>Cubit</h3>
+  <pre><code>flutter_monorepo my_app --state cubit</code></pre>
+  <p>Generates <code>Cubit</code> with direct <code>emit()</code> methods, <code>BlocBuilder</code> screens, <code>GoRouter</code> routing, and <code>HydratedCubit</code> persistence.</p>
+</section>
+
+<section id="feat-http">
+  <h2><span class="section-number">02.</span> HTTP Clients</h2>
+  <p>All three clients generate an identical <code>ApiClient</code> API surface with generic methods returning <code>Result&lt;T&gt;</code>.</p>
+
+  <table>
+    <tr><th>Flag</th><th>Values</th><th>Default</th></tr>
+    <tr><td><code>--http</code></td><td><code>dio</code>, <code>http</code>, <code>chopper</code></td><td><code>dio</code></td></tr>
+  </table>
+
+  <h3>Dio (default)</h3>
+  <pre><code>flutter_monorepo my_app --http dio</code></pre>
+  <p>Most popular Flutter HTTP client. Full interceptor support, timeout handling, <code>DioException</code> mapping to <code>AppException</code>.</p>
+
+  <h3>http</h3>
+  <pre><code>flutter_monorepo my_app --http http</code></pre>
+  <p>Official Dart team package. Lightweight, minimal dependencies.</p>
+
+  <h3>Chopper</h3>
+  <pre><code>flutter_monorepo my_app --http chopper</code></pre>
+  <p>Type-safe HTTP client with interceptor chain pattern.</p>
+
+  <div class="callout tip">
+    <strong>All clients generate the same methods</strong>
+    <code>get&lt;T&gt;()</code>, <code>getList&lt;T&gt;()</code>, <code>post&lt;T&gt;()</code>, <code>put&lt;T&gt;()</code>, <code>delete()</code> &mdash; all returning <code>Result&lt;T&gt;</code>. Swapping HTTP clients doesn't change your app code.
+  </div>
+</section>
+
+<section id="feat-l10n">
+  <h2><span class="section-number">03.</span> Localization (12 Languages)</h2>
+
+  <table>
+    <tr><th>Flag</th><th>Default</th></tr>
+    <tr><td><code>--locales</code> or <code>-l</code></td><td><code>en,ar</code></td></tr>
+  </table>
+
+  <pre><code># English + Arabic + Spanish + French
+flutter_monorepo my_app --locales en,ar,es,fr</code></pre>
+
+  <p><strong>12 built-in languages:</strong> English, Arabic (RTL), Spanish, French, German, Portuguese, Chinese, Japanese, Korean, Hindi, Turkish, Russian.</p>
+
+  <p>Each locale generates an ARB file with 7 pre-translated strings. Includes:</p>
+  <ul>
+    <li><strong>Date formatter</strong> &mdash; short, medium, long, time, custom patterns</li>
+    <li><strong>Number formatter</strong> &mdash; decimal, currency, compact, percent</li>
+    <li><strong>DirectionalityBuilder</strong> &mdash; widget for RTL layout support</li>
+    <li><strong>Auto gen-l10n</strong> &mdash; <code>flutter gen-l10n</code> runs during generation</li>
+  </ul>
+</section>
+
+<section id="feat-platforms">
+  <h2><span class="section-number">04.</span> Multi-Platform Support</h2>
+
+  <table>
+    <tr><th>Flag</th><th>Default</th></tr>
+    <tr><td><code>--platforms</code> or <code>-p</code></td><td><code>android,ios</code></td></tr>
+  </table>
+
+  <pre><code># All 6 platforms
+flutter_monorepo my_app --platforms android,ios,web,linux,macos,windows</code></pre>
+
+  <p>Any combination of Android, iOS, Web, Linux, macOS, and Windows. Platform files are generated by <code>flutter create</code> under the hood.</p>
+</section>
+
+<section id="feat-theme">
+  <h2><span class="section-number">05.</span> Material 3 Design System</h2>
+  <p>Every project includes a complete Material 3 design system in <code>packages/ui/</code> with light and dark themes.</p>
+  <ul>
+    <li><strong>AppColors</strong> &mdash; Light + dark color schemes</li>
+    <li><strong>AppSpacing</strong> &mdash; Consistent spacing scale</li>
+    <li><strong>AppTypography</strong> &mdash; Text styles with Material 3 type scale</li>
+    <li><strong>AppTheme</strong> &mdash; Complete <code>ThemeData</code> with 30+ component themes (AppBar, Card, Button, Input, Dialog, BottomSheet, Chip, etc.)</li>
+    <li><strong>Responsive utilities</strong> &mdash; Breakpoints (mobileSmall 360, mobile 600, tablet 900, desktop 1200) with <code>ResponsiveBuilder</code></li>
+    <li><strong>Asset management</strong> &mdash; Type-safe <code>AppIcons</code>, <code>AppImages</code>, <code>AppFonts</code> constants</li>
+  </ul>
+</section>
+
+<section id="feat-arch">
+  <h2><span class="section-number">06.</span> Clean Architecture</h2>
+  <p>5 packages following clean architecture principles. The core package has <strong>zero dependencies</strong> on Flutter or any framework.</p>
+
+  <table>
+    <tr><th>Package</th><th>Purpose</th><th>Dependencies</th></tr>
+    <tr><td><code>packages/core</code></td><td>Business logic, models, repositories (interfaces), use cases</td><td>Pure Dart only</td></tr>
+    <tr><td><code>packages/ui</code></td><td>Design system, widgets, responsive utilities</td><td>Flutter only</td></tr>
+    <tr><td><code>packages/network</code></td><td>HTTP client, interceptors, repository implementations</td><td>Core + HTTP client</td></tr>
+    <tr><td><code>packages/l10n</code></td><td>Localization, formatters, RTL support</td><td>Flutter + intl</td></tr>
+    <tr><td><code>my_app_app</code></td><td>App entry point, routing, screens, DI</td><td>All packages + state framework</td></tr>
+  </table>
+</section>
+
+<section id="feat-errors">
+  <h2><span class="section-number">07.</span> Sealed Error Handling</h2>
+  <p>Every project includes a sealed <code>AppException</code> hierarchy and <code>Result&lt;T&gt;</code> pattern.</p>
+
+  <h3>Exception types</h3>
+  <pre><code>sealed class AppException
+├── ApiException (statusCode, endpoint)
+├── CacheException (key)
+├── ValidationException (field, constraint)
+├── NetworkException (isTimeout)
+└── TimeoutException (duration)</code></pre>
+
+  <h3>Result pattern</h3>
+  <pre><code>sealed class Result&lt;T&gt;
+├── Success&lt;T&gt;(T data)
+└── Failure(AppException error)</code></pre>
+
+  <p>All API calls return <code>Result&lt;T&gt;</code>. No uncaught exceptions. Pattern matching with Dart 3 sealed classes.</p>
+</section>
+
+<section id="feat-versions">
+  <h2><span class="section-number">08.</span> Auto Version Resolution</h2>
+  <p>At generation time, the CLI fetches the <strong>latest compatible version</strong> of every dependency from pub.dev. If offline, it falls back to tested hardcoded versions.</p>
+</section>
+
+<section id="feat-doctor">
+  <h2><span class="section-number">09.</span> Doctor Command</h2>
+  <p>Validates your monorepo's structure with <strong>95+ checks</strong>. Auto-detects your project config (state management, HTTP client, locales) from existing files.</p>
+
+  <h3>Check structure</h3>
+  <pre><code>flutter_monorepo doctor</code></pre>
+
+  <h3>Auto-fix missing items</h3>
+  <pre><code>flutter_monorepo doctor --fix</code></pre>
+  <p>Missing files are restored with <strong>full template content</strong> &mdash; not empty placeholders. Skills, settings, README, LICENSE, and configs are all regenerated.</p>
+</section>
+
+<section id="feat-workflow">
+  <h2><span class="section-number">10.</span> Development Workflow Guides</h2>
+  <p>Step-by-step guides that <strong>auto-adapt</strong> to your detected state management framework.</p>
+
+  <pre><code>flutter_monorepo workflow        # Overview
+flutter_monorepo workflow a      # Component Design
+flutter_monorepo workflow b      # Screen Design
+flutter_monorepo workflow c      # Business Logic</code></pre>
+
+  <h3>Workflow A &mdash; Component Design</h3>
+  <p>Build a reusable widget in <code>packages/ui/</code> with optional companion state in <code>packages/core/states/</code>. Framework-agnostic.</p>
+
+  <h3>Workflow B &mdash; Screen Design</h3>
+  <p>Build a full screen with controller/provider/bloc + sections pattern. Adapts to GetX (GetxController + GetView), Riverpod (Notifier + ConsumerWidget), Bloc (Events + States + BlocBuilder), or Cubit (emit + BlocBuilder).</p>
+
+  <h3>Workflow C &mdash; Business Logic</h3>
+  <p>Implement business rules in <code>packages/core/</code>, API calls in <code>packages/network/</code>, and wire DI per framework. Pure Dart logic, swappable implementations.</p>
+</section>
+
+<section id="feat-testing">
+  <h2><span class="section-number">11.</span> Test-During-Development</h2>
+  <p>6 test directories are pre-created so you write tests alongside code, not after:</p>
+  <ul>
+    <li><code>packages/core/test/states/</code> &mdash; Component state unit tests</li>
+    <li><code>packages/core/test/rules/</code> &mdash; Business logic tests</li>
+    <li><code>packages/core/test/models/</code> &mdash; Model serialization tests</li>
+    <li><code>packages/ui/test/widgets/</code> &mdash; Widget render tests</li>
+    <li><code>packages/network/test/</code> &mdash; HTTP client tests</li>
+    <li><code>my_app_app/test/screens/</code> &mdash; Screen controller tests</li>
+  </ul>
+</section>
+
+<section id="feat-skills">
+  <h2><span class="section-number">12.</span> AI Agent Skills</h2>
+  <p>Every project includes 4 Claude Code skills in <code>.claude/skills/</code> that auto-adapt to your framework.</p>
+
+  <table>
+    <tr><th>Skill</th><th>Trigger</th></tr>
+    <tr><td>Component Design</td><td>"Build a component", "Create a widget"</td></tr>
+    <tr><td>Screen Design</td><td>"Build this screen", "Create a page"</td></tr>
+    <tr><td>Business Logic</td><td>"Implement this rule", "Add business logic"</td></tr>
+    <tr><td>Monorepo Doctor</td><td>"Check structure", "What's missing"</td></tr>
+  </table>
+
+  <p>Pre-approved tools in <code>.claude/settings.json</code>: Read, Glob, Grep, <code>dart analyze</code>, <code>dart test</code>, <code>flutter test</code>, <code>flutter gen-l10n</code>, <code>dart pub get</code>, <code>dart format</code>.</p>
+</section>
+
+<section id="feat-github">
+  <h2><span class="section-number">13.</span> GitHub Community Files</h2>
+  <table>
+    <tr><th>Flag</th><th>Default</th></tr>
+    <tr><td><code>--github</code></td><td><code>false</code></td></tr>
+  </table>
+  <pre><code>flutter_monorepo my_app --github</code></pre>
+  <p>Generates CI workflow, bug/feature issue templates, PR template, code of conduct, and funding placeholder.</p>
+</section>
+
+<section id="feat-docs">
+  <h2><span class="section-number">14.</span> Auto-Generated Documentation</h2>
+  <p>Every project gets:</p>
+  <ul>
+    <li><strong>README.md</strong> &mdash; Project overview with tech stack, structure, and getting started</li>
+    <li><strong>LICENSE</strong> &mdash; Full legal text for your chosen license type</li>
+    <li><strong>CONTRIBUTING.md</strong> &mdash; Contribution guidelines</li>
+    <li><strong>PACKAGE.md</strong> &mdash; Per-package documentation (core, ui, network, l10n)</li>
+  </ul>
+</section>
+
+<section id="feat-license">
+  <h2><span class="section-number">15.</span> License Types (11)</h2>
+  <table>
+    <tr><th>Flag</th><th>Default</th></tr>
+    <tr><td><code>--license</code></td><td><code>proprietary</code></td></tr>
+  </table>
+  <pre><code>flutter_monorepo my_app --license mit</code></pre>
+  <p>Supported: <code>proprietary</code>, <code>mit</code>, <code>apache-2.0</code>, <code>bsd-2-clause</code>, <code>bsd-3-clause</code>, <code>gpl-2.0</code>, <code>gpl-3.0</code>, <code>lgpl-2.1</code>, <code>mpl-2.0</code>, <code>unlicense</code>, <code>isc</code>.</p>
+</section>
+
+<section id="feat-linting">
+  <h2><span class="section-number">16.</span> Production Linting</h2>
+  <p>Every project ships with strict, production-grade analysis:</p>
+  <ul>
+    <li><strong>strict-casts</strong>, <strong>strict-raw-types</strong>, <strong>strict-inference</strong> enabled</li>
+    <li><strong>30+ lint rules</strong> including const constructors, null safety, RTL safety</li>
+    <li>Based on <code>package:lints/recommended.yaml</code></li>
+  </ul>
+  <pre><code>dart analyze          # Run analysis
+dart format .         # Format code</code></pre>
+</section>
+
+<hr>
+
+<section id="options">
+  <h2>All Options Reference</h2>
+  <table>
+    <tr><th>Flag</th><th>Values</th><th>Default</th></tr>
+    <tr><td><code>--state, -s</code></td><td>getx, riverpod, bloc, cubit</td><td>getx</td></tr>
+    <tr><td><code>--http</code></td><td>dio, http, chopper</td><td>dio</td></tr>
+    <tr><td><code>--locales, -l</code></td><td>Comma-separated locale codes</td><td>en,ar</td></tr>
+    <tr><td><code>--platforms, -p</code></td><td>android, ios, web, linux, macos, windows</td><td>android,ios</td></tr>
+    <tr><td><code>--org, -o</code></td><td>Organization identifier</td><td>com.example</td></tr>
+    <tr><td><code>--license</code></td><td>proprietary, mit, apache-2.0, ...</td><td>proprietary</td></tr>
+    <tr><td><code>--git / --no-git</code></td><td>boolean</td><td>true</td></tr>
+    <tr><td><code>--github</code></td><td>boolean</td><td>false</td></tr>
+  </table>
+</section>
+
+<hr>
+
+<section id="examples">
+  <h2>Example Combinations</h2>
+
+  <h3>Default (GetX + Dio + English/Arabic)</h3>
+  <pre><code>flutter_monorepo my_app</code></pre>
+
+  <h3>Riverpod + All Platforms + 4 Languages</h3>
+  <pre><code>flutter_monorepo my_app \
+  --state riverpod \
+  --http dio \
+  --locales en,ar,es,fr \
+  --platforms android,ios,web,macos \
+  --license mit \
+  --github</code></pre>
+
+  <h3>Bloc + Chopper + Full i18n</h3>
+  <pre><code>flutter_monorepo my_app \
+  --state bloc \
+  --http chopper \
+  --locales en,ar,es,fr,de,pt,zh,ja,ko,hi,tr,ru \
+  --org com.mycompany</code></pre>
+
+  <h3>Minimal (Cubit + http package)</h3>
+  <pre><code>flutter_monorepo my_app \
+  --state cubit \
+  --http http \
+  --locales en \
+  --platforms android \
+  --no-git</code></pre>
+</section>
+
+<hr>
+
+<section id="credits">
+  <h2>Credits &amp; License</h2>
+  <p>Built by <strong>MSI Shamim</strong> &mdash; <a href="https://github.com/msi-shamim" target="_blank">GitHub</a> &middot; <a href="mailto:im.msishamim@gmail.com">Email</a></p>
+  <p>MIT License. Open source. Published on <a href="https://pub.dev/packages/flutter_monorepo" target="_blank">pub.dev</a>.</p>
+
+  <div class="callout info">
+    <strong>Also by the same author</strong>
+    <a href="https://www.npmjs.com/package/@msishamim/create-next-monorepo" target="_blank">@msishamim/create-next-monorepo</a> &mdash; the same architecture pattern for Next.js + NestJS/Express monorepos (npm, 22 CLI options). Both tools share the strategy-pattern architecture, doctor/workflow commands, and AI skills system.
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>&copy; 2026 MSI Shamim &middot; <a href="https://pub.dev/packages/flutter_monorepo">pub.dev</a> &middot; <a href="https://github.com/msi-shamim/flutter_monorepo">GitHub</a></p>
+</footer>
+
+</body>
+</html>
