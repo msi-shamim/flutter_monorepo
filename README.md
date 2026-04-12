@@ -2,6 +2,13 @@
 
 A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one command — with your choice of state management, HTTP client, locales, and platforms.
 
+[![pub version](https://img.shields.io/pub/v/flutter_monorepo)](https://pub.dev/packages/flutter_monorepo)
+[![pub points](https://img.shields.io/pub/points/flutter_monorepo)](https://pub.dev/packages/flutter_monorepo/score)
+[![license](https://img.shields.io/github/license/msi-shamim/flutter_monorepo)](LICENSE)
+[![Dart](https://img.shields.io/badge/Dart-%5E3.10.4-blue?logo=dart&logoColor=white)](https://dart.dev)
+[![GitHub issues](https://img.shields.io/github/issues/msi-shamim/flutter_monorepo)](https://github.com/msi-shamim/flutter_monorepo/issues)
+[![GitHub stars](https://img.shields.io/github/stars/msi-shamim/flutter_monorepo?style=social)](https://github.com/msi-shamim/flutter_monorepo)
+
 ## Features
 
 - **Multi-framework support** — GetX, Riverpod, Bloc, or Cubit via `--state`
