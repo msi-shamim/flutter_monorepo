@@ -115,23 +115,52 @@ List<String> _splitList(String? value) {
 
 StateManagement _detectStateManagement(
     File pubspecFile, String name, String rootPath) {
-  if (!pubspecFile.existsSync()) return StateManagement.getx;
+  if (!pubspecFile.existsSync()) {
+    // The pubspec is the strongest signal, but a project missing it is exactly
+    // the case doctor is meant to help with. Defaulting to GetX here made a
+    // Riverpod project look like a GetX one, so --fix wrote GetX scaffolding
+    // into it. The framework-specific directories are the next best evidence.
+    return _detectStateManagementFromLayout(name, rootPath) ??
+        StateManagement.getx;
+  }
   final content = pubspecFile.readAsStringSync();
 
   if (content.contains('flutter_riverpod:')) return StateManagement.riverpod;
   if (content.contains('flutter_bloc:')) {
-    final blocsDir = Directory('$rootPath/${name}_app/lib/app/blocs');
-    if (blocsDir.existsSync()) {
-      final files = blocsDir.listSync().whereType<File>();
-      for (final f in files) {
-        if (f.readAsStringSync().contains('HydratedCubit')) {
-          return StateManagement.cubit;
-        }
-      }
-    }
-    return StateManagement.bloc;
+    return _blocOrCubit('$rootPath/${name}_app/lib/app/blocs');
   }
   return StateManagement.getx;
+}
+
+/// Infers the framework from the directories the generator creates for it.
+///
+/// Returns `null` when the layout is ambiguous, leaving the caller to decide.
+StateManagement? _detectStateManagementFromLayout(String name, String rootPath) {
+  final appDir = '$rootPath/${name}_app/lib/app';
+  if (Directory('$appDir/providers').existsSync()) {
+    return StateManagement.riverpod;
+  }
+  if (Directory('$appDir/blocs').existsSync()) {
+    return _blocOrCubit('$rootPath/${name}_app/lib/app/blocs');
+  }
+  if (Directory('$appDir/controllers').existsSync() ||
+      Directory('$appDir/bindings').existsSync()) {
+    return StateManagement.getx;
+  }
+  return null;
+}
+
+/// Distinguishes cubit from bloc by the base class the generated files use.
+StateManagement _blocOrCubit(String blocsPath) {
+  final blocsDir = Directory(blocsPath);
+  if (blocsDir.existsSync()) {
+    for (final f in blocsDir.listSync().whereType<File>()) {
+      if (f.readAsStringSync().contains('HydratedCubit')) {
+        return StateManagement.cubit;
+      }
+    }
+  }
+  return StateManagement.bloc;
 }
 
 HttpClient _detectHttpClient(File pubspecFile) {

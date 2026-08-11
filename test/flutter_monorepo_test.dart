@@ -193,6 +193,56 @@ void main() {
     });
   });
 
+  group('Framework detection without the app pubspec', () {
+    /// Builds a pre-marker monorepo skeleton whose app has [stateDir].
+    Directory skeleton(String stateDir) {
+      final dir = Directory.systemTemp.createTempSync('fm_layout');
+      File('${dir.path}/pubspec.yaml').writeAsStringSync(
+          'name: my_app_workspace\nworkspace:\n  - my_app_app\n');
+      Directory('${dir.path}/packages/core').createSync(recursive: true);
+      Directory('${dir.path}/packages/l10n').createSync(recursive: true);
+      Directory('${dir.path}/my_app_app/lib/app/$stateDir')
+          .createSync(recursive: true);
+      return dir;
+    }
+
+    test('falls back to the layout instead of defaulting to GetX', () {
+      final dir = skeleton('providers');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      expect(detectProjectConfig(dir.path)!.stateManagement,
+          StateManagement.riverpod);
+    });
+
+    test('distinguishes cubit from bloc by base class', () {
+      final dir = skeleton('blocs');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/my_app_app/lib/app/blocs/theme_bloc.dart')
+          .writeAsStringSync('class ThemeCubit extends HydratedCubit<int> {}');
+      expect(detectProjectConfig(dir.path)!.stateManagement,
+          StateManagement.cubit);
+    });
+
+    test('still reports GetX for a GetX layout', () {
+      final dir = skeleton('controllers');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      expect(
+          detectProjectConfig(dir.path)!.stateManagement, StateManagement.getx);
+    });
+
+    test('a marker outranks the layout entirely', () {
+      final dir = skeleton('controllers');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/$projectMarkerFile').writeAsStringSync(
+          root.projectMarker(ProjectConfig(
+        name: 'my_app',
+        org: 'com.example',
+        stateManagement: StateManagement.bloc,
+      )));
+      expect(
+          detectProjectConfig(dir.path)!.stateManagement, StateManagement.bloc);
+    });
+  });
+
   group('ProjectConfig', () {
     test('derives all package names from project name', () {
       final config = ProjectConfig(name: 'my_app', org: 'com.example');
