@@ -1,7 +1,13 @@
 import '../../project_config.dart';
 import '../../version.dart';
 import '../storage_templates.dart';
+import '../flavor_helpers.dart';
 import 'app_template_strategy.dart';
+
+/// Start-up lines for the Riverpod entrypoint.
+const _riverpodBootstrapBody =
+    '  await initAppStore();\n'
+    '  runApp(const ProviderScope(child: MainApp()));\n';
 
 class RiverpodTemplateStrategy extends AppTemplateStrategy {
   @override
@@ -54,16 +60,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
 import 'package:${c.ui}/${c.ui}.dart';
 
-import 'app/providers/locale_provider.dart';
+${flavorBootstrapImport(c)}import 'app/providers/locale_provider.dart';
 import 'app/providers/theme_provider.dart';
 import 'app/router/app_router.dart';
 import 'app/storage/app_store.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initAppStore();
-  runApp(const ProviderScope(child: MainApp()));
-}
+${mainEntrypoint(c, _riverpodBootstrapBody)}
 
 class MainApp extends ConsumerWidget {
   const MainApp({super.key});

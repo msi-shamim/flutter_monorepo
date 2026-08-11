@@ -1,9 +1,17 @@
 import '../../project_config.dart';
 import 'app_template_strategy.dart';
 import 'bloc_templates.dart';
+import '../flavor_helpers.dart';
 
 /// Cubit shares most of Bloc's structure — only the state classes differ.
 /// Controllers use `Cubit` with direct `emit()` instead of `Bloc` with events.
+/// Start-up lines shared by the Cubit entrypoints.
+const _cubitBootstrapBody =
+    '  await initAppStore();\n'
+    '  // Cubit hydration goes through the same backend as everything else.\n'
+    '  HydratedBloc.storage = KeyValueHydratedStorage(appStore);\n'
+    '  runApp(const MainApp());\n';
+
 class CubitTemplateStrategy extends AppTemplateStrategy {
   final _bloc = BlocTemplateStrategy();
 
@@ -19,19 +27,13 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
 import 'package:${c.ui}/${c.ui}.dart';
 
-import 'app/blocs/locale_bloc.dart';
+${flavorBootstrapImport(c)}import 'app/blocs/locale_bloc.dart';
 import 'app/blocs/theme_bloc.dart';
 import 'app/router/app_router.dart';
 import 'app/storage/app_store.dart';
 import 'app/storage/hydrated_store.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initAppStore();
-  // Bloc hydration goes through the same backend as everything else.
-  HydratedBloc.storage = KeyValueHydratedStorage(appStore);
-  runApp(const MainApp());
-}
+${mainEntrypoint(c, _cubitBootstrapBody)}
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

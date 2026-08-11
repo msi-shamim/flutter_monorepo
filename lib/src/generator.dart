@@ -14,6 +14,7 @@ import 'templates/license_templates.dart' as license;
 import 'templates/github_templates.dart' as github;
 import 'templates/ci_templates.dart' as ci;
 import 'templates/storage_templates.dart' as storage;
+import 'templates/flavor_templates.dart' as flavor;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -51,6 +52,7 @@ class Generator {
     _writeL10nPackage();
     _writeAppCode();
     _writeSkills();
+    _writeFlavors();
     await _resolveDependencies();
     await _generateL10n();
     await _formatCode();
@@ -504,6 +506,76 @@ class Generator {
       '.claude/skills/monorepo-doctor/SKILL.md',
       skills.monrepoDoctorSkill(config),
     );
+  }
+
+  // ── Build flavors ───────────────────────────────────────
+  void _writeFlavors() {
+    if (!config.flavors) return;
+    _log('Writing build flavors...');
+
+    _write(
+      '${config.app}/lib/app/config/app_environment.dart',
+      flavor.appEnvironment(config),
+    );
+    for (final name in flavor.flavorNames) {
+      _write(
+        '${config.app}/lib/main_$name.dart',
+        flavor.flavorEntrypoint(config, name),
+      );
+    }
+    _write('FLAVORS.md', flavor.flavorsDoc(config));
+
+    if (config.platforms.contains('android')) _patchAndroidFlavors();
+
+    if (config.platforms.contains('ios')) {
+      for (final name in flavor.flavorNames) {
+        _write(
+          '${config.app}/ios/Flutter/$name.xcconfig',
+          flavor.iosFlavorConfig(config, name),
+        );
+      }
+    }
+  }
+
+  /// Injects product flavors into the build file `flutter create` produced.
+  ///
+  /// Patching generated Gradle is inherently version-sensitive, so a failure
+  /// to find the anchor is reported rather than silently skipped.
+  void _patchAndroidFlavors() {
+    final gradle = File('$rootPath/${config.app}/android/app/build.gradle.kts');
+    if (!gradle.existsSync()) {
+      _fail('android/app/build.gradle.kts not found — flavors not applied');
+      return;
+    }
+
+    final content = gradle.readAsStringSync();
+    const anchor = '    buildTypes {';
+    if (!content.contains(anchor)) {
+      _fail(
+        'could not find the buildTypes block in build.gradle.kts — '
+        'Android flavors not applied',
+      );
+      return;
+    }
+
+    gradle.writeAsStringSync(
+      content.replaceFirst(anchor, '${flavor.androidFlavors(config)}$anchor'),
+    );
+    _patchAndroidManifestLabel();
+  }
+
+  /// Points the launcher label at the per-flavor `app_name` resource.
+  void _patchAndroidManifestLabel() {
+    final manifest = File(
+      '$rootPath/${config.app}/android/app/src/main/AndroidManifest.xml',
+    );
+    if (!manifest.existsSync()) return;
+    final content = manifest.readAsStringSync();
+    final updated = content.replaceFirst(
+      RegExp(r'android:label="[^"]*"'),
+      r'android:label="@string/app_name"',
+    );
+    if (updated != content) manifest.writeAsStringSync(updated);
   }
 
   // ── Post-generation commands ────────────────────────────

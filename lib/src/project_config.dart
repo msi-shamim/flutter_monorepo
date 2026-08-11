@@ -258,6 +258,7 @@ class ProjectConfig {
     this.githubFiles = false,
     this.ci = CiProvider.none,
     this.testScope = TestScope.unit,
+    this.flavors = false,
     StorageBackend? storage,
   }) : storage = storage ?? StorageBackend.defaultFor(stateManagement),
        app = '${name}_app',
@@ -299,6 +300,9 @@ class ProjectConfig {
 
   /// How much test scaffolding is generated.
   final TestScope testScope;
+
+  /// Whether dev/staging/prod build flavors are generated.
+  final bool flavors;
 
   /// Backend behind the generated `KeyValueStore`.
   final StorageBackend storage;

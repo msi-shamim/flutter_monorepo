@@ -41,6 +41,7 @@ github: ${c.githubFiles}
 ci: ${c.ci.cliName}
 test: ${c.testScope.cliName}
 storage: ${c.storage.cliName}
+flavors: ${c.flavors}
 generator_version: $packageVersion
 ''';
 

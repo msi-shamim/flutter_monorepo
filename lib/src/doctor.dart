@@ -7,6 +7,7 @@ import 'templates/root_templates.dart' as root;
 import 'templates/license_templates.dart' as license;
 import 'templates/github_templates.dart' as github;
 import 'templates/ci_templates.dart' as ci;
+import 'templates/flavor_templates.dart' as flavor;
 
 /// Diagnoses a generated monorepo's structure integrity.
 ///
@@ -97,6 +98,16 @@ class Doctor {
         );
       case CiProvider.gitlab:
         _restorableFiles['.gitlab-ci.yml'] = ci.gitlabCi(config);
+    }
+
+    if (config.flavors) {
+      _restorableFiles['FLAVORS.md'] = flavor.flavorsDoc(config);
+      _restorableFiles['${config.app}/lib/app/config/app_environment.dart'] =
+          flavor.appEnvironment(config);
+      for (final name in flavor.flavorNames) {
+        _restorableFiles['${config.app}/lib/main_$name.dart'] = flavor
+            .flavorEntrypoint(config, name);
+      }
     }
 
     if (config.testScope == TestScope.full) {
@@ -294,6 +305,9 @@ class Doctor {
     if (c.ci == CiProvider.github) {
       dirs.addAll(['.github', '.github/workflows']);
     }
+    if (c.flavors) {
+      dirs.add('${c.app}/lib/app/config');
+    }
     if (c.testScope == TestScope.full) {
       dirs.addAll(['${c.app}/integration_test', 'packages/core/test/helpers']);
     }
@@ -419,6 +433,14 @@ class Doctor {
         files.add('.github/workflows/ci.yml');
       case CiProvider.gitlab:
         files.add('.gitlab-ci.yml');
+    }
+
+    if (c.flavors) {
+      files.addAll([
+        'FLAVORS.md',
+        '${c.app}/lib/app/config/app_environment.dart',
+        for (final f in flavor.flavorNames) '${c.app}/lib/main_$f.dart',
+      ]);
     }
 
     if (c.testScope == TestScope.full) {

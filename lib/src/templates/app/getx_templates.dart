@@ -1,7 +1,13 @@
 import '../../project_config.dart';
 import '../../version.dart';
 import '../storage_templates.dart';
+import '../flavor_helpers.dart';
 import 'app_template_strategy.dart';
+
+/// Start-up lines for the GetX entrypoint.
+const _getxBootstrapBody =
+    '  await initAppStore();\n'
+    '  runApp(const MainApp());\n';
 
 class GetxTemplateStrategy extends AppTemplateStrategy {
   @override
@@ -53,15 +59,11 @@ import 'package:get/get.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
 import 'package:${c.ui}/${c.ui}.dart';
 
-import 'app/bindings/initial_binding.dart';
+${flavorBootstrapImport(c)}import 'app/bindings/initial_binding.dart';
 import 'app/routes/app_pages.dart';
 import 'app/storage/app_store.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initAppStore();
-  runApp(const MainApp());
-}
+${mainEntrypoint(c, _getxBootstrapBody)}
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

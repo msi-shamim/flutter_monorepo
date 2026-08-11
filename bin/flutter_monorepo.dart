@@ -175,6 +175,12 @@ Future<void> _runCreate(List<String> arguments) async {
       help: 'CI pipeline to generate (--github implies github)',
     )
     ..addFlag(
+      'flavor',
+      defaultsTo: false,
+      negatable: false,
+      help: 'Generate dev/staging/prod build flavors',
+    )
+    ..addFlag(
       'github',
       defaultsTo: false,
       negatable: true,
@@ -324,6 +330,7 @@ Future<void> _runCreate(List<String> arguments) async {
     gitInit: args['git'] as bool,
     githubFiles: githubFiles,
     ci: ci,
+    flavors: args['flavor'] as bool,
     testScope: TestScope.fromCliName(args['test'] as String),
     storage: args.wasParsed('storage')
         ? StorageBackend.fromCliName(args['storage'] as String)

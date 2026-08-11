@@ -104,6 +104,7 @@ ProjectConfig? _readMarker(String rootPath) {
         _parseEnum(_extractYamlValue(content, 'test'), TestScope.values) ??
         TestScope.unit,
     storage: _parseStorage(_extractYamlValue(content, 'storage')),
+    flavors: _extractYamlValue(content, 'flavors') == 'true',
   );
 }
 

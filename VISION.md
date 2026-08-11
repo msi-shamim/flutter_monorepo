@@ -86,11 +86,13 @@ flutter_monorepo my_app --ci none         # default
 Generates a pipeline that analyzes, checks formatting and runs every
 package's tests. `--github` implies `--ci github`.
 
-### `--flavor` — Build Flavors (dev/staging/prod)
+### `--flavor` — Build Flavors (dev/staging/prod) — **shipped in v1.6**
 ```bash
 flutter_monorepo my_app --flavor
 ```
-Generates environment configs, `.env` file pattern, and flavor-specific launch configs.
+Generates a per-environment config, an entrypoint per flavor, Android product
+flavors, and iOS xcconfigs. Android is fully wired and verified by building a
+flavored APK; iOS needs the Xcode scheme steps recorded in FLAVORS.md.
 
 ---
 
