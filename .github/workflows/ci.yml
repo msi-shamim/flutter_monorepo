@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  analyze:
+    name: Analyze & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - run: dart pub get
+
+      - name: Analyze
+        run: dart analyze --fatal-infos
+
+      - name: Format check
+        run: dart format --set-exit-if-changed .
+
+      - name: Unit tests
+        run: dart test
+
+  integration:
+    # Generates a real monorepo per state management choice and drives it
+    # through resolve, analyze, format, and its tests including the boot test
+    # that pumps the app. The unit suite asserts on template strings and cannot
+    # catch a generated project that fails version solving or throws on
+    # startup — both of which have shipped before.
+    name: Generate & boot (${{ matrix.state }})
+    runs-on: ubuntu-latest
+    needs: analyze
+    strategy:
+      fail-fast: false
+      matrix:
+        state: [getx, riverpod, bloc, cubit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: dart pub get
+
+      - name: Generate and boot
+        run: dart test test/integration/generate_and_boot.dart -n "${{ matrix.state }}"
