@@ -2,7 +2,7 @@ import '../../project_config.dart';
 import '../../version.dart';
 import 'app_template_strategy.dart';
 
-class RiverpodTemplateStrategy implements AppTemplateStrategy {
+class RiverpodTemplateStrategy extends AppTemplateStrategy {
   @override
   String appPubspec(ProjectConfig c) => '''
 name: ${c.app}
@@ -39,6 +39,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ${c.versions['flutter_lints']}
+${testDevDependencies(c)}
 
 flutter:
   uses-material-design: true
@@ -203,6 +204,30 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   @override
   String homeBinding(ProjectConfig c) => ''; // No bindings in Riverpod
+
+  @override
+  String testDevDependencies(ProjectConfig c) =>
+      '  shared_preferences_platform_interface: any\n';
+
+  @override
+  String testSetup(ProjectConfig c) => '''
+import 'dart:async';
+
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+
+/// Runs automatically before every test in this directory.
+///
+/// The theme and locale providers read SharedPreferences while they build, and
+/// plugins are not registered under `flutter test`, so without this any widget
+/// test that pumps the app fails with "The SharedPreferencesAsyncPlatform
+/// instance must be set" before rendering a frame.
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  SharedPreferencesAsyncPlatform.instance =
+      InMemorySharedPreferencesAsync.empty();
+  await testMain();
+}
+''';
 
   @override
   String homeController(ProjectConfig c) => ''; // State lives in providers

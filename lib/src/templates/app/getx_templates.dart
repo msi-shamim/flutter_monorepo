@@ -2,7 +2,7 @@ import '../../project_config.dart';
 import '../../version.dart';
 import 'app_template_strategy.dart';
 
-class GetxTemplateStrategy implements AppTemplateStrategy {
+class GetxTemplateStrategy extends AppTemplateStrategy {
   @override
   String appPubspec(ProjectConfig c) => '''
 name: ${c.app}
@@ -38,6 +38,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ${c.versions['flutter_lints']}
+${testDevDependencies(c)}
 
 flutter:
   uses-material-design: true
@@ -267,6 +268,59 @@ class HomeBinding extends Bindings {
   void dependencies() {
     Get.lazyPut(() => HomeController());
   }
+}
+''';
+
+  @override
+  String testDevDependencies(ProjectConfig c) =>
+      '  path_provider_platform_interface: any\n';
+
+  @override
+  String testSetup(ProjectConfig c) => '''
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+/// Runs automatically before every test in this directory.
+///
+/// The controllers read GetStorage as they initialise, and GetStorage resolves
+/// its location through path_provider, which is not registered under
+/// `flutter test`. Without this, any widget test that pumps the app fails
+/// before rendering a frame.
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final dir = Directory.systemTemp.createTempSync('app_test_storage');
+  PathProviderPlatform.instance = _TestPathProvider(dir.path);
+  await GetStorage.init();
+  await testMain();
+
+  // Best effort: GetStorage keeps its file open, and on Windows deleting an
+  // open file fails and would surface as a test failure.
+  try {
+    dir.deleteSync(recursive: true);
+  } on FileSystemException {
+    // A leftover temp directory is not worth failing a test run over.
+  }
+}
+
+class _TestPathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  _TestPathProvider(this.path);
+
+  final String path;
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async => path;
+
+  @override
+  Future<String?> getApplicationSupportPath() async => path;
+
+  @override
+  Future<String?> getTemporaryPath() async => path;
 }
 ''';
 

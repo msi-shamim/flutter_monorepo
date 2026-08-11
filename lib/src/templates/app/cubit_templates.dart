@@ -4,7 +4,7 @@ import 'bloc_templates.dart';
 
 /// Cubit shares most of Bloc's structure — only the state classes differ.
 /// Controllers use `Cubit` with direct `emit()` instead of `Bloc` with events.
-class CubitTemplateStrategy implements AppTemplateStrategy {
+class CubitTemplateStrategy extends AppTemplateStrategy {
   final _bloc = BlocTemplateStrategy();
 
   @override
@@ -148,6 +148,38 @@ ${localeConstants(c)}
 
   @override
   String homeController(ProjectConfig c) => '';
+
+  @override
+  String testSetup(ProjectConfig c) => '''
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+
+/// Runs automatically before every test in this directory.
+///
+/// The theme and locale blocs are HydratedBlocs, so constructing them without
+/// HydratedBloc.storage set throws before any widget renders. Tests get a
+/// throwaway storage directory rather than the app's real one.
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final dir = Directory.systemTemp.createTempSync('app_test_storage');
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: HydratedStorageDirectory(dir.path),
+  );
+  await testMain();
+
+  // Close before removing: the storage keeps its files open, and on Windows
+  // deleting them while open fails and would report as a test failure.
+  await HydratedBloc.storage.close();
+  try {
+    dir.deleteSync(recursive: true);
+  } on FileSystemException {
+    // A leftover temp directory is not worth failing a test run over.
+  }
+}
+''';
 
   @override
   String homeScreen(ProjectConfig c) => '''

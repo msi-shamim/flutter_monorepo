@@ -2,7 +2,7 @@ import '../../project_config.dart';
 import '../../version.dart';
 import 'app_template_strategy.dart';
 
-class BlocTemplateStrategy implements AppTemplateStrategy {
+class BlocTemplateStrategy extends AppTemplateStrategy {
   @override
   String appPubspec(ProjectConfig c) => '''
 name: ${c.app}
@@ -40,6 +40,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ${c.versions['flutter_lints']}
+${testDevDependencies(c)}
 
 flutter:
   uses-material-design: true
@@ -220,6 +221,38 @@ final appRouter = GoRouter(
 
   @override
   String homeController(ProjectConfig c) => ''; // State lives in Blocs
+
+  @override
+  String testSetup(ProjectConfig c) => '''
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+
+/// Runs automatically before every test in this directory.
+///
+/// The theme and locale blocs are HydratedBlocs, so constructing them without
+/// HydratedBloc.storage set throws before any widget renders. Tests get a
+/// throwaway storage directory rather than the app's real one.
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  final dir = Directory.systemTemp.createTempSync('app_test_storage');
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: HydratedStorageDirectory(dir.path),
+  );
+  await testMain();
+
+  // Close before removing: the storage keeps its files open, and on Windows
+  // deleting them while open fails and would report as a test failure.
+  await HydratedBloc.storage.close();
+  try {
+    dir.deleteSync(recursive: true);
+  } on FileSystemException {
+    // A leftover temp directory is not worth failing a test run over.
+  }
+}
+''';
 
   @override
   String homeScreen(ProjectConfig c) => '''

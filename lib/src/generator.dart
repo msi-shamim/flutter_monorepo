@@ -350,6 +350,8 @@ class Generator {
     final widgetTest = File('$rootPath/${config.app}/test/widget_test.dart');
     if (widgetTest.existsSync()) widgetTest.deleteSync();
     _write('${config.app}/test/app_test.dart', appStarterTest(config));
+    _writeIfNotEmpty(
+        '${config.app}/test/flutter_test_config.dart', tmpl.testSetup(config));
   }
 
   // ── AI Agent Skills ──────────────────────────────────────

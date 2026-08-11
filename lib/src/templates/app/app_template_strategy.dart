@@ -37,6 +37,19 @@ abstract class AppTemplateStrategy {
 
   /// Generates the home screen controller/bloc. Empty if not applicable.
   String homeController(ProjectConfig c);
+
+  /// Generates `test/flutter_test_config.dart` for the app package.
+  ///
+  /// The theme and locale state read from persistent storage as they are
+  /// built, and storage plugins are not registered under `flutter test`. Any
+  /// widget test that pumps the app therefore fails on the platform
+  /// instance before it renders anything. Flutter runs this file
+  /// automatically for every test in the directory, so the in-memory
+  /// substitute is installed without each test having to know about it.
+  String testSetup(ProjectConfig c);
+
+  /// Extra dev dependencies the generated tests require, as pubspec lines.
+  String testDevDependencies(ProjectConfig c) => '';
 }
 
 /// Framework-agnostic route constants — same for all state managers.
@@ -53,12 +66,27 @@ abstract final class AppRoutes {
 
 /// Starter test for the app package, valid for every state management choice.
 String appStarterTest(ProjectConfig c) => '''
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:${c.l10n}/${c.l10n}.dart';
+${_bootTestImports(c)}import 'package:${c.l10n}/${c.l10n}.dart';
 
 import 'package:${c.app}/app/routes/app_routes.dart';
+import 'package:${c.app}/main.dart';
 
 void main() {
+  group('App', () {
+    // The real proof the scaffold works: the app builds, resolves its theme
+    // and locale state, routes to the initial screen and renders a frame.
+    // flutter_test_config.dart installs the storage substitutes this needs.
+    testWidgets('boots and renders the home screen', (tester) async {
+      await tester.pumpWidget(${_rootWidget(c)});
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MaterialApp), findsOneWidget);
+      expect(find.byType(AppBar), findsOneWidget);
+    });
+  });
+
   group('AppRoutes', () {
     test('declares the initial route', () {
       expect(AppRoutes.home, '/home');
@@ -79,6 +107,19 @@ void main() {
   });
 }
 ''';
+
+/// Framework-specific imports the boot test needs.
+String _bootTestImports(ProjectConfig c) => switch (c.stateManagement) {
+      StateManagement.riverpod =>
+        "import 'package:flutter_riverpod/flutter_riverpod.dart';\n",
+      _ => '',
+    };
+
+/// The root widget expression to pump, including any framework scope wrapper.
+String _rootWidget(ProjectConfig c) => switch (c.stateManagement) {
+      StateManagement.riverpod => 'const ProviderScope(child: MainApp())',
+      _ => 'const MainApp()',
+    };
 
 String _localeListLiteral(ProjectConfig c) =>
     '[${c.locales.map((l) => "'$l'").join(', ')}]';
