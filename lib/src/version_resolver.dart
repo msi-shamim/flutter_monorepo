@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'version.dart';
+
 /// Resolves latest compatible package versions from pub.dev at generation time.
 ///
 /// Fetches the latest version within the same major version as our tested
-/// fallbacks. This ensures API compatibility while getting the newest patches.
-/// Falls back to hardcoded defaults if offline or API fails.
+/// fallbacks, restricted to versions a project on [generatedSdkFloor] can
+/// actually resolve. This ensures API compatibility while getting the newest
+/// patches. Falls back to hardcoded defaults if offline or API fails.
 class VersionResolver {
   final _cache = <String, String>{};
 
@@ -81,19 +84,23 @@ class VersionResolver {
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
         final json = jsonDecode(body) as Map<String, dynamic>;
-        final versions = (json['versions'] as List<dynamic>)
-            .map((v) => (v as Map<String, dynamic>)['version'] as String)
-            .toList();
+        final entries = (json['versions'] as List<dynamic>)
+            .cast<Map<String, dynamic>>();
 
         // Find latest version with the same major version as our fallback
+        // that a project on [generatedSdkFloor] can actually resolve.
         String? bestMatch;
-        for (final v in versions) {
-          final clean = v.split('+').first.split('-').first; // strip build/pre-release
+        for (final entry in entries) {
+          final v = entry['version'] as String;
+          // Never resolve a pre-release into a generated pubspec: during any
+          // pre-release window it outranks the newest stable release.
+          if (v.contains('-')) continue;
+          final clean = v.split('+').first;
           final parts = clean.split('.');
           if (parts.length >= 2) {
             final major = int.tryParse(parts[0]) ?? -1;
-            if (major == targetMajor) {
-              if (bestMatch == null || _isNewer(v, bestMatch)) {
+            if (major == targetMajor && _satisfiesGeneratedSdk(entry)) {
+              if (bestMatch == null || isNewer(v, bestMatch)) {
                 bestMatch = v;
               }
             }
@@ -110,8 +117,38 @@ class VersionResolver {
     }
   }
 
+  /// Whether a project declaring [generatedSdkFloor] can resolve this version.
+  ///
+  /// Rejects candidates whose declared SDK lower bound is above our floor —
+  /// those resolve fine on a newer local SDK but break `pub get` for anyone
+  /// on the constraint the generated pubspecs actually declare.
+  /// Unparseable or absent constraints are accepted; pub is the final arbiter.
+  bool _satisfiesGeneratedSdk(Map<String, dynamic> versionEntry) {
+    final pubspec = versionEntry['pubspec'];
+    if (pubspec is! Map<String, dynamic>) return true;
+    final environment = pubspec['environment'];
+    if (environment is! Map<String, dynamic>) return true;
+    return acceptsSdkConstraint(environment['sdk']);
+  }
+
+  /// Whether [sdkConstraint] admits a project declaring [generatedSdkFloor].
+  ///
+  /// Anything unparseable or absent is accepted; pub is the final arbiter.
+  bool acceptsSdkConstraint(Object? sdkConstraint) {
+    if (sdkConstraint is! String) return true;
+
+    final lowerBound =
+        RegExp(r'(?:\^|>=)\s*(\d+\.\d+\.\d+)').firstMatch(sdkConstraint);
+    if (lowerBound == null) return true;
+
+    return !isNewer(lowerBound.group(1)!, generatedSdkFloor);
+  }
+
   /// Returns true if [a] is newer than [b] using simple version comparison.
-  bool _isNewer(String a, String b) {
+  ///
+  /// Build metadata breaks ties, so `8.0.0+1` ranks above `8.0.0`. Pre-release
+  /// suffixes are not handled here — they are filtered out before comparison.
+  bool isNewer(String a, String b) {
     final aParts = a.split('+').first.split('-').first.split('.').map(int.tryParse).toList();
     final bParts = b.split('+').first.split('-').first.split('.').map(int.tryParse).toList();
     for (var i = 0; i < 3; i++) {
@@ -120,6 +157,15 @@ class VersionResolver {
       if (av > bv) return true;
       if (av < bv) return false;
     }
-    return false;
+    final aBuild = _buildNumber(a);
+    final bBuild = _buildNumber(b);
+    return aBuild > bBuild;
+  }
+
+  /// Numeric build metadata (`8.0.0+1` → 1), or 0 when absent or non-numeric.
+  int _buildNumber(String version) {
+    final plus = version.indexOf('+');
+    if (plus == -1) return 0;
+    return int.tryParse(version.substring(plus + 1).split('.').first) ?? 0;
   }
 }

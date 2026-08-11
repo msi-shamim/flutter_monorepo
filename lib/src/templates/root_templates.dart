@@ -1,11 +1,12 @@
 import '../project_config.dart';
+import '../version.dart';
 
 String rootPubspec(ProjectConfig c) => '''
 name: ${c.name}_workspace
 publish_to: 'none'
 
 environment:
-  sdk: ^3.10.4
+  sdk: $generatedSdkConstraint
 
 workspace:
   - ${c.app}

@@ -172,6 +172,49 @@ void main() {
     });
   });
 
+  group('VersionResolver SDK filtering', () {
+    final resolver = VersionResolver();
+
+    test('rejects versions requiring an SDK above the generated floor', () {
+      expect(resolver.acceptsSdkConstraint('>=3.12.0 <4.0.0'), isFalse);
+      expect(resolver.acceptsSdkConstraint('^3.12.0'), isFalse);
+    });
+
+    test('accepts versions the generated floor satisfies', () {
+      expect(resolver.acceptsSdkConstraint('^3.10.4'), isTrue);
+      expect(resolver.acceptsSdkConstraint('>=3.0.0 <4.0.0'), isTrue);
+      expect(resolver.acceptsSdkConstraint('^3.10.0'), isTrue);
+    });
+
+    test('accepts absent or unparseable constraints', () {
+      expect(resolver.acceptsSdkConstraint(null), isTrue);
+      expect(resolver.acceptsSdkConstraint('any'), isTrue);
+      expect(resolver.acceptsSdkConstraint(42), isTrue);
+    });
+
+    test('generatedSdkFloor is the lower bound of generatedSdkConstraint', () {
+      expect(generatedSdkConstraint, '^$generatedSdkFloor');
+    });
+  });
+
+  group('VersionResolver.isNewer', () {
+    final resolver = VersionResolver();
+
+    test('compares numeric components', () {
+      expect(resolver.isNewer('1.2.3', '1.2.2'), isTrue);
+      expect(resolver.isNewer('1.3.0', '1.2.9'), isTrue);
+      expect(resolver.isNewer('2.0.0', '1.9.9'), isTrue);
+      expect(resolver.isNewer('1.2.2', '1.2.3'), isFalse);
+      expect(resolver.isNewer('1.2.3', '1.2.3'), isFalse);
+    });
+
+    test('build metadata breaks ties', () {
+      expect(resolver.isNewer('8.0.0+1', '8.0.0'), isTrue);
+      expect(resolver.isNewer('8.0.0', '8.0.0+1'), isFalse);
+      expect(resolver.isNewer('8.0.0+2', '8.0.0+1'), isTrue);
+    });
+  });
+
   group('VersionResolver', () {
     test('returns fallback for known packages', () {
       final resolver = VersionResolver();

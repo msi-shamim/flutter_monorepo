@@ -1,4 +1,5 @@
 import '../project_config.dart';
+import '../version.dart';
 
 String l10nPubspec(ProjectConfig c) => '''
 name: ${c.l10n}
@@ -8,7 +9,7 @@ version: 0.1.0
 resolution: workspace
 
 environment:
-  sdk: ^3.10.4
+  sdk: $generatedSdkConstraint
 
 dependencies:
   flutter:
