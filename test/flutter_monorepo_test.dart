@@ -83,6 +83,32 @@ void main() {
     });
   });
 
+  group('ARCHITECTURE.md', () {
+    test('describes the real package graph and choices', () {
+      final config = ProjectConfig(
+        name: 'my_shop',
+        org: 'com.example',
+        stateManagement: StateManagement.riverpod,
+        httpClient: HttpClient.chopper,
+        locales: ['en', 'es'],
+      );
+      final doc = root.architectureMd(config);
+      expect(doc, contains('my_shop_core'));
+      expect(doc, contains('my_shop_network'));
+      expect(doc, contains('app/providers/'));
+      expect(doc, contains('chopper'));
+      expect(doc, contains('en, es'));
+      expect(doc, contains('GoRouter'));
+    });
+
+    test('reflects GetX routing rather than GoRouter', () {
+      final doc = root.architectureMd(
+          ProjectConfig(name: 'a', org: 'o', stateManagement: StateManagement.getx));
+      expect(doc, contains('app_pages.dart'));
+      expect(doc, isNot(contains('GoRouter')));
+    });
+  });
+
   group('Monorepo detection', () {
     test('rejects an ordinary Dart package', () {
       final dir = Directory.systemTemp.createTempSync('fm_plain_pkg');

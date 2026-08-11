@@ -202,6 +202,7 @@ class Generator {
     _write('.gitignore', root.rootGitignore());
     _write('analysis_options.yaml', root.analysisOptions());
     _write('README.md', root.readmeMd(config));
+    _write('ARCHITECTURE.md', root.architectureMd(config));
     _write('LICENSE', license.licenseText(config));
     _write('CONTRIBUTING.md', root.contributingMd(config));
   }

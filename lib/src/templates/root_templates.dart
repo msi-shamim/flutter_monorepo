@@ -39,6 +39,77 @@ github: ${c.githubFiles}
 generator_version: $packageVersion
 ''';
 
+/// Architecture reference for the generated monorepo.
+String architectureMd(ProjectConfig c) {
+  final stateDir = switch (c.stateManagement) {
+    StateManagement.getx => 'app/controllers/',
+    StateManagement.riverpod => 'app/providers/',
+    StateManagement.bloc || StateManagement.cubit => 'app/blocs/',
+  };
+  final routing = c.usesGoRouter
+      ? '`${c.app}/lib/app/router/app_router.dart` (GoRouter)'
+      : '`${c.app}/lib/app/routes/app_pages.dart` (GetX pages)';
+
+  return '''
+# ${c.pascal} — Architecture
+
+## Layers
+
+The workspace is one app package and four shared packages. Dependencies point
+in one direction only: the app may depend on any package, packages may depend
+on `${c.core}`, and nothing depends on the app.
+
+```
+${c.app}  ──▶  ${c.ui}  ──▶  ${c.core}
+   │              │
+   ├──────────▶  ${c.network}  ──▶  ${c.core}
+   └──────────▶  ${c.l10n}
+```
+
+| Package | Responsibility | May import |
+|---------|----------------|------------|
+| `packages/core` | Business rules, models, use cases, `Result<T>`, exceptions | Pure Dart only — no Flutter |
+| `packages/ui` | Theme, spacing, typography, responsive helpers, shared widgets | Flutter, `${c.core}` |
+| `packages/network` | HTTP client (${c.httpClient.name}), interceptors, repositories | `${c.core}` |
+| `packages/l10n` | ARB files, generated localizations, formatters | Flutter, `intl` |
+| `${c.app}` | Screens, ${c.stateManagement.name} state, routing, DI | Everything above |
+
+## Why core is pure Dart
+
+`packages/core` declares no Flutter dependency. That is what lets its rules and
+use cases be tested with `dart test` — no widget binding, no device, no mocking
+of framework types. Putting a `Widget` or a `BuildContext` in core breaks this
+and is the one boundary worth defending.
+
+## State management — ${c.stateManagement.name}
+
+State lives in `${c.app}/lib/$stateDir`. Screens read from it and render; they
+do not hold business logic. Rules that outlive a screen belong in
+`packages/core/lib/rules/`.
+
+Routing is declared in $routing, with route names in
+`${c.app}/lib/app/routes/app_routes.dart`.
+
+## Localization
+
+Locales: ${c.locales.join(', ')}. Source strings are ARB files in
+`packages/l10n/lib/l10n/arb/`; `flutter gen-l10n` compiles them into
+`packages/l10n/lib/l10n/generated/`, which the package barrel re-exports.
+Add a string to every ARB file, then re-run `flutter gen-l10n`.
+
+## Adding a feature
+
+1. Model and rules → `packages/core`, with tests beside them.
+2. Repository → `packages/network`, returning `Result<T>`.
+3. Shared widgets → `packages/ui`. Screen-specific widgets stay with the screen.
+4. Strings → `packages/l10n`, every locale.
+5. State and screen → `${c.app}`.
+
+Run `flutter_monorepo workflow` for the step-by-step version of this, and
+`flutter_monorepo doctor` to verify the structure is intact.
+''';
+}
+
 String rootGitignore() => '''
 # Dart/Flutter
 .dart_tool/

@@ -63,6 +63,7 @@ class Doctor {
       '.claude/skills/monorepo-doctor/SKILL.md':
           skills.monrepoDoctorSkill(config),
       'README.md': root.readmeMd(config),
+      'ARCHITECTURE.md': root.architectureMd(config),
       'LICENSE': license.licenseText(config),
       'CONTRIBUTING.md': root.contributingMd(config),
       '.gitignore': root.rootGitignore(),
@@ -281,6 +282,7 @@ class Doctor {
       '.gitignore',
       'analysis_options.yaml',
       'README.md',
+      'ARCHITECTURE.md',
       'LICENSE',
       'CONTRIBUTING.md',
       // AI agent skills
