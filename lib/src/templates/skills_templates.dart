@@ -531,11 +531,14 @@ missing directories or files.
 
 '''
       '```bash\n'
-      '# Check structure (report only)\n'
-      'dart run flutter_monorepo doctor\n'
+      '# The CLI is a global tool; the project does not depend on it.\n'
+      '# dart pub global activate flutter_monorepo   # once, if not installed\n'
       '\n'
-      '# Check and fix missing items\n'
-      'dart run flutter_monorepo doctor --fix\n'
+      '# Check structure (report only)\n'
+      'flutter_monorepo doctor\n'
+      '\n'
+      '# Check and fix what it can\n'
+      'flutter_monorepo doctor --fix\n'
       '```\n'
       '''
 
@@ -547,14 +550,15 @@ missing directories or files.
 - Core: exceptions, models, rules, states, repositories, usecases, utils, extensions
 - UI: assets, responsive, theme, widgets + asset dirs (icons, fonts, images)
 - Network: client, interceptors, repositories
-- L10n: formatters, widgets, l10n/arb
+- L10n: formatters, widgets, l10n/arb, l10n/generated
 - App: routes, screens/home + framework-specific dirs
 - Tests: core/test/{states,rules,models}, ui/test/widgets, network/test, ${c.app}/test/screens
 - Skills: .claude/skills/{component-design,screen-design,business-logic,monorepo-doctor}
 
 ### Files
 
-- Root: README.md, LICENSE, CONTRIBUTING.md
+- Root: .flutter_monorepo.yaml (generation marker), README.md, ARCHITECTURE.md,
+  LICENSE, CONTRIBUTING.md, .gitignore, analysis_options.yaml
 - All pubspec.yaml, PACKAGE.md, barrel exports
 - Core: app_exception, base_model, base_repository, use_case, result, extensions
 - UI: app_icons, app_images, app_fonts, breakpoints, responsive, theme files
@@ -568,8 +572,12 @@ missing directories or files.
 
 When doctor reports missing items:
 
-1. If a **directory** is missing — it was likely accidentally deleted. Use --fix to recreate.
-2. If a **file** is missing — --fix creates an empty placeholder. You will need to populate it.
-3. If many items are missing — consider re-running the generator or checking git history.
+1. If a **directory** is missing — it was likely deleted by accident. `--fix` recreates it.
+2. If a **file** has a template — `--fix` restores its full content (README, ARCHITECTURE,
+   LICENSE, CONTRIBUTING, .gitignore, the skills and settings, the directory sentinels).
+3. If a file has no template — `--fix` reports it and leaves it absent, deliberately. Writing
+   an empty placeholder would satisfy the next check and hide the problem. Restore it from git.
+4. `--fix` never overwrites a file that already exists, so local edits are safe.
+5. If many items are missing — consider re-running the generator or checking git history.
 ''';
 }
