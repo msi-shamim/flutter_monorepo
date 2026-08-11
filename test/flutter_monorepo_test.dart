@@ -429,6 +429,27 @@ void main() {
     });
   });
 
+  group('VersionResolver.caretSeries', () {
+    final resolver = VersionResolver();
+
+    test('groups 1.0.0 and above by major version', () {
+      expect(resolver.caretSeries('4.7.2'), resolver.caretSeries('4.8.0'));
+      expect(resolver.caretSeries('4.7.2'),
+          isNot(resolver.caretSeries('5.0.0')));
+    });
+
+    test('treats each 0.x as its own breaking series', () {
+      expect(resolver.caretSeries('0.20.2'), resolver.caretSeries('0.20.3'));
+      expect(resolver.caretSeries('0.20.2'),
+          isNot(resolver.caretSeries('0.21.0')));
+    });
+
+    test('returns null for unparseable input', () {
+      expect(resolver.caretSeries('nonsense'), isNull);
+      expect(resolver.caretSeries('4'), isNull);
+    });
+  });
+
   group('VersionResolver.isNewer', () {
     final resolver = VersionResolver();
 

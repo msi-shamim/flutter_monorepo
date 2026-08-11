@@ -76,18 +76,29 @@ class VersionResolver {
       return;
     }
 
-    // Extract the major version from our fallback (e.g., "^4.7.2" → 4)
+    // The series a caret constraint keeps you inside. For 1.0.0 and above that
+    // is the major version; below it, pub treats each 0.x as its own breaking
+    // series, so ^0.20.2 must not accept 0.21.0 the way "major 0" would.
     final fallbackVersion = fallback.replaceFirst('^', '').split('+').first;
-    final targetMajor = int.tryParse(fallbackVersion.split('.').first) ?? 0;
+    final targetSeries = caretSeries(fallbackVersion);
+    if (targetSeries == null) {
+      _cache[packageName] = fallback;
+      return;
+    }
 
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
     try {
-      final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
       final request = await client.getUrl(
         Uri.parse('https://pub.dev/api/packages/$packageName'),
       );
-      final response = await request.close();
+      // connectionTimeout bounds only the TCP connect, so a server that
+      // accepts the connection and then stalls would hang generation forever.
+      final response = await request.close().timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
-        final body = await response.transform(utf8.decoder).join();
+        final body = await response
+            .transform(utf8.decoder)
+            .join()
+            .timeout(const Duration(seconds: 10));
         final json = jsonDecode(body) as Map<String, dynamic>;
         final entries = (json['versions'] as List<dynamic>)
             .cast<Map<String, dynamic>>();
@@ -100,14 +111,10 @@ class VersionResolver {
           // Never resolve a pre-release into a generated pubspec: during any
           // pre-release window it outranks the newest stable release.
           if (v.contains('-')) continue;
-          final clean = v.split('+').first;
-          final parts = clean.split('.');
-          if (parts.length >= 2) {
-            final major = int.tryParse(parts[0]) ?? -1;
-            if (major == targetMajor && _satisfiesGeneratedSdk(entry)) {
-              if (bestMatch == null || isNewer(v, bestMatch)) {
-                bestMatch = v;
-              }
+          if (caretSeries(v.split('+').first) == targetSeries &&
+              _satisfiesGeneratedSdk(entry)) {
+            if (bestMatch == null || isNewer(v, bestMatch)) {
+              bestMatch = v;
             }
           }
         }
@@ -116,10 +123,28 @@ class VersionResolver {
       } else {
         _cache[packageName] = fallback;
       }
-      client.close();
     } catch (_) {
       _cache[packageName] = fallback;
+    } finally {
+      // Every early return and throw above used to skip this, leaking one
+      // client per failed package while resolveAll fetches them concurrently.
+      client.close(force: true);
     }
+  }
+
+  /// The compatibility series a caret constraint on [version] admits.
+  ///
+  /// `4.7.2` and `4.8.0` share the series `4`; `0.20.2` and `0.20.3` share
+  /// `0.20`, but `0.21.0` does not — under pub's rules a leading zero shifts
+  /// the breaking component one place right. Returns null if unparseable.
+  String? caretSeries(String version) {
+    final parts = version.split('.');
+    if (parts.length < 2) return null;
+    final major = int.tryParse(parts[0]);
+    if (major == null) return null;
+    if (major > 0) return '$major';
+    if (int.tryParse(parts[1]) == null) return null;
+    return '0.${parts[1]}';
   }
 
   /// Whether a project declaring [generatedSdkFloor] can resolve this version.
