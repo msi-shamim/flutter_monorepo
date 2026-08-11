@@ -150,6 +150,28 @@ void main() {
     });
   });
 
+  group('VersionResolver SDK pinning', () {
+    test('intl is treated as SDK-pinned', () {
+      expect(VersionResolver.sdkPinned, contains('intl'));
+    });
+
+    test('every SDK-pinned package has a tested fallback', () {
+      for (final name in VersionResolver.sdkPinned) {
+        expect(
+          VersionResolver.fallbacks[name],
+          isNotNull,
+          reason: '$name is SDK-pinned but has no fallback to fall back to',
+        );
+      }
+    });
+
+    test('resolveAll uses the fallback for SDK-pinned packages', () async {
+      final resolver = VersionResolver();
+      await resolver.resolveAll(['intl']);
+      expect(resolver['intl'], VersionResolver.fallbacks['intl']);
+    });
+  });
+
   group('VersionResolver', () {
     test('returns fallback for known packages', () {
       final resolver = VersionResolver();

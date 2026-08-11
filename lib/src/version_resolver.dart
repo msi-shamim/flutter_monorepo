@@ -32,14 +32,26 @@ class VersionResolver {
     'flutter_lints': '^6.0.0',
   };
 
+  /// Packages whose version is dictated by the Flutter SDK itself.
+  ///
+  /// `flutter_localizations` depends on an exact `intl` version, so any
+  /// constraint we resolve that excludes it makes `pub get` fail outright.
+  /// These are never fetched — the tested [fallbacks] entry is authoritative
+  /// because it is the version the pinned SDK package ships against.
+  static const sdkPinned = <String>{'intl'};
+
   /// Resolves latest compatible versions for all needed packages.
   Future<void> resolveAll(List<String> packageNames) async {
     stdout.writeln('→ Fetching latest package versions from pub.dev...');
     final futures = <Future<void>>[];
     for (final name in packageNames) {
-      if (!_cache.containsKey(name)) {
-        futures.add(_fetchLatestCompatible(name));
+      if (_cache.containsKey(name)) continue;
+      if (sdkPinned.contains(name)) {
+        // Pinned by the Flutter SDK — resolving it would only break pub get.
+        _cache[name] = fallbacks[name] ?? 'any';
+        continue;
       }
+      futures.add(_fetchLatestCompatible(name));
     }
     await Future.wait(futures);
   }
