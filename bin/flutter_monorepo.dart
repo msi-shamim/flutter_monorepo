@@ -33,7 +33,16 @@ Future<void> _runDoctor(List<String> arguments) async {
     ..addFlag('help',
         abbr: 'h', negatable: false, help: 'Show doctor usage');
 
-  final args = parser.parse(arguments);
+  final ArgResults args;
+  try {
+    args = parser.parse(arguments);
+  } on FormatException catch (e) {
+    stderr.writeln('Error: ${e.message}');
+    stderr.writeln('');
+    stderr.writeln('Usage: flutter_monorepo doctor [options]');
+    stderr.writeln(parser.usage);
+    exit(1);
+  }
 
   if (args['help'] as bool) {
     stdout.writeln('Usage: flutter_monorepo doctor [options]');
