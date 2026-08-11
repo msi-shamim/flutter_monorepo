@@ -273,8 +273,16 @@ class Generator {
     _write('packages/l10n/PACKAGE.md', l10n.l10nPackageMd(config));
     _write('packages/l10n/l10n.yaml', l10n.l10nYaml(config));
     _write('packages/l10n/lib/${config.l10n}.dart', l10n.l10nBarrel());
-    // Dynamic ARB generation for each locale
+    // Dynamic ARB generation for each locale. A locale carrying a region or
+    // script subtag also needs its base language as a fallback, or gen-l10n
+    // refuses to run: "Arb file for a fallback, pt, does not exist".
+    final arbLocales = <String>{};
     for (final locale in config.locales) {
+      final base = locale.split('_').first;
+      if (base != locale) arbLocales.add(base);
+      arbLocales.add(locale);
+    }
+    for (final locale in arbLocales) {
       _write(
         'packages/l10n/lib/l10n/arb/app_$locale.arb',
         l10n.arbFile(config, locale),

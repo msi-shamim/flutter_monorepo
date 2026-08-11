@@ -50,12 +50,23 @@ abstract final class AppRoutes {
 String localeConstants(ProjectConfig c) {
   final buf = StringBuffer();
   for (final locale in c.locales) {
-    buf.writeln("  static const Locale ${_localeVarName(locale)} = Locale('$locale');");
+    buf.writeln(
+        '  static const Locale ${_localeVarName(locale)} = ${localeLiteral(locale)};');
   }
   buf.writeln('  static const List<Locale> supportedLocales = [');
   buf.writeln(c.locales.map((l) => '    ${_localeVarName(l)}').join(',\n'));
   buf.writeln('  ];');
   return buf.toString();
+}
+
+/// The `Locale(...)` expression for [code].
+///
+/// A region subtag is a separate constructor argument — `Locale('en_US')`
+/// would produce a locale whose language code is the literal string `en_US`.
+String localeLiteral(String code) {
+  final parts = code.split('_');
+  if (parts.length == 2) return "Locale('${parts[0]}', '${parts[1]}')";
+  return "Locale('$code')";
 }
 
 /// The Dart identifier used for [code]'s `Locale` constant.

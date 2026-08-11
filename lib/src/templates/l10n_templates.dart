@@ -46,7 +46,11 @@ export 'widgets/directionality_builder.dart';
 /// The primary locale (first in list) gets `@` description annotations.
 String arbFile(ProjectConfig c, String locale) {
   final isPrimary = locale == c.primaryLocale;
-  final t = _translations[locale] ?? _translations['en']!;
+  // A region variant falls back to its base language before English, so
+  // pt_BR gets Portuguese strings rather than untranslated English ones.
+  final t = _translations[locale] ??
+      _translations[locale.split('_').first] ??
+      _translations['en']!;
 
   final entries = <String, String>{
     'appTitle': (t['appTitle'] ?? '{app}').replaceAll('{app}', c.pascal),

@@ -143,11 +143,19 @@ Future<void> _runCreate(List<String> arguments) async {
   }
 
   // Parse & validate locales
-  final locales = (args['locales'] as String)
-      .split(',')
-      .map((l) => l.trim())
-      .where((l) => l.isNotEmpty)
-      .toList();
+  final locales = <String>[];
+  for (final raw in (args['locales'] as String).split(',')) {
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) continue;
+    final normalized = _normalizeLocale(trimmed);
+    if (normalized == null) {
+      stderr.writeln(
+          'Error: Invalid locale "$trimmed". Expected a language code '
+          'optionally followed by a region, e.g. en, pt_BR or zh-Hans.');
+      exit(1);
+    }
+    locales.add(normalized);
+  }
   if (locales.isEmpty) {
     stderr.writeln('Error: At least one locale is required.');
     exit(1);
@@ -225,6 +233,30 @@ Future<void> _runCreate(List<String> arguments) async {
     exit(1);
   }
 }
+
+/// Normalizes a `--locales` entry to the form the templates and ARB files use.
+///
+/// Accepts `en`, `pt-BR` and `pt_BR`, returning `en` and `pt_BR`. Returns null
+/// for anything that is not a language code with an optional region subtag —
+/// such input previously reached the templates and produced Dart identifiers
+/// like `locale_en-US`, which do not parse.
+String? _normalizeLocale(String input) {
+  final match =
+      RegExp(r'^([a-zA-Z]{2,3})(?:[-_]([a-zA-Z]{2,4}|\d{3}))?$').firstMatch(input);
+  if (match == null) return null;
+
+  final language = match.group(1)!.toLowerCase();
+  final region = match.group(2);
+  if (region == null) return language;
+
+  // Script subtags are title case (Hans), region subtags upper case (BR).
+  final normalizedRegion =
+      region.length == 4 ? _titleCase(region) : region.toUpperCase();
+  return '${language}_$normalizedRegion';
+}
+
+String _titleCase(String value) =>
+    value[0].toUpperCase() + value.substring(1).toLowerCase();
 
 void _printUsage(ArgParser parser) {
   stdout.writeln('Usage: flutter_monorepo <project_name> [options]');

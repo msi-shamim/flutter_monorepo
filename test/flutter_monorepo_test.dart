@@ -169,10 +169,27 @@ void main() {
 
     test('localeVarName produces a valid Dart identifier', () {
       final identifier = RegExp(r'^[a-zA-Z_$][a-zA-Z0-9_$]*$');
-      for (final code in codes) {
+      for (final code in [...codes, 'pt_BR', 'en_US', 'zh_Hans']) {
         expect(identifier.hasMatch(localeVarName(code)), isTrue,
             reason: '$code produced "${localeVarName(code)}"');
       }
+    });
+
+    test('region subtags become a separate Locale argument', () {
+      expect(localeLiteral('en'), "Locale('en')");
+      expect(localeLiteral('pt_BR'), "Locale('pt', 'BR')");
+      expect(localeLiteral('zh_Hans'), "Locale('zh', 'Hans')");
+    });
+
+    test('generated constants for region locales parse as Dart', () {
+      final config = ProjectConfig(
+        name: 'my_app',
+        org: 'com.example',
+        locales: ['pt_BR', 'en'],
+      );
+      final source = localeConstants(config);
+      expect(source, contains("static const Locale locale_pt_BR = Locale('pt', 'BR');"));
+      expect(source, isNot(contains('-')));
     });
   });
 
