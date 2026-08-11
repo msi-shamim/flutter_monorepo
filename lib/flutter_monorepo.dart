@@ -8,6 +8,7 @@ export 'src/templates/app/app_template_strategy.dart'
     show
         AppTemplateStrategy,
         appRoutes,
+        integrationTestDependency,
         localeConstants,
         localeLiteral,
         localeVarName;

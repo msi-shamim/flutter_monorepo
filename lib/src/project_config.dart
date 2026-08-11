@@ -56,6 +56,35 @@ enum CiProvider {
   );
 }
 
+/// How much test scaffolding the generator writes.
+enum TestScope {
+  /// Starter unit and widget tests only.
+  unit,
+
+  /// Adds an integration_test suite and shared fixtures.
+  full;
+
+  /// CLI-friendly identifier used in the `--test` flag.
+  String get cliName => name;
+
+  /// All valid `--test` identifiers, in declaration order.
+  static List<String> get cliNames =>
+      values.map((e) => e.cliName).toList(growable: false);
+
+  /// Parse from CLI string.
+  ///
+  /// Throws an [ArgumentError] listing the valid identifiers when [name]
+  /// matches no scope.
+  static TestScope fromCliName(String name) => values.firstWhere(
+    (e) => e.cliName == name,
+    orElse: () => throw ArgumentError.value(
+      name,
+      'name',
+      'Unknown test scope. Valid values: ${cliNames.join(', ')}',
+    ),
+  );
+}
+
 /// Supported HTTP client libraries.
 enum HttpClient {
   /// Dio — feature-rich HTTP client with interceptors.
@@ -171,6 +200,7 @@ class ProjectConfig {
     this.gitInit = true,
     this.githubFiles = false,
     this.ci = CiProvider.none,
+    this.testScope = TestScope.unit,
   }) : app = '${name}_app',
        core = '${name}_core',
        ui = '${name}_ui',
@@ -207,6 +237,9 @@ class ProjectConfig {
 
   /// CI provider whose pipeline file is generated, if any.
   final CiProvider ci;
+
+  /// How much test scaffolding is generated.
+  final TestScope testScope;
 
   /// Populated by [VersionResolver] before template generation.
   late final VersionResolver versions;

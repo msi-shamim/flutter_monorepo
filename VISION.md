@@ -111,12 +111,14 @@ flutter_monorepo my_app --template dashboard
 ```
 Pre-built screen sets with navigation, bottom tabs, drawers.
 
-### `--test` — Testing Setup
+### `--test` — Testing Setup — **shipped in v1.5**
 ```bash
-flutter_monorepo my_app --test unit        # unit tests only (default)
-flutter_monorepo my_app --test full        # unit + widget + integration
+flutter_monorepo my_app --test unit        # unit + widget tests (default)
+flutter_monorepo my_app --test full        # adds integration_test + fixtures
 ```
-Generates test directory structure, mock helpers, and example tests for each package.
+Every project gets starter unit and widget tests. `full` additionally
+generates an `integration_test` suite that drives the real app on a device,
+and shared fixtures for core tests.
 
 ---
 

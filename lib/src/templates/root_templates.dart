@@ -39,6 +39,7 @@ locales: ${c.locales.join(',')}
 platforms: ${c.platforms.join(',')}
 github: ${c.githubFiles}
 ci: ${c.ci.cliName}
+test: ${c.testScope.cliName}
 generator_version: $packageVersion
 ''';
 

@@ -158,6 +158,12 @@ Future<void> _runCreate(List<String> arguments) async {
       help: 'License type for the project',
     )
     ..addOption(
+      'test',
+      defaultsTo: TestScope.unit.cliName,
+      allowed: TestScope.cliNames,
+      help: 'Test scaffolding: unit, or full (adds integration_test)',
+    )
+    ..addOption(
       'ci',
       defaultsTo: CiProvider.none.cliName,
       allowed: CiProvider.cliNames,
@@ -313,6 +319,7 @@ Future<void> _runCreate(List<String> arguments) async {
     gitInit: args['git'] as bool,
     githubFiles: githubFiles,
     ci: ci,
+    testScope: TestScope.fromCliName(args['test'] as String),
   );
 
   final targetDir = Directory('${Directory.current.path}/$projectName');
@@ -335,6 +342,7 @@ Future<void> _runCreate(List<String> arguments) async {
   stdout.writeln('║  Git:        ${config.gitInit ? 'yes' : 'no'}');
   stdout.writeln('║  GitHub:     ${config.githubFiles ? 'yes' : 'no'}');
   stdout.writeln('║  CI:         ${config.ci.cliName}');
+  stdout.writeln('║  Tests:      ${config.testScope.cliName}');
   stdout.writeln('║  Path:       ${targetDir.path}');
   stdout.writeln('╚══════════════════════════════════════════════════╝');
   stdout.writeln('');

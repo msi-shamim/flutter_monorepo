@@ -41,7 +41,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ${c.versions['flutter_lints']}
-${testDevDependencies(c)}
+${testDevDependencies(c)}${integrationTestDependency(c)}
 
 flutter:
   uses-material-design: true

@@ -100,6 +100,9 @@ ProjectConfig? _readMarker(String rootPath) {
     ci:
         _parseEnum(_extractYamlValue(content, 'ci'), CiProvider.values) ??
         CiProvider.none,
+    testScope:
+        _parseEnum(_extractYamlValue(content, 'test'), TestScope.values) ??
+        TestScope.unit,
   );
 }
 

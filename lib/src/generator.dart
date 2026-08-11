@@ -273,6 +273,12 @@ class Generator {
       core.listExtensions(),
     );
     _write('packages/core/test/core_test.dart', core.coreStarterTest(config));
+    if (config.testScope == TestScope.full) {
+      _write(
+        'packages/core/test/helpers/fixtures.dart',
+        ci.coreTestFixtures(config),
+      );
+    }
   }
 
   // ── UI package ──────────────────────────────────────────
@@ -445,6 +451,12 @@ class Generator {
       '${config.app}/test/flutter_test_config.dart',
       tmpl.testSetup(config),
     );
+    if (config.testScope == TestScope.full) {
+      _write(
+        '${config.app}/integration_test/app_test.dart',
+        ci.appIntegrationTest(config),
+      );
+    }
   }
 
   // ── AI Agent Skills ──────────────────────────────────────

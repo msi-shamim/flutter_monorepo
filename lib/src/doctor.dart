@@ -99,6 +99,13 @@ class Doctor {
         _restorableFiles['.gitlab-ci.yml'] = ci.gitlabCi(config);
     }
 
+    if (config.testScope == TestScope.full) {
+      _restorableFiles['${config.app}/integration_test/app_test.dart'] = ci
+          .appIntegrationTest(config);
+      _restorableFiles['packages/core/test/helpers/fixtures.dart'] = ci
+          .coreTestFixtures(config);
+    }
+
     stdout.writeln('');
     stdout.writeln(
       '→ Detected: ${config.name} (${config.stateManagement.name} + ${config.httpClient.name}, locales: ${config.locales.join(',')})',
@@ -287,6 +294,9 @@ class Doctor {
     if (c.ci == CiProvider.github) {
       dirs.addAll(['.github', '.github/workflows']);
     }
+    if (c.testScope == TestScope.full) {
+      dirs.addAll(['${c.app}/integration_test', 'packages/core/test/helpers']);
+    }
 
     // --github and --ci github both want .github; check it once.
     return dirs.toSet().toList();
@@ -409,6 +419,13 @@ class Doctor {
         files.add('.github/workflows/ci.yml');
       case CiProvider.gitlab:
         files.add('.gitlab-ci.yml');
+    }
+
+    if (c.testScope == TestScope.full) {
+      files.addAll([
+        '${c.app}/integration_test/app_test.dart',
+        'packages/core/test/helpers/fixtures.dart',
+      ]);
     }
 
     return files;

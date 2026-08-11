@@ -468,6 +468,52 @@ void main() {
     });
   });
 
+  group('TestScope', () {
+    test('cliName round-trips for every value', () {
+      for (final scope in TestScope.values) {
+        expect(TestScope.fromCliName(scope.cliName), scope);
+      }
+    });
+
+    test('the marker records the choice', () {
+      expect(
+        root.projectMarker(
+          ProjectConfig(name: 'a', org: 'o', testScope: TestScope.full),
+        ),
+        contains('test: full'),
+      );
+    });
+
+    test('only full declares the integration_test dependency', () {
+      final unit = ProjectConfig(name: 'a', org: 'o');
+      final full = ProjectConfig(
+        name: 'a',
+        org: 'o',
+        testScope: TestScope.full,
+      );
+      expect(integrationTestDependency(unit), isEmpty);
+      expect(integrationTestDependency(full), contains('integration_test'));
+    });
+
+    test('the integration test drives the real app entrypoint', () {
+      for (final sm in StateManagement.values) {
+        final config = ProjectConfig(
+          name: 'my_app',
+          org: 'com.example',
+          stateManagement: sm,
+          testScope: TestScope.full,
+        )..versions = VersionResolver();
+
+        final source = ci_templates.appIntegrationTest(config);
+        expect(source, contains("import 'package:my_app_app/main.dart';"));
+        expect(source, contains('IntegrationTestWidgetsFlutterBinding'));
+        if (sm == StateManagement.riverpod) {
+          expect(source, contains('ProviderScope'));
+        }
+      }
+    });
+  });
+
   group('ProjectConfig', () {
     test('derives all package names from project name', () {
       final config = ProjectConfig(name: 'my_app', org: 'com.example');

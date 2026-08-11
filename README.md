@@ -137,6 +137,7 @@ packages/network/test/                         # API client tests
 | `--org` | `-o` | `com.example` | Organization identifier for Android/iOS bundle |
 | `--[no-]git` | | on | Initialize git repository with first commit |
 | `--ci` | | `none` | CI pipeline: `none`, `github` (Actions), `gitlab`. `--github` implies `github` |
+| `--test` | | `unit` | Test scaffolding: `unit`, or `full` (adds an `integration_test` suite and shared fixtures) |
 | `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, code of conduct) |
 | `--help` | `-h` | | Show help message |
 | `--version` | | | Show version |

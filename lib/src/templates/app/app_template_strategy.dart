@@ -52,6 +52,15 @@ abstract class AppTemplateStrategy {
   String testDevDependencies(ProjectConfig c) => '';
 }
 
+/// The integration_test dev dependency, for `--test full` only.
+///
+/// It is an SDK package, so it costs nothing to resolve but is omitted from
+/// unit-scope projects to keep their pubspec to what they actually use.
+String integrationTestDependency(ProjectConfig c) =>
+    c.testScope == TestScope.full
+    ? '  integration_test:\n    sdk: flutter\n'
+    : '';
+
 /// Framework-agnostic route constants — same for all state managers.
 String appRoutes() => '''
 abstract final class AppRoutes {
