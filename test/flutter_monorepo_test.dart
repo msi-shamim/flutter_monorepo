@@ -5,16 +5,17 @@ import 'package:flutter_monorepo/src/templates/license_templates.dart'
     as license;
 import 'package:flutter_monorepo/src/templates/root_templates.dart' as root;
 import 'package:flutter_monorepo/src/templates/core_templates.dart' as core;
-import 'package:flutter_monorepo/src/templates/github_templates.dart'
-    as github;
+import 'package:flutter_monorepo/src/templates/github_templates.dart' as github;
 import 'package:test/test.dart';
 
 void main() {
   group('packageVersion', () {
     test('matches the version in pubspec.yaml', () {
       final pubspec = File('pubspec.yaml').readAsStringSync();
-      final match =
-          RegExp(r'^version:\s*(\S+)\s*$', multiLine: true).firstMatch(pubspec);
+      final match = RegExp(
+        r'^version:\s*(\S+)\s*$',
+        multiLine: true,
+      ).firstMatch(pubspec);
       expect(match, isNotNull, reason: 'pubspec.yaml has no version: field');
       expect(
         match!.group(1),
@@ -51,8 +52,9 @@ void main() {
     test('round-trips through detectProjectConfig', () {
       final dir = Directory.systemTemp.createTempSync('fm_marker_test');
       addTearDown(() => dir.deleteSync(recursive: true));
-      File('${dir.path}/$projectMarkerFile')
-          .writeAsStringSync(root.projectMarker(config));
+      File(
+        '${dir.path}/$projectMarkerFile',
+      ).writeAsStringSync(root.projectMarker(config));
 
       final detected = detectProjectConfig(dir.path);
       expect(detected, isNotNull);
@@ -74,8 +76,9 @@ void main() {
         org: 'com.example',
         locales: ['en', 'ar'],
       );
-      File('${dir.path}/$projectMarkerFile')
-          .writeAsStringSync(root.projectMarker(ordered));
+      File(
+        '${dir.path}/$projectMarkerFile',
+      ).writeAsStringSync(root.projectMarker(ordered));
 
       final detected = detectProjectConfig(dir.path);
       expect(detected!.locales, ['en', 'ar']);
@@ -103,7 +106,12 @@ void main() {
 
     test('reflects GetX routing rather than GoRouter', () {
       final doc = root.architectureMd(
-          ProjectConfig(name: 'a', org: 'o', stateManagement: StateManagement.getx));
+        ProjectConfig(
+          name: 'a',
+          org: 'o',
+          stateManagement: StateManagement.getx,
+        ),
+      );
       expect(doc, contains('app_pages.dart'));
       expect(doc, isNot(contains('GoRouter')));
     });
@@ -113,8 +121,9 @@ void main() {
     test('rejects an ordinary Dart package', () {
       final dir = Directory.systemTemp.createTempSync('fm_plain_pkg');
       addTearDown(() => dir.deleteSync(recursive: true));
-      File('${dir.path}/pubspec.yaml')
-          .writeAsStringSync('name: my_cool_tool\nversion: 1.0.0\n');
+      File(
+        '${dir.path}/pubspec.yaml',
+      ).writeAsStringSync('name: my_cool_tool\nversion: 1.0.0\n');
       Directory('${dir.path}/lib').createSync();
 
       expect(detectProjectConfig(dir.path), isNull);
@@ -123,8 +132,9 @@ void main() {
     test('rejects a workspace root with no package tree', () {
       final dir = Directory.systemTemp.createTempSync('fm_bare_ws');
       addTearDown(() => dir.deleteSync(recursive: true));
-      File('${dir.path}/pubspec.yaml')
-          .writeAsStringSync('name: thing_workspace\nworkspace:\n  - app\n');
+      File(
+        '${dir.path}/pubspec.yaml',
+      ).writeAsStringSync('name: thing_workspace\nworkspace:\n  - app\n');
 
       expect(detectProjectConfig(dir.path), isNull);
     });
@@ -133,7 +143,8 @@ void main() {
       final dir = Directory.systemTemp.createTempSync('fm_ws_name');
       addTearDown(() => dir.deleteSync(recursive: true));
       File('${dir.path}/pubspec.yaml').writeAsStringSync(
-          'name: task_workspace_workspace\nworkspace:\n  - task_workspace_app\n');
+        'name: task_workspace_workspace\nworkspace:\n  - task_workspace_app\n',
+      );
       Directory('${dir.path}/packages/core').createSync(recursive: true);
       Directory('${dir.path}/packages/l10n').createSync(recursive: true);
 
@@ -144,7 +155,8 @@ void main() {
       final dir = Directory.systemTemp.createTempSync('fm_legacy');
       addTearDown(() => dir.deleteSync(recursive: true));
       File('${dir.path}/pubspec.yaml').writeAsStringSync(
-          'name: my_app_workspace\nworkspace:\n  - my_app_app\n');
+        'name: my_app_workspace\nworkspace:\n  - my_app_app\n',
+      );
       Directory('${dir.path}/packages/core').createSync(recursive: true);
       Directory('${dir.path}/packages/l10n').createSync(recursive: true);
 
@@ -157,9 +169,28 @@ void main() {
   group('Locale identifiers', () {
     // Every code the templates can name, plus codes with no friendly name.
     const codes = [
-      'en', 'ar', 'es', 'fr', 'de', 'pt', 'zh', 'ja', 'ko', 'hi',
-      'tr', 'ru', 'it', 'nl', 'pl', 'sv', 'th', 'vi', 'id', 'ms',
-      'sw', 'zu',
+      'en',
+      'ar',
+      'es',
+      'fr',
+      'de',
+      'pt',
+      'zh',
+      'ja',
+      'ko',
+      'hi',
+      'tr',
+      'ru',
+      'it',
+      'nl',
+      'pl',
+      'sv',
+      'th',
+      'vi',
+      'id',
+      'ms',
+      'sw',
+      'zu',
     ];
 
     for (final sm in StateManagement.values) {
@@ -179,25 +210,23 @@ void main() {
 
           // Collect declared constants, then confirm every locale identifier
           // the template references resolves to one of them.
-          final declared = RegExp(r'static const Locale (\w+) =')
-              .allMatches(source)
-              .map((m) => m.group(1)!)
-              .toSet();
+          final declared = RegExp(
+            r'static const Locale (\w+) =',
+          ).allMatches(source).map((m) => m.group(1)!).toSet();
 
           final referenced = RegExp(
-                  r'\b(locale_[a-z0-9_]+|english|arabic|spanish|french|german|'
-                  r'portuguese|chinese|japanese|korean|hindi|turkish|russian|'
-                  r'italian|dutch|polish|swedish|thai|vietnamese|indonesian|'
-                  r'malay)\b')
-              .allMatches(source)
-              .map((m) => m.group(1)!)
-              .toSet();
+            r'\b(locale_[a-z0-9_]+|english|arabic|spanish|french|german|'
+            r'portuguese|chinese|japanese|korean|hindi|turkish|russian|'
+            r'italian|dutch|polish|swedish|thai|vietnamese|indonesian|'
+            r'malay)\b',
+          ).allMatches(source).map((m) => m.group(1)!).toSet();
 
           for (final ref in referenced) {
             expect(
               declared,
               contains(ref),
-              reason: '${sm.name}/$code references $ref, which is '
+              reason:
+                  '${sm.name}/$code references $ref, which is '
                   'never declared (declared: $declared)',
             );
           }
@@ -208,8 +237,11 @@ void main() {
     test('localeVarName produces a valid Dart identifier', () {
       final identifier = RegExp(r'^[a-zA-Z_$][a-zA-Z0-9_$]*$');
       for (final code in [...codes, 'pt_BR', 'en_US', 'zh_Hans']) {
-        expect(identifier.hasMatch(localeVarName(code)), isTrue,
-            reason: '$code produced "${localeVarName(code)}"');
+        expect(
+          identifier.hasMatch(localeVarName(code)),
+          isTrue,
+          reason: '$code produced "${localeVarName(code)}"',
+        );
       }
     });
 
@@ -226,7 +258,10 @@ void main() {
         locales: ['pt_BR', 'en'],
       );
       final source = localeConstants(config);
-      expect(source, contains("static const Locale locale_pt_BR = Locale('pt', 'BR');"));
+      expect(
+        source,
+        contains("static const Locale locale_pt_BR = Locale('pt', 'BR');"),
+      );
       expect(source, isNot(contains('-')));
     });
   });
@@ -236,35 +271,44 @@ void main() {
     Directory skeleton(String stateDir) {
       final dir = Directory.systemTemp.createTempSync('fm_layout');
       File('${dir.path}/pubspec.yaml').writeAsStringSync(
-          'name: my_app_workspace\nworkspace:\n  - my_app_app\n');
+        'name: my_app_workspace\nworkspace:\n  - my_app_app\n',
+      );
       Directory('${dir.path}/packages/core').createSync(recursive: true);
       Directory('${dir.path}/packages/l10n').createSync(recursive: true);
-      Directory('${dir.path}/my_app_app/lib/app/$stateDir')
-          .createSync(recursive: true);
+      Directory(
+        '${dir.path}/my_app_app/lib/app/$stateDir',
+      ).createSync(recursive: true);
       return dir;
     }
 
     test('falls back to the layout instead of defaulting to GetX', () {
       final dir = skeleton('providers');
       addTearDown(() => dir.deleteSync(recursive: true));
-      expect(detectProjectConfig(dir.path)!.stateManagement,
-          StateManagement.riverpod);
+      expect(
+        detectProjectConfig(dir.path)!.stateManagement,
+        StateManagement.riverpod,
+      );
     });
 
     test('distinguishes cubit from bloc by base class', () {
       final dir = skeleton('blocs');
       addTearDown(() => dir.deleteSync(recursive: true));
-      File('${dir.path}/my_app_app/lib/app/blocs/theme_bloc.dart')
-          .writeAsStringSync('class ThemeCubit extends HydratedCubit<int> {}');
-      expect(detectProjectConfig(dir.path)!.stateManagement,
-          StateManagement.cubit);
+      File(
+        '${dir.path}/my_app_app/lib/app/blocs/theme_bloc.dart',
+      ).writeAsStringSync('class ThemeCubit extends HydratedCubit<int> {}');
+      expect(
+        detectProjectConfig(dir.path)!.stateManagement,
+        StateManagement.cubit,
+      );
     });
 
     test('still reports GetX for a GetX layout', () {
       final dir = skeleton('controllers');
       addTearDown(() => dir.deleteSync(recursive: true));
       expect(
-          detectProjectConfig(dir.path)!.stateManagement, StateManagement.getx);
+        detectProjectConfig(dir.path)!.stateManagement,
+        StateManagement.getx,
+      );
     });
 
     test('cubit survives losing the files detection used to grep', () {
@@ -274,27 +318,37 @@ void main() {
       final dir = skeleton('blocs');
       addTearDown(() => dir.deleteSync(recursive: true));
       File('${dir.path}/$projectMarkerFile').writeAsStringSync(
-          root.projectMarker(ProjectConfig(
-        name: 'my_app',
-        org: 'com.example',
-        stateManagement: StateManagement.cubit,
-      )));
+        root.projectMarker(
+          ProjectConfig(
+            name: 'my_app',
+            org: 'com.example',
+            stateManagement: StateManagement.cubit,
+          ),
+        ),
+      );
 
-      expect(detectProjectConfig(dir.path)!.stateManagement,
-          StateManagement.cubit);
+      expect(
+        detectProjectConfig(dir.path)!.stateManagement,
+        StateManagement.cubit,
+      );
     });
 
     test('a marker outranks the layout entirely', () {
       final dir = skeleton('controllers');
       addTearDown(() => dir.deleteSync(recursive: true));
       File('${dir.path}/$projectMarkerFile').writeAsStringSync(
-          root.projectMarker(ProjectConfig(
-        name: 'my_app',
-        org: 'com.example',
-        stateManagement: StateManagement.bloc,
-      )));
+        root.projectMarker(
+          ProjectConfig(
+            name: 'my_app',
+            org: 'com.example',
+            stateManagement: StateManagement.bloc,
+          ),
+        ),
+      );
       expect(
-          detectProjectConfig(dir.path)!.stateManagement, StateManagement.bloc);
+        detectProjectConfig(dir.path)!.stateManagement,
+        StateManagement.bloc,
+      );
     });
   });
 
@@ -309,10 +363,7 @@ void main() {
     });
 
     test('generates PascalCase from snake_case', () {
-      expect(
-        ProjectConfig(name: 'my_app', org: 'com.example').pascal,
-        'MyApp',
-      );
+      expect(ProjectConfig(name: 'my_app', org: 'com.example').pascal, 'MyApp');
       expect(
         ProjectConfig(name: 'hello_world', org: 'com.example').pascal,
         'HelloWorld',
@@ -477,14 +528,18 @@ void main() {
 
     test('groups 1.0.0 and above by major version', () {
       expect(resolver.caretSeries('4.7.2'), resolver.caretSeries('4.8.0'));
-      expect(resolver.caretSeries('4.7.2'),
-          isNot(resolver.caretSeries('5.0.0')));
+      expect(
+        resolver.caretSeries('4.7.2'),
+        isNot(resolver.caretSeries('5.0.0')),
+      );
     });
 
     test('treats each 0.x as its own breaking series', () {
       expect(resolver.caretSeries('0.20.2'), resolver.caretSeries('0.20.3'));
-      expect(resolver.caretSeries('0.20.2'),
-          isNot(resolver.caretSeries('0.21.0')));
+      expect(
+        resolver.caretSeries('0.20.2'),
+        isNot(resolver.caretSeries('0.21.0')),
+      );
     });
 
     test('returns null for unparseable input', () {
@@ -874,8 +929,11 @@ void main() {
         final text = license.licenseText(c);
         // unlicense and mpl2 don't have year/copyright lines
         if (type != LicenseType.unlicense && type != LicenseType.mpl2) {
-          expect(text, contains(year),
-              reason: '${type.cliName} should contain year');
+          expect(
+            text,
+            contains(year),
+            reason: '${type.cliName} should contain year',
+          );
         }
       }
     });
@@ -887,8 +945,11 @@ void main() {
           org: 'com.test',
           licenseType: type,
         );
-        expect(license.licenseText(c).trim(), isNotEmpty,
-            reason: '${type.cliName} should return non-empty text');
+        expect(
+          license.licenseText(c).trim(),
+          isNotEmpty,
+          reason: '${type.cliName} should return non-empty text',
+        );
       }
     });
   });

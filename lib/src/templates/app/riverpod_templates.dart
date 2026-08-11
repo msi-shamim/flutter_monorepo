@@ -4,7 +4,8 @@ import 'app_template_strategy.dart';
 
 class RiverpodTemplateStrategy extends AppTemplateStrategy {
   @override
-  String appPubspec(ProjectConfig c) => '''
+  String appPubspec(ProjectConfig c) =>
+      '''
 name: ${c.app}
 description: "A ${c.pascal} Flutter application."
 publish_to: 'none'
@@ -46,7 +47,8 @@ flutter:
 ''';
 
   @override
-  String mainDart(ProjectConfig c) => '''
+  String mainDart(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
@@ -127,7 +129,8 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
 ''';
 
   @override
-  String localeController(ProjectConfig c) => '''
+  String localeController(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -233,7 +236,8 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   String homeController(ProjectConfig c) => ''; // State lives in providers
 
   @override
-  String homeScreen(ProjectConfig c) => '''
+  String homeScreen(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';

@@ -158,14 +158,14 @@ void main() async {
   );
 
   // 2. Print derived names
-  print('App package:     ${config.app}');        // my_app_app
-  print('Core package:    ${config.core}');       // my_app_core
-  print('UI package:      ${config.ui}');         // my_app_ui
-  print('Network package: ${config.network}');    // my_app_network
-  print('L10n package:    ${config.l10n}');       // my_app_l10n
-  print('PascalCase:      ${config.pascal}');     // MyApp
+  print('App package:     ${config.app}'); // my_app_app
+  print('Core package:    ${config.core}'); // my_app_core
+  print('UI package:      ${config.ui}'); // my_app_ui
+  print('Network package: ${config.network}'); // my_app_network
+  print('L10n package:    ${config.l10n}'); // my_app_l10n
+  print('PascalCase:      ${config.pascal}'); // MyApp
   print('Primary locale:  ${config.primaryLocale}'); // en
-  print('Uses GoRouter:   ${config.usesGoRouter}');  // true (Riverpod)
+  print('Uses GoRouter:   ${config.usesGoRouter}'); // true (Riverpod)
   print('');
 
   // 3. Check required packages for this configuration

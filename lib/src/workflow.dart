@@ -35,14 +35,12 @@ class Workflow {
     final workflowBDesc = switch (sm) {
       StateManagement.getx =>
         'Figma screen → controller + binding + screen + sections',
-      StateManagement.riverpod =>
-        'Figma screen → provider + screen + sections',
+      StateManagement.riverpod => 'Figma screen → provider + screen + sections',
       StateManagement.bloc =>
         'Figma screen → bloc + events + states + screen + sections',
       StateManagement.cubit =>
         'Figma screen → cubit + state + screen + sections',
-      null =>
-        'Figma screen → controller/provider/bloc + screen + sections',
+      null => 'Figma screen → controller/provider/bloc + screen + sections',
     };
 
     // Quick reference: state management directory
@@ -73,8 +71,7 @@ class Workflow {
       StateManagement.bloc ||
       StateManagement.cubit =>
         'Route definition         → <app>/lib/app/router/',
-      null =>
-        'Route definition         → <app>/lib/app/routes/ or router/',
+      null => 'Route definition         → <app>/lib/app/routes/ or router/',
     };
 
     // Quick reference: middleware/guard
@@ -278,7 +275,8 @@ AI Agent Skill
   Binding     → Get.lazyPut() for controller + dependencies
   Screen      → GetView<Controller>, assembles sections in Scaffold
   Sections    → StatelessWidget, receive data + callbacks via params''';
-        sectionRulesNote = '  • Stateless (not GetView) — controller owns the state';
+        sectionRulesNote =
+            '  • Stateless (not GetView) — controller owns the state';
         routingInstructions = '''
   Add route constant in app/routes/app_routes.dart
   Register GetPage in app/routes/app_pages.dart''';
@@ -304,7 +302,8 @@ AI Agent Skill
   Provider    → Notifier with state class, API calls, uses companion states
   Screen      → ConsumerWidget, uses ref.watch() to read providers
   Sections    → StatelessWidget, receive data + callbacks via params''';
-        sectionRulesNote = '  • Stateless (not ConsumerWidget) — provider owns the state';
+        sectionRulesNote =
+            '  • Stateless (not ConsumerWidget) — provider owns the state';
         routingInstructions = '''
   Add route constant in app/routes/app_routes.dart
   Add GoRoute in app/router/app_router.dart''';
@@ -334,7 +333,8 @@ AI Agent Skill
   States      → Sealed class hierarchy (e.g., Initial, Loading, Loaded, Error)
   Screen      → BlocBuilder<Bloc, State>, assembles sections in Scaffold
   Sections    → StatelessWidget, receive data + callbacks via params''';
-        sectionRulesNote = '  • Stateless (not BlocBuilder) — bloc owns the state';
+        sectionRulesNote =
+            '  • Stateless (not BlocBuilder) — bloc owns the state';
         routingInstructions = '''
   Add route constant in app/routes/app_routes.dart
   Add GoRoute in app/router/app_router.dart
@@ -363,7 +363,8 @@ AI Agent Skill
   States      → State class (or sealed class for multiple states)
   Screen      → BlocBuilder<Cubit, State>, assembles sections in Scaffold
   Sections    → StatelessWidget, receive data + callbacks via params''';
-        sectionRulesNote = '  • Stateless (not BlocBuilder) — cubit owns the state';
+        sectionRulesNote =
+            '  • Stateless (not BlocBuilder) — cubit owns the state';
         routingInstructions = '''
   Add route constant in app/routes/app_routes.dart
   Add GoRoute in app/router/app_router.dart

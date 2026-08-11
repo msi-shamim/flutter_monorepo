@@ -19,7 +19,8 @@ String licenseText(ProjectConfig c) {
   };
 }
 
-String _proprietary(int year, String holder) => '''
+String _proprietary(int year, String holder) =>
+    '''
 Copyright (c) $year $holder. All Rights Reserved.
 
 PROPRIETARY AND CONFIDENTIAL
@@ -31,7 +32,8 @@ via any medium, is strictly prohibited without prior written permission.
 For licensing inquiries, contact the copyright holder.
 ''';
 
-String _mit(int year, String holder) => '''
+String _mit(int year, String holder) =>
+    '''
 MIT License
 
 Copyright (c) $year $holder
@@ -55,7 +57,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ''';
 
-String _apache2(int year, String holder) => '''
+String _apache2(int year, String holder) =>
+    '''
 Apache License
 Version 2.0, January 2004
 https://www.apache.org/licenses/LICENSE-2.0
@@ -75,7 +78,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ''';
 
-String _bsd2clause(int year, String holder) => '''
+String _bsd2clause(int year, String holder) =>
+    '''
 BSD 2-Clause License
 
 Copyright (c) $year $holder
@@ -103,7 +107,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ''';
 
-String _bsd3clause(int year, String holder) => '''
+String _bsd3clause(int year, String holder) =>
+    '''
 BSD 3-Clause License
 
 Copyright (c) $year $holder
@@ -135,7 +140,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 ''';
 
-String _gpl2(int year, String holder) => '''
+String _gpl2(int year, String holder) =>
+    '''
 GNU General Public License v2.0
 
 Copyright (c) $year $holder
@@ -154,7 +160,8 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, see <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>.
 ''';
 
-String _gpl3(int year, String holder) => '''
+String _gpl3(int year, String holder) =>
+    '''
 GNU General Public License v3.0
 
 Copyright (c) $year $holder
@@ -173,7 +180,8 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>.
 ''';
 
-String _lgpl21(int year, String holder) => '''
+String _lgpl21(int year, String holder) =>
+    '''
 GNU Lesser General Public License v2.1
 
 Copyright (c) $year $holder
@@ -226,7 +234,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <https://unlicense.org>
 ''';
 
-String _isc(int year, String holder) => '''
+String _isc(int year, String holder) =>
+    '''
 ISC License
 
 Copyright (c) $year $holder

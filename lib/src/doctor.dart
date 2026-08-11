@@ -54,14 +54,16 @@ class Doctor {
     // Build map of files that can be fully restored
     _restorableFiles = {
       '.claude/settings.json': skills.claudeSettings(),
-      '.claude/skills/component-design/SKILL.md':
-          skills.componentDesignSkill(config),
-      '.claude/skills/screen-design/SKILL.md':
-          skills.screenDesignSkill(config),
-      '.claude/skills/business-logic/SKILL.md':
-          skills.businessLogicSkill(config),
-      '.claude/skills/monorepo-doctor/SKILL.md':
-          skills.monrepoDoctorSkill(config),
+      '.claude/skills/component-design/SKILL.md': skills.componentDesignSkill(
+        config,
+      ),
+      '.claude/skills/screen-design/SKILL.md': skills.screenDesignSkill(config),
+      '.claude/skills/business-logic/SKILL.md': skills.businessLogicSkill(
+        config,
+      ),
+      '.claude/skills/monorepo-doctor/SKILL.md': skills.monrepoDoctorSkill(
+        config,
+      ),
       'README.md': root.readmeMd(config),
       'ARCHITECTURE.md': root.architectureMd(config),
       'LICENSE': license.licenseText(config),
@@ -76,19 +78,20 @@ class Doctor {
       _restorableFiles.addAll({
         'CODE_OF_CONDUCT.md': github.codeOfConduct(config),
         '.github/FUNDING.yml': github.fundingYml(config),
-        '.github/ISSUE_TEMPLATE/bug_report.md':
-            github.bugReportTemplate(config),
-        '.github/ISSUE_TEMPLATE/feature_request.md':
-            github.featureRequestTemplate(config),
-        '.github/pull_request_template.md':
-            github.pullRequestTemplate(config),
+        '.github/ISSUE_TEMPLATE/bug_report.md': github.bugReportTemplate(
+          config,
+        ),
+        '.github/ISSUE_TEMPLATE/feature_request.md': github
+            .featureRequestTemplate(config),
+        '.github/pull_request_template.md': github.pullRequestTemplate(config),
         '.github/workflows/ci.yml': github.ciWorkflow(config),
       });
     }
 
     stdout.writeln('');
     stdout.writeln(
-        '→ Detected: ${config.name} (${config.stateManagement.name} + ${config.httpClient.name}, locales: ${config.locales.join(',')})');
+      '→ Detected: ${config.name} (${config.stateManagement.name} + ${config.httpClient.name}, locales: ${config.locales.join(',')})',
+    );
     stdout.writeln('');
 
     final dirs = _expectedDirectories(config);
@@ -107,21 +110,25 @@ class Doctor {
     // Summary
     stdout.writeln('');
     if (_missing == 0) {
-      stdout.writeln('Result: All $_passed checks passed. Structure is intact.');
+      stdout.writeln(
+        'Result: All $_passed checks passed. Structure is intact.',
+      );
     } else {
       stdout.writeln('Result: $_passed passed, $_missing missing.');
       if (fix) {
         stdout.writeln('Restored: $_restored of $_missing.');
         if (_unrestorable > 0) {
           stdout.writeln(
-              '$_unrestorable file(s) have no template and were left absent — '
-              'restore them from version control.');
+            '$_unrestorable file(s) have no template and were left absent — '
+            'restore them from version control.',
+          );
         } else {
           stdout.writeln('Structure is now intact.');
         }
       } else {
         stdout.writeln(
-            'Run `flutter_monorepo doctor --fix` to restore missing items.');
+          'Run `flutter_monorepo doctor --fix` to restore missing items.',
+        );
       }
     }
 
@@ -149,8 +156,11 @@ class Doctor {
     }
   }
 
-  void _restore(String relativePath, String fullPath,
-      {required bool isDirectory}) {
+  void _restore(
+    String relativePath,
+    String fullPath, {
+    required bool isDirectory,
+  }) {
     if (isDirectory) {
       Directory(fullPath).createSync(recursive: true);
       stdout.writeln('    → Created directory');
@@ -181,8 +191,9 @@ class Doctor {
     final config = detectProjectConfig(rootPath);
     if (config == null) {
       stderr.writeln(
-          'Error: Could not detect project config. '
-          'Are you in a flutter_monorepo project root?');
+        'Error: Could not detect project config. '
+        'Are you in a flutter_monorepo project root?',
+      );
     }
     return config;
   }
@@ -250,25 +261,15 @@ class Doctor {
           '${c.app}/lib/app/middleware',
         ]);
       case StateManagement.riverpod:
-        dirs.addAll([
-          '${c.app}/lib/app/providers',
-          '${c.app}/lib/app/router',
-        ]);
+        dirs.addAll(['${c.app}/lib/app/providers', '${c.app}/lib/app/router']);
       case StateManagement.bloc:
       case StateManagement.cubit:
-        dirs.addAll([
-          '${c.app}/lib/app/blocs',
-          '${c.app}/lib/app/router',
-        ]);
+        dirs.addAll(['${c.app}/lib/app/blocs', '${c.app}/lib/app/router']);
     }
 
     // GitHub community directories
     if (c.githubFiles) {
-      dirs.addAll([
-        '.github',
-        '.github/ISSUE_TEMPLATE',
-        '.github/workflows',
-      ]);
+      dirs.addAll(['.github', '.github/ISSUE_TEMPLATE', '.github/workflows']);
     }
 
     return dirs;

@@ -1,7 +1,8 @@
 import '../project_config.dart';
 import '../version.dart';
 
-String l10nPubspec(ProjectConfig c) => '''
+String l10nPubspec(ProjectConfig c) =>
+    '''
 name: ${c.l10n}
 description: Localization package for ${c.pascal} (${c.locales.join(', ').toUpperCase()}).
 publish_to: 'none'
@@ -27,7 +28,8 @@ flutter:
   generate: true
 ''';
 
-String l10nYaml(ProjectConfig c) => '''
+String l10nYaml(ProjectConfig c) =>
+    '''
 arb-dir: lib/l10n/arb
 template-arb-file: app_${c.primaryLocale}.arb
 output-localization-file: app_localizations.dart
@@ -54,13 +56,17 @@ String arbFile(ProjectConfig c, String locale) {
   final isPrimary = locale == c.primaryLocale;
   // A region variant falls back to its base language before English, so
   // pt_BR gets Portuguese strings rather than untranslated English ones.
-  final t = _translations[locale] ??
+  final t =
+      _translations[locale] ??
       _translations[locale.split('_').first] ??
       _translations['en']!;
 
   final entries = <String, String>{
     'appTitle': (t['appTitle'] ?? '{app}').replaceAll('{app}', c.pascal),
-    'welcomeMessage': (t['welcomeMessage'] ?? 'Welcome to {app}').replaceAll('{app}', c.pascal),
+    'welcomeMessage': (t['welcomeMessage'] ?? 'Welcome to {app}').replaceAll(
+      '{app}',
+      c.pascal,
+    ),
     'settings': t['settings'] ?? 'Settings',
     'language': t['language'] ?? 'Language',
     'theme': t['theme'] ?? 'Theme',
@@ -84,8 +90,10 @@ String arbFile(ProjectConfig c, String locale) {
   if (!hasTranslation(locale)) {
     // ARB is JSON, so this cannot be a // comment. @@x- attributes are the
     // documented extension point and are ignored by gen-l10n.
-    buf.writeln('  "@@x-untranslated": '
-        '"Values below are English placeholders — translate before shipping.",');
+    buf.writeln(
+      '  "@@x-untranslated": '
+      '"Values below are English placeholders — translate before shipping.",',
+    );
   }
 
   final keys = entries.keys.toList();
@@ -118,12 +126,15 @@ const _translations = <String, Map<String, String>>{
   },
   'ar': {
     'appTitle': '{app}',
-    'welcomeMessage': '\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a {app}',
+    'welcomeMessage':
+        '\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a {app}',
     'settings': '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a',
     'language': '\u0627\u0644\u0644\u063a\u0629',
     'theme': '\u0627\u0644\u0645\u0638\u0647\u0631',
-    'darkMode': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u062f\u0627\u0643\u0646',
-    'lightMode': '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0641\u0627\u062a\u062d',
+    'darkMode':
+        '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u062f\u0627\u0643\u0646',
+    'lightMode':
+        '\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u0641\u0627\u062a\u062d',
   },
   'es': {
     'appTitle': '{app}',
@@ -181,7 +192,8 @@ const _translations = <String, Map<String, String>>{
   },
   'ko': {
     'appTitle': '{app}',
-    'welcomeMessage': '{app}\uc5d0 \uc624\uc2e0 \uac83\uc744 \ud658\uc601\ud569\ub2c8\ub2e4',
+    'welcomeMessage':
+        '{app}\uc5d0 \uc624\uc2e0 \uac83\uc744 \ud658\uc601\ud569\ub2c8\ub2e4',
     'settings': '\uc124\uc815',
     'language': '\uc5b8\uc5b4',
     'theme': '\ud14c\ub9c8',
@@ -190,7 +202,8 @@ const _translations = <String, Map<String, String>>{
   },
   'hi': {
     'appTitle': '{app}',
-    'welcomeMessage': '{app} \u092e\u0947\u0902 \u0906\u092a\u0915\u093e \u0938\u094d\u0935\u093e\u0917\u0924 \u0939\u0948',
+    'welcomeMessage':
+        '{app} \u092e\u0947\u0902 \u0906\u092a\u0915\u093e \u0938\u094d\u0935\u093e\u0917\u0924 \u0939\u0948',
     'settings': '\u0938\u0947\u091f\u093f\u0902\u0917\u094d\u0938',
     'language': '\u092d\u093e\u0937\u093e',
     'theme': '\u0925\u0940\u092e',
@@ -208,12 +221,15 @@ const _translations = <String, Map<String, String>>{
   },
   'ru': {
     'appTitle': '{app}',
-    'welcomeMessage': '\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 {app}',
+    'welcomeMessage':
+        '\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 {app}',
     'settings': '\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438',
     'language': '\u042f\u0437\u044b\u043a',
     'theme': '\u0422\u0435\u043c\u0430',
-    'darkMode': '\u0422\u0451\u043c\u043d\u044b\u0439 \u0440\u0435\u0436\u0438\u043c',
-    'lightMode': '\u0421\u0432\u0435\u0442\u043b\u044b\u0439 \u0440\u0435\u0436\u0438\u043c',
+    'darkMode':
+        '\u0422\u0451\u043c\u043d\u044b\u0439 \u0440\u0435\u0436\u0438\u043c',
+    'lightMode':
+        '\u0421\u0432\u0435\u0442\u043b\u044b\u0439 \u0440\u0435\u0436\u0438\u043c',
   },
 };
 
@@ -260,7 +276,8 @@ class DirectionalityBuilder extends StatelessWidget {
 }
 ''';
 
-String l10nPackageMd(ProjectConfig c) => '''
+String l10nPackageMd(ProjectConfig c) =>
+    '''
 # ${c.l10n}
 
 Localization (${c.locales.join(', ').toUpperCase()}), formatters, and RTL helpers.

@@ -1,7 +1,8 @@
 import '../project_config.dart';
 import '../version.dart';
 
-String uiPubspec(ProjectConfig c) => '''
+String uiPubspec(ProjectConfig c) =>
+    '''
 name: ${c.ui}
 description: Shared UI components for ${c.pascal}.
 publish_to: 'none'
@@ -37,7 +38,8 @@ flutter:
 ''';
 
 /// Starter widget test for the shared UI package.
-String uiStarterTest(ProjectConfig c) => '''
+String uiStarterTest(ProjectConfig c) =>
+    '''
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:${c.ui}/${c.ui}.dart';
@@ -400,7 +402,8 @@ abstract final class AppTheme {
 }
 ''';
 
-String uiPackageMd(ProjectConfig c) => '''
+String uiPackageMd(ProjectConfig c) =>
+    '''
 # ${c.ui}
 
 Shared UI components, themes, design tokens, responsive utilities, and centralized assets.

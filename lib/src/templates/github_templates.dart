@@ -61,7 +61,8 @@ String fundingYml(ProjectConfig c) => '''
 ''';
 
 /// GitHub Issue template for bug reports.
-String bugReportTemplate(ProjectConfig c) => '''
+String bugReportTemplate(ProjectConfig c) =>
+    '''
 ---
 name: Bug Report
 about: Report a bug to help us improve ${c.pascal}
@@ -106,7 +107,8 @@ Add any other context about the problem here.
 ''';
 
 /// GitHub Issue template for feature requests.
-String featureRequestTemplate(ProjectConfig c) => '''
+String featureRequestTemplate(ProjectConfig c) =>
+    '''
 ---
 name: Feature Request
 about: Suggest an idea for ${c.pascal}
@@ -169,7 +171,8 @@ Brief description of what this PR does.
 ''';
 
 /// GitHub Actions CI workflow.
-String ciWorkflow(ProjectConfig c) => '''
+String ciWorkflow(ProjectConfig c) =>
+    '''
 name: CI
 
 on:

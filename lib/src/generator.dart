@@ -96,18 +96,17 @@ class Generator {
   // ── Flutter create ──────────────────────────────────────
   Future<void> _createFlutterProject() async {
     _log('Creating Flutter project...');
-    final result = await Process.run(
-      'flutter',
-      [
-        'create',
-        '--org', config.org,
-        '--project-name', config.app,
-        '$rootPath/${config.app}',
-        '--platforms', config.platforms.join(','),
-        '--no-pub',
-      ],
-      runInShell: true,
-    );
+    final result = await Process.run('flutter', [
+      'create',
+      '--org',
+      config.org,
+      '--project-name',
+      config.app,
+      '$rootPath/${config.app}',
+      '--platforms',
+      config.platforms.join(','),
+      '--no-pub',
+    ], runInShell: true);
     if (result.exitCode != 0) {
       throw Exception('flutter create failed:\n${result.stderr}');
     }
@@ -214,12 +213,18 @@ class Generator {
     _log('Writing GitHub community files...');
     _write('CODE_OF_CONDUCT.md', github.codeOfConduct(config));
     _write('.github/FUNDING.yml', github.fundingYml(config));
-    _write('.github/ISSUE_TEMPLATE/bug_report.md',
-        github.bugReportTemplate(config));
-    _write('.github/ISSUE_TEMPLATE/feature_request.md',
-        github.featureRequestTemplate(config));
-    _write('.github/pull_request_template.md',
-        github.pullRequestTemplate(config));
+    _write(
+      '.github/ISSUE_TEMPLATE/bug_report.md',
+      github.bugReportTemplate(config),
+    );
+    _write(
+      '.github/ISSUE_TEMPLATE/feature_request.md',
+      github.featureRequestTemplate(config),
+    );
+    _write(
+      '.github/pull_request_template.md',
+      github.pullRequestTemplate(config),
+    );
     _write('.github/workflows/ci.yml', github.ciWorkflow(config));
   }
 
@@ -229,14 +234,29 @@ class Generator {
     _write('packages/core/pubspec.yaml', core.corePubspec(config));
     _write('packages/core/PACKAGE.md', core.corePackageMd(config));
     _write('packages/core/lib/${config.core}.dart', core.coreBarrel(config));
-    _write('packages/core/lib/exceptions/app_exception.dart', core.appException());
+    _write(
+      'packages/core/lib/exceptions/app_exception.dart',
+      core.appException(),
+    );
     _write('packages/core/lib/models/base_model.dart', core.baseModel());
-    _write('packages/core/lib/repositories/base_repository.dart', core.baseRepository());
+    _write(
+      'packages/core/lib/repositories/base_repository.dart',
+      core.baseRepository(),
+    );
     _write('packages/core/lib/usecases/use_case.dart', core.useCase(config));
     _write('packages/core/lib/utils/result.dart', core.result(config));
-    _write('packages/core/lib/extensions/string_extensions.dart', core.stringExtensions());
-    _write('packages/core/lib/extensions/date_extensions.dart', core.dateExtensions());
-    _write('packages/core/lib/extensions/list_extensions.dart', core.listExtensions());
+    _write(
+      'packages/core/lib/extensions/string_extensions.dart',
+      core.stringExtensions(),
+    );
+    _write(
+      'packages/core/lib/extensions/date_extensions.dart',
+      core.dateExtensions(),
+    );
+    _write(
+      'packages/core/lib/extensions/list_extensions.dart',
+      core.listExtensions(),
+    );
     _write('packages/core/test/core_test.dart', core.coreStarterTest(config));
   }
 
@@ -250,8 +270,14 @@ class Generator {
     _write('packages/ui/lib/assets/app_images.dart', ui.appImages(config));
     _write('packages/ui/lib/assets/app_fonts.dart', ui.appFonts());
     _write('packages/ui/lib/responsive/breakpoints.dart', ui.breakpoints());
-    _write('packages/ui/lib/responsive/responsive_helper.dart', ui.responsiveHelper());
-    _write('packages/ui/lib/responsive/responsive_builder.dart', ui.responsiveBuilder());
+    _write(
+      'packages/ui/lib/responsive/responsive_helper.dart',
+      ui.responsiveHelper(),
+    );
+    _write(
+      'packages/ui/lib/responsive/responsive_builder.dart',
+      ui.responsiveBuilder(),
+    );
     _write('packages/ui/lib/theme/app_colors.dart', ui.appColors());
     _write('packages/ui/lib/theme/app_spacing.dart', ui.appSpacing());
     _write('packages/ui/lib/theme/app_typography.dart', ui.appTypography());
@@ -265,10 +291,22 @@ class Generator {
     _write('packages/network/pubspec.yaml', net.networkPubspec(config));
     _write('packages/network/PACKAGE.md', net.networkPackageMd(config));
     _write('packages/network/lib/${config.network}.dart', net.networkBarrel());
-    _write('packages/network/lib/client/api_client.dart', net.apiClient(config));
-    _write('packages/network/lib/interceptors/auth_interceptor.dart', net.authInterceptor(config));
-    _write('packages/network/lib/interceptors/logging_interceptor.dart', net.loggingInterceptor(config));
-    _write('packages/network/test/api_client_test.dart', net.networkStarterTest(config));
+    _write(
+      'packages/network/lib/client/api_client.dart',
+      net.apiClient(config),
+    );
+    _write(
+      'packages/network/lib/interceptors/auth_interceptor.dart',
+      net.authInterceptor(config),
+    );
+    _write(
+      'packages/network/lib/interceptors/logging_interceptor.dart',
+      net.loggingInterceptor(config),
+    );
+    _write(
+      'packages/network/test/api_client_test.dart',
+      net.networkStarterTest(config),
+    );
   }
 
   // ── L10n package ────────────────────────────────────────
@@ -296,13 +334,24 @@ class Generator {
       if (!l10n.hasTranslation(locale)) untranslated.add(locale);
     }
     if (untranslated.isNotEmpty) {
-      stdout.writeln('  Note: no built-in strings for '
-          '${untranslated.join(', ')} — those ARB files contain English '
-          'placeholders and are marked for translation.');
+      stdout.writeln(
+        '  Note: no built-in strings for '
+        '${untranslated.join(', ')} — those ARB files contain English '
+        'placeholders and are marked for translation.',
+      );
     }
-    _write('packages/l10n/lib/formatters/date_formatter.dart', l10n.dateFormatter());
-    _write('packages/l10n/lib/formatters/number_formatter.dart', l10n.numberFormatter());
-    _write('packages/l10n/lib/widgets/directionality_builder.dart', l10n.directionalityBuilder());
+    _write(
+      'packages/l10n/lib/formatters/date_formatter.dart',
+      l10n.dateFormatter(),
+    );
+    _write(
+      'packages/l10n/lib/formatters/number_formatter.dart',
+      l10n.numberFormatter(),
+    );
+    _write(
+      'packages/l10n/lib/widgets/directionality_builder.dart',
+      l10n.directionalityBuilder(),
+    );
   }
 
   // ── App code (strategy pattern) ─────────────────────────
@@ -315,8 +364,14 @@ class Generator {
     _write('${config.app}/lib/app/routes/app_routes.dart', appRoutes());
 
     // Routing
-    _writeIfNotEmpty('${config.app}/lib/app/routes/app_pages.dart', tmpl.appPages(config));
-    _writeIfNotEmpty('${config.app}/lib/app/router/app_router.dart', tmpl.appRouter(config));
+    _writeIfNotEmpty(
+      '${config.app}/lib/app/routes/app_pages.dart',
+      tmpl.appPages(config),
+    );
+    _writeIfNotEmpty(
+      '${config.app}/lib/app/router/app_router.dart',
+      tmpl.appRouter(config),
+    );
 
     // State management — write to framework-specific directories
     final stateDir = switch (config.stateManagement) {
@@ -335,15 +390,36 @@ class Generator {
       StateManagement.bloc || StateManagement.cubit => 'locale_bloc.dart',
     };
 
-    _writeIfNotEmpty('${config.app}/lib/app/$stateDir/$themeFile', tmpl.themeController(config));
-    _writeIfNotEmpty('${config.app}/lib/app/$stateDir/$localeFile', tmpl.localeController(config));
-    _writeIfNotEmpty('${config.app}/lib/app/bindings/initial_binding.dart', tmpl.initialBinding(config));
-    _writeIfNotEmpty('${config.app}/lib/app/middleware/auth_middleware.dart', tmpl.authMiddleware(config));
+    _writeIfNotEmpty(
+      '${config.app}/lib/app/$stateDir/$themeFile',
+      tmpl.themeController(config),
+    );
+    _writeIfNotEmpty(
+      '${config.app}/lib/app/$stateDir/$localeFile',
+      tmpl.localeController(config),
+    );
+    _writeIfNotEmpty(
+      '${config.app}/lib/app/bindings/initial_binding.dart',
+      tmpl.initialBinding(config),
+    );
+    _writeIfNotEmpty(
+      '${config.app}/lib/app/middleware/auth_middleware.dart',
+      tmpl.authMiddleware(config),
+    );
 
     // Screen
-    _writeIfNotEmpty('${config.app}/lib/screens/home/home_binding.dart', tmpl.homeBinding(config));
-    _writeIfNotEmpty('${config.app}/lib/screens/home/home_controller.dart', tmpl.homeController(config));
-    _write('${config.app}/lib/screens/home/home_screen.dart', tmpl.homeScreen(config));
+    _writeIfNotEmpty(
+      '${config.app}/lib/screens/home/home_binding.dart',
+      tmpl.homeBinding(config),
+    );
+    _writeIfNotEmpty(
+      '${config.app}/lib/screens/home/home_controller.dart',
+      tmpl.homeController(config),
+    );
+    _write(
+      '${config.app}/lib/screens/home/home_screen.dart',
+      tmpl.homeScreen(config),
+    );
 
     // Replace flutter create's default test, which references a counter app
     // that does not exist here, with one that exercises the generated code.
@@ -351,24 +427,39 @@ class Generator {
     if (widgetTest.existsSync()) widgetTest.deleteSync();
     _write('${config.app}/test/app_test.dart', appStarterTest(config));
     _writeIfNotEmpty(
-        '${config.app}/test/flutter_test_config.dart', tmpl.testSetup(config));
+      '${config.app}/test/flutter_test_config.dart',
+      tmpl.testSetup(config),
+    );
   }
 
   // ── AI Agent Skills ──────────────────────────────────────
   void _writeSkills() {
     _log('Writing AI agent skills...');
     _write('.claude/settings.json', skills.claudeSettings());
-    _write('.claude/skills/component-design/SKILL.md', skills.componentDesignSkill(config));
-    _write('.claude/skills/screen-design/SKILL.md', skills.screenDesignSkill(config));
-    _write('.claude/skills/business-logic/SKILL.md', skills.businessLogicSkill(config));
-    _write('.claude/skills/monorepo-doctor/SKILL.md', skills.monrepoDoctorSkill(config));
+    _write(
+      '.claude/skills/component-design/SKILL.md',
+      skills.componentDesignSkill(config),
+    );
+    _write(
+      '.claude/skills/screen-design/SKILL.md',
+      skills.screenDesignSkill(config),
+    );
+    _write(
+      '.claude/skills/business-logic/SKILL.md',
+      skills.businessLogicSkill(config),
+    );
+    _write(
+      '.claude/skills/monorepo-doctor/SKILL.md',
+      skills.monrepoDoctorSkill(config),
+    );
   }
 
   // ── Post-generation commands ────────────────────────────
   Future<void> _resolveDependencies() async {
     _log('Resolving dependencies...');
     final result = await Process.run(
-      'dart', ['pub', 'get'],
+      'dart',
+      ['pub', 'get'],
       workingDirectory: rootPath,
       runInShell: true,
     );
@@ -381,7 +472,8 @@ class Generator {
   Future<void> _generateL10n() async {
     _log('Generating l10n...');
     final result = await Process.run(
-      'flutter', ['gen-l10n'],
+      'flutter',
+      ['gen-l10n'],
       workingDirectory: '$rootPath/packages/l10n',
       runInShell: true,
     );
@@ -402,7 +494,8 @@ class Generator {
   Future<void> _formatCode() async {
     _log('Formatting generated code...');
     final result = await Process.run(
-      'dart', ['format', '.'],
+      'dart',
+      ['format', '.'],
       workingDirectory: rootPath,
       runInShell: true,
     );
@@ -415,7 +508,8 @@ class Generator {
   Future<void> _analyze() async {
     _log('Running dart analyze...');
     final result = await Process.run(
-      'dart', ['analyze'],
+      'dart',
+      ['analyze'],
       workingDirectory: rootPath,
       runInShell: true,
     );
@@ -435,7 +529,8 @@ class Generator {
       ['commit', '-m', 'Initial commit: ${config.pascal} monorepo'],
     ]) {
       final result = await Process.run(
-        'git', step,
+        'git',
+        step,
         workingDirectory: rootPath,
         runInShell: true,
       );

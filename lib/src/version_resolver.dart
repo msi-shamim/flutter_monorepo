@@ -95,7 +95,9 @@ class VersionResolver {
       );
       // connectionTimeout bounds only the TCP connect, so a server that
       // accepts the connection and then stalls would hang generation forever.
-      final response = await request.close().timeout(const Duration(seconds: 10));
+      final response = await request.close().timeout(
+        const Duration(seconds: 10),
+      );
       if (response.statusCode == 200) {
         final body = await response
             .transform(utf8.decoder)
@@ -169,8 +171,9 @@ class VersionResolver {
   bool acceptsSdkConstraint(Object? sdkConstraint) {
     if (sdkConstraint is! String) return true;
 
-    final lowerBound =
-        RegExp(r'(?:\^|>=)\s*(\d+\.\d+\.\d+)').firstMatch(sdkConstraint);
+    final lowerBound = RegExp(
+      r'(?:\^|>=)\s*(\d+\.\d+\.\d+)',
+    ).firstMatch(sdkConstraint);
     if (lowerBound == null) return true;
 
     return !isNewer(lowerBound.group(1)!, generatedSdkFloor);
@@ -181,8 +184,22 @@ class VersionResolver {
   /// Build metadata breaks ties, so `8.0.0+1` ranks above `8.0.0`. Pre-release
   /// suffixes are not handled here — they are filtered out before comparison.
   bool isNewer(String a, String b) {
-    final aParts = a.split('+').first.split('-').first.split('.').map(int.tryParse).toList();
-    final bParts = b.split('+').first.split('-').first.split('.').map(int.tryParse).toList();
+    final aParts = a
+        .split('+')
+        .first
+        .split('-')
+        .first
+        .split('.')
+        .map(int.tryParse)
+        .toList();
+    final bParts = b
+        .split('+')
+        .first
+        .split('-')
+        .first
+        .split('.')
+        .map(int.tryParse)
+        .toList();
     for (var i = 0; i < 3; i++) {
       final av = i < aParts.length ? (aParts[i] ?? 0) : 0;
       final bv = i < bParts.length ? (bParts[i] ?? 0) : 0;

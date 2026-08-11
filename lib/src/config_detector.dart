@@ -20,13 +20,18 @@ ProjectConfig? detectProjectConfig(String rootPath) {
   // Strip only the suffix the generator appends. replaceAll would turn
   // task_workspace_workspace into "task", pointing every subsequent check at
   // a project that does not exist.
-  final name = _extractYamlValue(rootContent, 'name')
-      ?.replaceFirst(RegExp(r'_workspace$'), '');
+  final name = _extractYamlValue(
+    rootContent,
+    'name',
+  )?.replaceFirst(RegExp(r'_workspace$'), '');
   if (name == null) return null;
 
   final appPubspecFile = File('$rootPath/${name}_app/pubspec.yaml');
-  final stateManagement =
-      _detectStateManagement(appPubspecFile, name, rootPath);
+  final stateManagement = _detectStateManagement(
+    appPubspecFile,
+    name,
+    rootPath,
+  );
 
   final netPubspecFile = File('$rootPath/packages/network/pubspec.yaml');
   final httpClient = _detectHttpClient(netPubspecFile);
@@ -77,12 +82,15 @@ ProjectConfig? _readMarker(String rootPath) {
   return ProjectConfig(
     name: name,
     org: _extractYamlValue(content, 'org') ?? 'com.example',
-    stateManagement: _parseEnum(
-        _extractYamlValue(content, 'state'), StateManagement.values) ??
+    stateManagement:
+        _parseEnum(
+          _extractYamlValue(content, 'state'),
+          StateManagement.values,
+        ) ??
         StateManagement.getx,
     httpClient:
         _parseEnum(_extractYamlValue(content, 'http'), HttpClient.values) ??
-            HttpClient.dio,
+        HttpClient.dio,
     licenseType: license == null
         ? LicenseType.proprietary
         : _parseLicense(license) ?? LicenseType.proprietary,
@@ -117,7 +125,10 @@ List<String> _splitList(String? value) {
 }
 
 StateManagement _detectStateManagement(
-    File pubspecFile, String name, String rootPath) {
+  File pubspecFile,
+  String name,
+  String rootPath,
+) {
   if (!pubspecFile.existsSync()) {
     // The pubspec is the strongest signal, but a project missing it is exactly
     // the case doctor is meant to help with. Defaulting to GetX here made a
@@ -138,7 +149,10 @@ StateManagement _detectStateManagement(
 /// Infers the framework from the directories the generator creates for it.
 ///
 /// Returns `null` when the layout is ambiguous, leaving the caller to decide.
-StateManagement? _detectStateManagementFromLayout(String name, String rootPath) {
+StateManagement? _detectStateManagementFromLayout(
+  String name,
+  String rootPath,
+) {
   final appDir = '$rootPath/${name}_app/lib/app';
   if (Directory('$appDir/providers').existsSync()) {
     return StateManagement.riverpod;

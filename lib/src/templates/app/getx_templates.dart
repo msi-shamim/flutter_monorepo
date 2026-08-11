@@ -4,7 +4,8 @@ import 'app_template_strategy.dart';
 
 class GetxTemplateStrategy extends AppTemplateStrategy {
   @override
-  String appPubspec(ProjectConfig c) => '''
+  String appPubspec(ProjectConfig c) =>
+      '''
 name: ${c.app}
 description: "A ${c.pascal} Flutter application."
 publish_to: 'none'
@@ -45,7 +46,8 @@ flutter:
 ''';
 
   @override
-  String mainDart(ProjectConfig c) => '''
+  String mainDart(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -142,7 +144,8 @@ class ThemeController extends GetxController {
 ''';
 
   @override
-  String localeController(ProjectConfig c) => '''
+  String localeController(ProjectConfig c) =>
+      '''
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -325,7 +328,8 @@ class _TestPathProvider extends PathProviderPlatform
 ''';
 
   @override
-  String homeScreen(ProjectConfig c) => '''
+  String homeScreen(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
@@ -374,7 +378,6 @@ class HomeScreen extends GetView<HomeController> {
 }
 ''';
 }
-
 
 String _localeToggleMethod(ProjectConfig c) {
   // Always use cycleLocale for consistency

@@ -73,33 +73,33 @@ enum LicenseType {
 
   /// CLI-friendly identifier used in `--license` flag.
   String get cliName => switch (this) {
-        proprietary => 'proprietary',
-        mit => 'mit',
-        apache2 => 'apache-2.0',
-        bsd2clause => 'bsd-2-clause',
-        bsd3clause => 'bsd-3-clause',
-        gpl2 => 'gpl-2.0',
-        gpl3 => 'gpl-3.0',
-        lgpl21 => 'lgpl-2.1',
-        mpl2 => 'mpl-2.0',
-        unlicense => 'unlicense',
-        isc => 'isc',
-      };
+    proprietary => 'proprietary',
+    mit => 'mit',
+    apache2 => 'apache-2.0',
+    bsd2clause => 'bsd-2-clause',
+    bsd3clause => 'bsd-3-clause',
+    gpl2 => 'gpl-2.0',
+    gpl3 => 'gpl-3.0',
+    lgpl21 => 'lgpl-2.1',
+    mpl2 => 'mpl-2.0',
+    unlicense => 'unlicense',
+    isc => 'isc',
+  };
 
   /// Display name for summary output.
   String get displayName => switch (this) {
-        proprietary => 'Proprietary',
-        mit => 'MIT',
-        apache2 => 'Apache 2.0',
-        bsd2clause => 'BSD 2-Clause',
-        bsd3clause => 'BSD 3-Clause',
-        gpl2 => 'GPL 2.0',
-        gpl3 => 'GPL 3.0',
-        lgpl21 => 'LGPL 2.1',
-        mpl2 => 'MPL 2.0',
-        unlicense => 'Unlicense',
-        isc => 'ISC',
-      };
+    proprietary => 'Proprietary',
+    mit => 'MIT',
+    apache2 => 'Apache 2.0',
+    bsd2clause => 'BSD 2-Clause',
+    bsd3clause => 'BSD 3-Clause',
+    gpl2 => 'GPL 2.0',
+    gpl3 => 'GPL 3.0',
+    lgpl21 => 'LGPL 2.1',
+    mpl2 => 'MPL 2.0',
+    unlicense => 'Unlicense',
+    isc => 'ISC',
+  };
 
   /// All valid `--license` identifiers, in declaration order.
   static List<String> get cliNames =>
@@ -110,13 +110,13 @@ enum LicenseType {
   /// Throws an [ArgumentError] listing the valid identifiers when [name]
   /// matches no license.
   static LicenseType fromCliName(String name) => values.firstWhere(
-        (e) => e.cliName == name,
-        orElse: () => throw ArgumentError.value(
-          name,
-          'name',
-          'Unknown license. Valid values: ${cliNames.join(', ')}',
-        ),
-      );
+    (e) => e.cliName == name,
+    orElse: () => throw ArgumentError.value(
+      name,
+      'name',
+      'Unknown license. Valid values: ${cliNames.join(', ')}',
+    ),
+  );
 }
 
 /// Holds all derived names and user choices for a project.
@@ -138,12 +138,12 @@ class ProjectConfig {
     this.licenseType = LicenseType.proprietary,
     this.gitInit = true,
     this.githubFiles = false,
-  })  : app = '${name}_app',
-        core = '${name}_core',
-        ui = '${name}_ui',
-        network = '${name}_network',
-        l10n = '${name}_l10n',
-        pascal = _toPascalCase(name);
+  }) : app = '${name}_app',
+       core = '${name}_core',
+       ui = '${name}_ui',
+       network = '${name}_network',
+       l10n = '${name}_l10n',
+       pascal = _toPascalCase(name);
 
   /// Project name in snake_case (e.g., `my_app`).
   final String name;
@@ -217,7 +217,12 @@ class ProjectConfig {
         pkgs.addAll(['flutter_riverpod', 'go_router', 'shared_preferences']);
       case StateManagement.bloc:
       case StateManagement.cubit:
-        pkgs.addAll(['flutter_bloc', 'hydrated_bloc', 'go_router', 'path_provider']);
+        pkgs.addAll([
+          'flutter_bloc',
+          'hydrated_bloc',
+          'go_router',
+          'path_provider',
+        ]);
     }
     return pkgs;
   }

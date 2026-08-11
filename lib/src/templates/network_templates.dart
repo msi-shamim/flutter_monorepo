@@ -33,7 +33,8 @@ dev_dependencies:
 }
 
 /// Starter test for the network package.
-String networkStarterTest(ProjectConfig c) => '''
+String networkStarterTest(ProjectConfig c) =>
+    '''
 import 'package:flutter_test/flutter_test.dart';
 import 'package:${c.core}/${c.core}.dart';
 import 'package:${c.network}/${c.network}.dart';
@@ -66,12 +67,13 @@ export 'interceptors/logging_interceptor.dart';
 // ═════════════════════════════════════════════════════════
 
 String apiClient(ProjectConfig c) => switch (c.httpClient) {
-      HttpClient.dio => _dioApiClient(c),
-      HttpClient.http => _httpApiClient(c),
-      HttpClient.chopper => _chopperApiClient(c),
-    };
+  HttpClient.dio => _dioApiClient(c),
+  HttpClient.http => _httpApiClient(c),
+  HttpClient.chopper => _chopperApiClient(c),
+};
 
-String _dioApiClient(ProjectConfig c) => '''
+String _dioApiClient(ProjectConfig c) =>
+    '''
 import 'package:dio/dio.dart';
 import 'package:${c.core}/${c.core}.dart';
 
@@ -139,7 +141,8 @@ class ApiClient {
 }
 ''';
 
-String _httpApiClient(ProjectConfig c) => '''
+String _httpApiClient(ProjectConfig c) =>
+    '''
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -236,7 +239,8 @@ class ApiClient {
 }
 ''';
 
-String _chopperApiClient(ProjectConfig c) => '''
+String _chopperApiClient(ProjectConfig c) =>
+    '''
 import 'dart:convert';
 
 import 'package:chopper/chopper.dart';
@@ -329,10 +333,10 @@ class ApiClient {
 // ═════════════════════════════════════════════════════════
 
 String authInterceptor(ProjectConfig c) => switch (c.httpClient) {
-      HttpClient.dio => _dioAuthInterceptor(),
-      HttpClient.http => _httpAuthInterceptor(),
-      HttpClient.chopper => _chopperAuthInterceptor(),
-    };
+  HttpClient.dio => _dioAuthInterceptor(),
+  HttpClient.http => _httpAuthInterceptor(),
+  HttpClient.chopper => _chopperAuthInterceptor(),
+};
 
 String _dioAuthInterceptor() => r'''
 import 'package:dio/dio.dart';
@@ -399,10 +403,10 @@ class AuthInterceptor implements Interceptor {
 // ═════════════════════════════════════════════════════════
 
 String loggingInterceptor(ProjectConfig c) => switch (c.httpClient) {
-      HttpClient.dio => _dioLoggingInterceptor(),
-      HttpClient.http => _httpLoggingInterceptor(),
-      HttpClient.chopper => _chopperLoggingInterceptor(),
-    };
+  HttpClient.dio => _dioLoggingInterceptor(),
+  HttpClient.http => _httpLoggingInterceptor(),
+  HttpClient.chopper => _chopperLoggingInterceptor(),
+};
 
 String _dioLoggingInterceptor() => r'''
 import 'dart:developer' as developer;

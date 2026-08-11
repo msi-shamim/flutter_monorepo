@@ -65,7 +65,8 @@ abstract final class AppRoutes {
 ''';
 
 /// Starter test for the app package, valid for every state management choice.
-String appStarterTest(ProjectConfig c) => '''
+String appStarterTest(ProjectConfig c) =>
+    '''
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 ${_bootTestImports(c)}import 'package:${c.l10n}/${c.l10n}.dart';
@@ -110,16 +111,16 @@ void main() {
 
 /// Framework-specific imports the boot test needs.
 String _bootTestImports(ProjectConfig c) => switch (c.stateManagement) {
-      StateManagement.riverpod =>
-        "import 'package:flutter_riverpod/flutter_riverpod.dart';\n",
-      _ => '',
-    };
+  StateManagement.riverpod =>
+    "import 'package:flutter_riverpod/flutter_riverpod.dart';\n",
+  _ => '',
+};
 
 /// The root widget expression to pump, including any framework scope wrapper.
 String _rootWidget(ProjectConfig c) => switch (c.stateManagement) {
-      StateManagement.riverpod => 'const ProviderScope(child: MainApp())',
-      _ => 'const MainApp()',
-    };
+  StateManagement.riverpod => 'const ProviderScope(child: MainApp())',
+  _ => 'const MainApp()',
+};
 
 String _localeListLiteral(ProjectConfig c) =>
     '[${c.locales.map((l) => "'$l'").join(', ')}]';
@@ -129,7 +130,8 @@ String localeConstants(ProjectConfig c) {
   final buf = StringBuffer();
   for (final locale in c.locales) {
     buf.writeln(
-        '  static const Locale ${_localeVarName(locale)} = ${localeLiteral(locale)};');
+      '  static const Locale ${_localeVarName(locale)} = ${localeLiteral(locale)};',
+    );
   }
   buf.writeln('  static const List<Locale> supportedLocales = [');
   buf.writeln(c.locales.map((l) => '    ${_localeVarName(l)}').join(',\n'));
@@ -155,11 +157,26 @@ String localeVarName(String code) => _localeVarName(code);
 
 String _localeVarName(String code) {
   const names = {
-    'en': 'english', 'ar': 'arabic', 'es': 'spanish', 'fr': 'french',
-    'de': 'german', 'pt': 'portuguese', 'zh': 'chinese', 'ja': 'japanese',
-    'ko': 'korean', 'hi': 'hindi', 'tr': 'turkish', 'ru': 'russian',
-    'it': 'italian', 'nl': 'dutch', 'pl': 'polish', 'sv': 'swedish',
-    'th': 'thai', 'vi': 'vietnamese', 'id': 'indonesian', 'ms': 'malay',
+    'en': 'english',
+    'ar': 'arabic',
+    'es': 'spanish',
+    'fr': 'french',
+    'de': 'german',
+    'pt': 'portuguese',
+    'zh': 'chinese',
+    'ja': 'japanese',
+    'ko': 'korean',
+    'hi': 'hindi',
+    'tr': 'turkish',
+    'ru': 'russian',
+    'it': 'italian',
+    'nl': 'dutch',
+    'pl': 'polish',
+    'sv': 'swedish',
+    'th': 'thai',
+    'vi': 'vietnamese',
+    'id': 'indonesian',
+    'ms': 'malay',
   };
   return names[code] ?? 'locale_$code';
 }

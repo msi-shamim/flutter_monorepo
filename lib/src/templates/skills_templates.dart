@@ -134,7 +134,8 @@ String screenDesignSkill(ProjectConfig c) {
       bindingTerm = 'Bindings class with Get.lazyPut()';
       routingTerm = 'GetPage in app_pages.dart';
       stateDir = 'controllers';
-      screenStructure = '''
+      screenStructure =
+          '''
 ### Screen folder structure
 
 '''
@@ -172,7 +173,8 @@ register GetPage in `${c.app}/lib/app/routes/app_pages.dart`.
       bindingTerm = 'Provider declarations';
       routingTerm = 'GoRoute in app_router.dart';
       stateDir = 'providers';
-      screenStructure = '''
+      screenStructure =
+          '''
 ### Screen folder structure
 
 '''
@@ -201,7 +203,8 @@ Add GoRoute in `${c.app}/lib/app/router/app_router.dart`.
       bindingTerm = 'BlocProvider in screen or router';
       routingTerm = 'GoRoute in app_router.dart';
       stateDir = 'blocs';
-      screenStructure = '''
+      screenStructure =
+          '''
 ### Screen folder structure
 
 '''
@@ -233,7 +236,8 @@ Wrap with BlocProvider at the route level.
       bindingTerm = 'BlocProvider in screen or router';
       routingTerm = 'GoRoute in app_router.dart';
       stateDir = 'blocs';
-      screenStructure = '''
+      screenStructure =
+          '''
 ### Screen folder structure
 
 '''
@@ -348,7 +352,8 @@ String businessLogicSkill(ProjectConfig c) {
   final String wiringExample;
   switch (c.stateManagement) {
     case StateManagement.getx:
-      wiringExample = '''
+      wiringExample =
+          '''
 ### Wiring in the app (GetX)
 
 The controller depends on the abstract repository (from core), not the
@@ -366,7 +371,8 @@ concrete implementation (from network). The binding injects the implementation.
           '}\n'
           '```\n';
     case StateManagement.riverpod:
-      wiringExample = '''
+      wiringExample =
+          '''
 ### Wiring in the app (Riverpod)
 
 Use provider overrides or ref.read() to inject the network implementation
@@ -381,7 +387,8 @@ for the core repository interface.
           '```\n';
     case StateManagement.bloc:
     case StateManagement.cubit:
-      wiringExample = '''
+      wiringExample =
+          '''
 ### Wiring in the app (${c.stateManagement.name})
 
 Use RepositoryProvider or constructor injection to provide the network

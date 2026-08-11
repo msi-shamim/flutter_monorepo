@@ -1,7 +1,8 @@
 import '../project_config.dart';
 import '../version.dart';
 
-String corePubspec(ProjectConfig c) => '''
+String corePubspec(ProjectConfig c) =>
+    '''
 name: ${c.core}
 description: Core shared logic for ${c.pascal}.
 publish_to: 'none'
@@ -17,7 +18,8 @@ dev_dependencies:
 ''';
 
 /// Starter test proving core is testable with `dart test` and no Flutter.
-String coreStarterTest(ProjectConfig c) => '''
+String coreStarterTest(ProjectConfig c) =>
+    '''
 import 'package:${c.core}/${c.core}.dart';
 import 'package:test/test.dart';
 
@@ -159,7 +161,8 @@ abstract class BaseRepository {
 }
 ''';
 
-String useCase(ProjectConfig c) => '''
+String useCase(ProjectConfig c) =>
+    '''
 import 'package:${c.core}/utils/result.dart';
 
 abstract class UseCase<T, P> {
@@ -173,7 +176,8 @@ abstract class NoParamUseCase<T> {
 }
 ''';
 
-String result(ProjectConfig c) => '''
+String result(ProjectConfig c) =>
+    '''
 import 'package:${c.core}/exceptions/app_exception.dart';
 
 sealed class Result<T> {
@@ -270,7 +274,8 @@ extension NullableListExtensions<T> on List<T>? {
 }
 ''';
 
-String corePackageMd(ProjectConfig c) => '''
+String corePackageMd(ProjectConfig c) =>
+    '''
 # ${c.core}
 
 Shared business logic, models, and utilities — **framework-free**, **UI-free**.

@@ -4,7 +4,8 @@ import 'app_template_strategy.dart';
 
 class BlocTemplateStrategy extends AppTemplateStrategy {
   @override
-  String appPubspec(ProjectConfig c) => '''
+  String appPubspec(ProjectConfig c) =>
+      '''
 name: ${c.app}
 description: "A ${c.pascal} Flutter application."
 publish_to: 'none'
@@ -47,7 +48,8 @@ flutter:
 ''';
 
   @override
-  String mainDart(ProjectConfig c) => '''
+  String mainDart(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -144,7 +146,8 @@ class ThemeBloc extends HydratedBloc<ThemeEvent, ThemeMode> {
 ''';
 
   @override
-  String localeController(ProjectConfig c) => '''
+  String localeController(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
@@ -255,7 +258,8 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 ''';
 
   @override
-  String homeScreen(ProjectConfig c) => '''
+  String homeScreen(ProjectConfig c) =>
+      '''
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
