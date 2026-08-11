@@ -166,9 +166,26 @@ Future<void> _runCreate(List<String> arguments) async {
     exit(0);
   }
 
-  if (args['help'] as bool || args.rest.isEmpty) {
+  if (args['help'] as bool) {
     _printUsage(parser);
-    exit(args['help'] as bool ? 0 : 1);
+    exit(0);
+  }
+
+  if (args.rest.isEmpty) {
+    stderr.writeln('Error: A project name is required.');
+    stderr.writeln('');
+    _printUsage(parser);
+    exit(1);
+  }
+
+  if (args.rest.length > 1) {
+    stderr.writeln(
+        'Error: Expected one project name but got ${args.rest.length}: '
+        '${args.rest.join(', ')}');
+    stderr.writeln('');
+    stderr.writeln('If the name contains spaces, quote it — though project '
+        'names must be lowercase with underscores.');
+    exit(1);
   }
 
   final projectName = args.rest.first;
