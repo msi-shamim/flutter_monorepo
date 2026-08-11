@@ -21,6 +21,9 @@ dependencies:
     sdk: flutter
   get: ${c.versions['get']}
   get_storage: ${c.versions['get_storage']}
+  # Pre-wired workspace packages. core and network are not imported by the
+  # generated screens yet; they are declared so feature code can import
+  # them without editing this pubspec first.
   ${c.core}:
     path: ../packages/core
   ${c.ui}:

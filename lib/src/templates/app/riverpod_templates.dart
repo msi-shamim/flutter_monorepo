@@ -22,6 +22,9 @@ dependencies:
   flutter_riverpod: ${c.versions['flutter_riverpod']}
   go_router: ${c.versions['go_router']}
   shared_preferences: ${c.versions['shared_preferences']}
+  # Pre-wired workspace packages. core and network are not imported by the
+  # generated screens yet; they are declared so feature code can import
+  # them without editing this pubspec first.
   ${c.core}:
     path: ../packages/core
   ${c.ui}:

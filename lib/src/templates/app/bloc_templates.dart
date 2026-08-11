@@ -23,6 +23,9 @@ dependencies:
   hydrated_bloc: ${c.versions['hydrated_bloc']}
   go_router: ${c.versions['go_router']}
   path_provider: ${c.versions['path_provider']}
+  # Pre-wired workspace packages. core and network are not imported by the
+  # generated screens yet; they are declared so feature code can import
+  # them without editing this pubspec first.
   ${c.core}:
     path: ../packages/core
   ${c.ui}:
