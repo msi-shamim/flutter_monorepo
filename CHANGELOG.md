@@ -1,3 +1,92 @@
+## 1.4.0
+
+Generated projects did not build. Version resolution emitted constraints the
+Flutter SDK forbids, and the generator reported success regardless — so the
+default `flutter_monorepo my_app` produced a monorepo that could not resolve
+dependencies, printed "created successfully" and exited 0. This release fixes
+that and 32 further defects found in a full audit of the tool.
+
+### Fixed — generation
+
+- **Dependency resolution failed in every generated project.** `intl` resolved
+  to a version `flutter_localizations` forbids, so `dart pub get` failed and
+  `dart analyze` reported 500+ errors. SDK-pinned packages are no longer
+  resolved live.
+- **`--state riverpod` failed version solving.** `flutter_riverpod` resolved
+  above the SDK floor the generated pubspecs declare. Candidate versions are
+  now filtered by their declared SDK constraint, and that floor lives in one
+  constant instead of eight copies.
+- **The generator claimed success no matter what failed.** `pub get`,
+  `gen-l10n`, `analyze` and all three git calls had their results ignored.
+  Failures are now reported and the CLI exits non-zero.
+- **GetX generated uncompilable code for 8 locales.** Two locale identifier
+  maps had drifted, so `--locales it,en` declared one constant and referenced
+  another. There is now a single map.
+- **Locales with a region subtag produced invalid Dart.** `--locales en-US`
+  emitted an unparseable identifier, a wrong `Locale()` form and an ARB name
+  `gen-l10n` rejects. Codes are validated and normalised, region variants emit
+  `Locale('pt', 'BR')`, and the base-language fallback ARB is generated.
+- **Pre-release and `0.x` versions were resolved incorrectly.** Pre-releases
+  could outrank the newest stable, and `^0.20.2` accepted any `0.x` including
+  breaking bumps.
+- **`--http http` could not build for web** — it imported `dart:io`.
+- Restored the `cupertino_icons` dependency, removing the web build font
+  warning.
+
+### Fixed — doctor
+
+- **`doctor --fix` wrote zero-byte placeholders** for anything it had no
+  template for, including every `pubspec.yaml` and barrel file. Because the
+  check is an existence check, the next run then certified the broken project
+  as intact. Unrestorable files are now reported and left absent.
+- **`doctor --fix` silently relicensed projects.** The license is not
+  recoverable from a generated tree, so an MIT project's LICENSE was rewritten
+  as "PROPRIETARY AND CONFIDENTIAL" and reported as restored.
+- **`doctor` treated any directory with a `pubspec.yaml` as a monorepo**, so
+  `--fix` scaffolded 59 files into unrelated packages.
+- **A missing app pubspec flipped framework detection to GetX**, so `--fix`
+  wrote GetX scaffolding into Riverpod projects.
+- **Deleting one locale's ARB, or all of `.github/`, was invisible** — those
+  checklists were derived from the artifacts being checked.
+- **`doctor --fix` exited 1 even after repairing everything.**
+- Nine generated paths were never checked, including the gen-l10n output
+  directory and the `.gitkeep` sentinels.
+- A project name containing `_workspace` broke detection outright.
+
+### Added
+
+- **`.flutter_monorepo.yaml`** — generated projects now record the choices they
+  were created with, so `doctor` and `workflow` read the configuration instead
+  of guessing it. Projects generated before 1.4.0 fall back to inference.
+- **`ARCHITECTURE.md`** — documented since 1.1 but never actually written. It
+  adapts to the project's packages, routing, state management and locales.
+- **Starter tests** for every package, exercising generated code. The CI
+  workflow's test steps previously ran against empty directories and failed.
+- **`AppRoutes.login`** — the GetX auth guard redirected to the route it
+  guards, which would loop. All four frameworks now reference one constant.
+- `workflow --help`, and an error for unknown workflow arguments, which
+  previously printed the overview and exited 0.
+
+### Changed
+
+- **`packages/core` no longer depends on Flutter.** It is documented as a pure
+  Dart package and now is one, which is also what makes
+  `dart test packages/core/test` work.
+- **Generated code is formatted** as part of generation, so the CI workflow's
+  `dart format --set-exit-if-changed` step passes.
+- **`go_router` 14 → 17 and `hydrated_bloc` 10 → 11.** Because resolution pins
+  to the fallback's major, a stale fallback was a permanent floor.
+- **`pubspec.lock` is committed**, not ignored — this is an application
+  workspace.
+- Unrecognised locales print a note and mark their ARB with
+  `@@x-untranslated`, instead of silently shipping English.
+- CI runs `flutter test` against the Flutter-dependent packages, not
+  `dart test`.
+- Better CLI errors for a missing project name, extra arguments, and an
+  unknown `doctor` flag, which previously crashed with a stack trace.
+- Corrected docs claims that did not match the output: component theme count,
+  lint rule count, lint baseline, and the unimplemented flags in VISION.md.
+
 ## 1.3.0
 
 - **README.md, LICENSE, CONTRIBUTING.md** — auto-generated for every new monorepo with project-specific content

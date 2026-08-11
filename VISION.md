@@ -127,10 +127,11 @@ Generates test directory structure, mock helpers, and example tests for each pac
 | **v1.1** | `--http` (dio/http/chopper), `doctor`, `workflow` | Production-ready |
 | **v1.2** | AI Agent Skills (`.claude/skills/`), smart `doctor --fix` | AI-assisted development |
 | **v1.3** | `--license` (11 types), `--github` (community files), README/LICENSE/CONTRIBUTING | Top-tier GitHub repo |
+| **v1.4** | Audit fixes: working dependency resolution, honest exit codes, project marker file, `ARCHITECTURE.md`, starter tests, green CI | Generated projects actually build |
 
 ---
 
-## Current State (v1.3.0)
+## Current State (v1.4.0)
 
 Shipped with:
 - Multi-framework support: GetX, Riverpod, Bloc, Cubit (`--state`)
@@ -152,6 +153,10 @@ Shipped with:
 - Route guard pattern (GetX middleware; GoRouter redirect is a documented stub)
 - Strict production linting
 - Complete documentation (ARCHITECTURE.md + PACKAGE.md per package)
-- Monorepo doctor with template-backed `--fix` restoration
+- Monorepo doctor with template-backed `--fix` restoration; never writes empty
+  placeholders
+- Project marker (`.flutter_monorepo.yaml`) so doctor and workflow read the
+  generation config instead of inferring it
+- Generated starter tests per package and a CI workflow that passes as generated
 - Development workflows (component, screen, business logic)
 - AI Agent Skills for Claude Code (4 framework-aware skills)
