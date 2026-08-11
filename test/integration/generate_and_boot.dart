@@ -89,6 +89,38 @@ void main() {
               'core tests failed:\n${coreTests.stdout}\n${coreTests.stderr}',
         );
 
+        // Every path the generated guidance points at must exist in the tree it
+        // describes. Four separate defects shipped because a skill referenced a
+        // directory that was never created, or one missing its lib/ segment.
+        final guidance = Directory('$projectDir/.claude/skills')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('SKILL.md'))
+            .map((f) => f.readAsStringSync())
+            .join('\n');
+        expect(guidance, isNotEmpty, reason: 'no skills were generated');
+
+        // Not a raw string: the project name has to interpolate, or app-package
+        // paths are never checked.
+        final referenced = RegExp('(?:packages|${name}_app)/[\\w./<>-]+')
+            .allMatches(guidance)
+            .map((m) => m.group(0)!)
+            // Placeholders like <screen_name> stand for files the developer
+            // creates; only concrete paths can be checked.
+            .where((p) => !p.contains('<'))
+            .map((p) => p.endsWith('/') ? p.substring(0, p.length - 1) : p)
+            .toSet();
+
+        final missing = referenced
+            .where((p) => !File('$projectDir/$p').existsSync())
+            .where((p) => !Directory('$projectDir/$p').existsSync())
+            .toList();
+        expect(
+          missing,
+          isEmpty,
+          reason: 'skills reference paths that do not exist: $missing',
+        );
+
         // doctor must consider its own output healthy.
         final doctor = await Process.run(
           'dart',

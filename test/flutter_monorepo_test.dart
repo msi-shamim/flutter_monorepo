@@ -6,6 +6,7 @@ import 'package:flutter_monorepo/src/templates/license_templates.dart'
 import 'package:flutter_monorepo/src/templates/root_templates.dart' as root;
 import 'package:flutter_monorepo/src/templates/core_templates.dart' as core;
 import 'package:flutter_monorepo/src/templates/github_templates.dart' as github;
+import 'package:flutter_monorepo/src/templates/skills_templates.dart' as skills;
 import 'package:test/test.dart';
 
 void main() {
@@ -350,6 +351,77 @@ void main() {
         StateManagement.bloc,
       );
     });
+  });
+
+  group('Generated guidance accuracy', () {
+    // Four separate defects shipped because a skill or workflow told the
+    // developer to run a command that cannot work in a generated project.
+    // These assertions make that class of drift mechanical rather than
+    // something someone has to notice.
+
+    /// Every skill and workflow string, for one configuration.
+    List<String> guidanceFor(ProjectConfig c) => [
+      skills.componentDesignSkill(c),
+      skills.screenDesignSkill(c),
+      skills.businessLogicSkill(c),
+      skills.monrepoDoctorSkill(c),
+      root.contributingMd(c),
+      root.readmeMd(c),
+      root.architectureMd(c),
+    ];
+
+    for (final sm in StateManagement.values) {
+      final config = ProjectConfig(
+        name: 'my_app',
+        org: 'com.example',
+        stateManagement: sm,
+      )..versions = VersionResolver();
+
+      test('${sm.name}: never runs dart test against a Flutter package', () {
+        for (final text in guidanceFor(config)) {
+          expect(
+            text,
+            isNot(contains('dart test packages/ui')),
+            reason: 'packages/ui depends on Flutter; needs flutter test',
+          );
+          expect(
+            text,
+            isNot(contains('dart test packages/network')),
+            reason: 'packages/network depends on Flutter; needs flutter test',
+          );
+          expect(
+            text,
+            isNot(contains('dart test my_app_app')),
+            reason: 'the app package needs flutter test',
+          );
+        }
+      });
+
+      test('${sm.name}: never invokes the CLI as a project dependency', () {
+        // Generated projects do not depend on flutter_monorepo, so
+        // `dart run flutter_monorepo ...` fails with "Could not find package".
+        for (final text in guidanceFor(config)) {
+          expect(text, isNot(contains('dart run flutter_monorepo')));
+        }
+      });
+
+      test('${sm.name}: package paths include the lib/ segment', () {
+        // packages/core/states/ does not exist; packages/core/lib/states/ does.
+        final wrong = RegExp(
+          r'packages/(core|ui|network|l10n)/(states|widgets|rules|models|'
+          r'exceptions|repositories|usecases|utils|extensions|theme|'
+          r'responsive|assets|client|interceptors|formatters)/',
+        );
+        for (final text in guidanceFor(config)) {
+          final match = wrong.firstMatch(text);
+          expect(
+            match,
+            isNull,
+            reason: 'missing lib/ segment: ${match?.group(0)}',
+          );
+        }
+      });
+    }
   });
 
   group('ProjectConfig', () {
