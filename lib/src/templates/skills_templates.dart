@@ -154,7 +154,7 @@ String screenDesignSkill(ProjectConfig c) {
 
 - Extend GetxController
 - Use .obs for reactive state
-- Companion states from packages/core/states/ for component logic
+- Companion states from packages/core/lib/states/ for component logic
 - API calls through repository interfaces (injected via binding)
 
 ### Binding pattern
@@ -191,7 +191,7 @@ register GetPage in `${c.app}/lib/app/routes/app_pages.dart`.
 ### Provider pattern
 
 - Use Notifier with @riverpod or manual provider declaration
-- Companion states from packages/core/states/ for component logic
+- Companion states from packages/core/lib/states/ for component logic
 - Access providers via ref.watch() / ref.read()
 
 ### Routing
@@ -224,7 +224,7 @@ Add GoRoute in `${c.app}/lib/app/router/app_router.dart`.
 
 - Define events (sealed class) and states (sealed class)
 - Use on<Event>() handlers in Bloc constructor
-- Companion states from packages/core/states/ for component logic
+- Companion states from packages/core/lib/states/ for component logic
 
 ### Routing
 
@@ -256,7 +256,7 @@ Wrap with BlocProvider at the route level.
 
 - Extend Cubit<State> or HydratedCubit<State>
 - Use emit() directly (no events)
-- Companion states from packages/core/states/ for component logic
+- Companion states from packages/core/lib/states/ for component logic
 
 ### Routing
 
