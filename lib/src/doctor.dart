@@ -23,6 +23,8 @@ class Doctor {
 
   int _passed = 0;
   int _missing = 0;
+  int _restored = 0;
+  int _unrestorable = 0;
 
   /// Maps relative file paths to content generators for smart restoration.
   /// Files in this map get their full content restored instead of empty files.
@@ -89,9 +91,15 @@ class Doctor {
     if (_missing == 0) {
       stdout.writeln('Result: All $_passed checks passed. Structure is intact.');
     } else {
-      stdout.writeln(
-          'Result: $_passed passed, $_missing missing.');
-      if (!fix) {
+      stdout.writeln('Result: $_passed passed, $_missing missing.');
+      if (fix) {
+        stdout.writeln('Restored: $_restored of $_missing.');
+        if (_unrestorable > 0) {
+          stdout.writeln(
+              '$_unrestorable file(s) have no template and were left absent — '
+              'restore them from version control.');
+        }
+      } else {
         stdout.writeln(
             'Run `flutter_monorepo doctor --fix` to restore missing items.');
       }
@@ -123,18 +131,25 @@ class Doctor {
     if (isDirectory) {
       Directory(fullPath).createSync(recursive: true);
       stdout.writeln('    → Created directory');
-    } else {
-      final file = File(fullPath);
-      file.parent.createSync(recursive: true);
-      final content = _restorableFiles[relativePath];
-      if (content != null) {
-        file.writeAsStringSync(content);
-        stdout.writeln('    → Restored with full content');
-      } else {
-        file.writeAsStringSync('');
-        stdout.writeln('    → Created empty file (populate manually)');
-      }
+      _restored++;
+      return;
     }
+
+    final content = _restorableFiles[relativePath];
+    if (content == null) {
+      // Deliberately leave the file absent. Writing an empty placeholder would
+      // satisfy the existence check on the next run, turning a reported problem
+      // into a silent one while the project stays broken.
+      stdout.writeln('    → Cannot restore: no template for this file');
+      _unrestorable++;
+      return;
+    }
+
+    final file = File(fullPath);
+    file.parent.createSync(recursive: true);
+    file.writeAsStringSync(content);
+    stdout.writeln('    → Restored with full content');
+    _restored++;
   }
 
   // ── Detection ──────────────────────────────────────────
