@@ -19,13 +19,13 @@ class VersionResolver {
     'get_storage': '^2.1.1',
     'flutter_riverpod': '^3.3.1',
     'flutter_bloc': '^9.1.0',
-    'hydrated_bloc': '^10.0.0',
+    'hydrated_bloc': '^11.0.0',
     // HTTP clients
     'dio': '^5.8.0+1',
     'http': '^1.3.0',
     'chopper': '^8.0.0+1',
     // Routing
-    'go_router': '^14.8.1',
+    'go_router': '^17.5.0',
     // Storage
     'shared_preferences': '^2.5.3',
     'path_provider': '^2.1.5',
