@@ -21,6 +21,20 @@ class Doctor {
   /// When true, missing directories and files are recreated.
   final bool fix;
 
+  /// Sentinels keeping otherwise-empty directories in git.
+  ///
+  /// Restoring the directory without its sentinel is not enough: git does not
+  /// track empty directories, so the next clone drops it again.
+  static const _gitkeepFiles = <String>[
+    'packages/core/lib/rules/.gitkeep',
+    'packages/core/lib/states/.gitkeep',
+    'packages/ui/lib/widgets/.gitkeep',
+    'packages/ui/assets/icons/.gitkeep',
+    'packages/ui/assets/fonts/.gitkeep',
+    'packages/ui/assets/images/.gitkeep',
+    'packages/network/lib/repositories/.gitkeep',
+  ];
+
   int _passed = 0;
   int _missing = 0;
   int _restored = 0;
@@ -51,10 +65,13 @@ class Doctor {
       'README.md': root.readmeMd(config),
       'LICENSE': license.licenseText(config),
       'CONTRIBUTING.md': root.contributingMd(config),
+      '.gitignore': root.rootGitignore(),
+      // Empty by design, unlike the placeholders _restore refuses to write.
+      for (final path in _gitkeepFiles) path: '',
     };
 
-    // Add GitHub community files if .github/ directory exists
-    if (Directory('$rootPath/.github').existsSync()) {
+    // GitHub community files were requested at generation time
+    if (config.githubFiles) {
       _restorableFiles.addAll({
         'CODE_OF_CONDUCT.md': github.codeOfConduct(config),
         '.github/FUNDING.yml': github.fundingYml(config),
@@ -204,6 +221,9 @@ class Doctor {
       'packages/l10n/lib/formatters',
       'packages/l10n/lib/widgets',
       'packages/l10n/lib/l10n/arb',
+      // gen-l10n output. The l10n barrel exports from here unconditionally,
+      // so losing it breaks every AppLocalizations import in the project.
+      'packages/l10n/lib/l10n/generated',
       // App
       '${c.app}/lib/app/routes',
       '${c.app}/lib/screens/home',
@@ -241,8 +261,8 @@ class Doctor {
         ]);
     }
 
-    // GitHub community directories (only if .github/ exists)
-    if (Directory('$rootPath/.github').existsSync()) {
+    // GitHub community directories
+    if (c.githubFiles) {
       dirs.addAll([
         '.github',
         '.github/ISSUE_TEMPLATE',
@@ -258,6 +278,7 @@ class Doctor {
       // Root
       projectMarkerFile,
       'pubspec.yaml',
+      '.gitignore',
       'analysis_options.yaml',
       'README.md',
       'LICENSE',
@@ -268,6 +289,8 @@ class Doctor {
       '.claude/skills/screen-design/SKILL.md',
       '.claude/skills/business-logic/SKILL.md',
       '.claude/skills/monorepo-doctor/SKILL.md',
+      // Directory sentinels
+      ..._gitkeepFiles,
       // Core
       'packages/core/pubspec.yaml',
       'packages/core/PACKAGE.md',
@@ -348,8 +371,8 @@ class Doctor {
         ]);
     }
 
-    // GitHub community files (only if .github/ exists)
-    if (Directory('$rootPath/.github').existsSync()) {
+    // GitHub community files
+    if (c.githubFiles) {
       files.addAll([
         'CODE_OF_CONDUCT.md',
         '.github/FUNDING.yml',
