@@ -98,7 +98,7 @@ Future<void> _runCreate(List<String> arguments) async {
         help: 'HTTP client library')
     ..addOption('license',
         defaultsTo: 'proprietary',
-        allowed: LicenseType.values.map((e) => e.cliName).toList(),
+        allowed: LicenseType.cliNames,
         help: 'License type for the project')
     ..addFlag('github',
         defaultsTo: false,
@@ -124,7 +124,7 @@ Future<void> _runCreate(List<String> arguments) async {
   }
 
   if (args['version'] as bool) {
-    stdout.writeln('flutter_monorepo 1.3.0');
+    stdout.writeln('flutter_monorepo $packageVersion');
     exit(0);
   }
 

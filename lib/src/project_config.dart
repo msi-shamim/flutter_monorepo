@@ -92,9 +92,22 @@ enum LicenseType {
         isc => 'ISC',
       };
 
+  /// All valid `--license` identifiers, in declaration order.
+  static List<String> get cliNames =>
+      values.map((e) => e.cliName).toList(growable: false);
+
   /// Parse from CLI string.
-  static LicenseType fromCliName(String name) =>
-      values.firstWhere((e) => e.cliName == name);
+  ///
+  /// Throws an [ArgumentError] listing the valid identifiers when [name]
+  /// matches no license.
+  static LicenseType fromCliName(String name) => values.firstWhere(
+        (e) => e.cliName == name,
+        orElse: () => throw ArgumentError.value(
+          name,
+          'name',
+          'Unknown license. Valid values: ${cliNames.join(', ')}',
+        ),
+      );
 }
 
 /// Holds all derived names and user choices for a project.

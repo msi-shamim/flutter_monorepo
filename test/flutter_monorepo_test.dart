@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_monorepo/flutter_monorepo.dart';
 import 'package:flutter_monorepo/src/templates/license_templates.dart'
     as license;
@@ -7,6 +9,20 @@ import 'package:flutter_monorepo/src/templates/github_templates.dart'
 import 'package:test/test.dart';
 
 void main() {
+  group('packageVersion', () {
+    test('matches the version in pubspec.yaml', () {
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+      final match =
+          RegExp(r'^version:\s*(\S+)\s*$', multiLine: true).firstMatch(pubspec);
+      expect(match, isNotNull, reason: 'pubspec.yaml has no version: field');
+      expect(
+        match!.group(1),
+        packageVersion,
+        reason: 'Bump lib/src/version.dart and pubspec.yaml together',
+      );
+    });
+  });
+
   group('ProjectConfig', () {
     test('derives all package names from project name', () {
       final config = ProjectConfig(name: 'my_app', org: 'com.example');
@@ -414,11 +430,19 @@ void main() {
       }
     });
 
-    test('fromCliName throws on unknown value', () {
+    test('fromCliName throws ArgumentError listing valid values', () {
       expect(
         () => LicenseType.fromCliName('unknown'),
-        throwsStateError,
+        throwsA(
+          isA<ArgumentError>()
+              .having((e) => e.invalidValue, 'invalidValue', 'unknown')
+              .having((e) => e.message, 'message', contains('apache-2.0')),
+        ),
       );
+    });
+
+    test('cliNames covers every value in declaration order', () {
+      expect(LicenseType.cliNames, LicenseType.values.map((e) => e.cliName));
     });
   });
 
