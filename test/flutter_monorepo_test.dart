@@ -116,6 +116,66 @@ void main() {
     });
   });
 
+  group('Locale identifiers', () {
+    // Every code the templates can name, plus codes with no friendly name.
+    const codes = [
+      'en', 'ar', 'es', 'fr', 'de', 'pt', 'zh', 'ja', 'ko', 'hi',
+      'tr', 'ru', 'it', 'nl', 'pl', 'sv', 'th', 'vi', 'id', 'ms',
+      'sw', 'zu',
+    ];
+
+    for (final sm in StateManagement.values) {
+      test('${sm.name}: every referenced locale constant is declared', () {
+        for (final code in codes) {
+          final config = ProjectConfig(
+            name: 'my_app',
+            org: 'com.example',
+            stateManagement: sm,
+            locales: [code, 'en'],
+          );
+          config.versions = VersionResolver();
+
+          final tmpl = createAppTemplates(sm);
+          final source = tmpl.localeController(config);
+          if (source.trim().isEmpty) continue;
+
+          // Collect declared constants, then confirm every locale identifier
+          // the template references resolves to one of them.
+          final declared = RegExp(r'static const Locale (\w+) =')
+              .allMatches(source)
+              .map((m) => m.group(1)!)
+              .toSet();
+
+          final referenced = RegExp(
+                  r'\b(locale_[a-z0-9_]+|english|arabic|spanish|french|german|'
+                  r'portuguese|chinese|japanese|korean|hindi|turkish|russian|'
+                  r'italian|dutch|polish|swedish|thai|vietnamese|indonesian|'
+                  r'malay)\b')
+              .allMatches(source)
+              .map((m) => m.group(1)!)
+              .toSet();
+
+          for (final ref in referenced) {
+            expect(
+              declared,
+              contains(ref),
+              reason: '${sm.name}/$code references $ref, which is '
+                  'never declared (declared: $declared)',
+            );
+          }
+        }
+      });
+    }
+
+    test('localeVarName produces a valid Dart identifier', () {
+      final identifier = RegExp(r'^[a-zA-Z_$][a-zA-Z0-9_$]*$');
+      for (final code in codes) {
+        expect(identifier.hasMatch(localeVarName(code)), isTrue,
+            reason: '$code produced "${localeVarName(code)}"');
+      }
+    });
+  });
+
   group('ProjectConfig', () {
     test('derives all package names from project name', () {
       final config = ProjectConfig(name: 'my_app', org: 'com.example');

@@ -58,6 +58,12 @@ String localeConstants(ProjectConfig c) {
   return buf.toString();
 }
 
+/// The Dart identifier used for [code]'s `Locale` constant.
+///
+/// Single source of truth: every template that names a locale constant must
+/// call this, or the declaration and its references drift apart.
+String localeVarName(String code) => _localeVarName(code);
+
 String _localeVarName(String code) {
   const names = {
     'en': 'english', 'ar': 'arabic', 'es': 'spanish', 'fr': 'french',

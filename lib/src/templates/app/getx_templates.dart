@@ -149,7 +149,7 @@ ${localeConstants(c)}
   static const _storageKey = 'locale';
 
   final _storage = GetStorage();
-  final _locale = ${_defaultLocaleVar(c)}.obs;
+  final _locale = ${localeVarName(c.primaryLocale)}.obs;
 
   Locale get locale => _locale.value;
   bool get isRTL => _locale.value.languageCode == 'ar';
@@ -176,7 +176,7 @@ ${_localeToggleMethod(c)}
     if (stored != null) {
       final locale = supportedLocales.firstWhere(
         (l) => l.languageCode == stored,
-        orElse: () => ${_defaultLocaleVar(c)},
+        orElse: () => ${localeVarName(c.primaryLocale)},
       );
       _locale.value = locale;
       Get.updateLocale(locale);
@@ -306,14 +306,6 @@ class HomeScreen extends GetView<HomeController> {
 ''';
 }
 
-String _defaultLocaleVar(ProjectConfig c) {
-  const names = {
-    'en': 'english', 'ar': 'arabic', 'es': 'spanish', 'fr': 'french',
-    'de': 'german', 'pt': 'portuguese', 'zh': 'chinese', 'ja': 'japanese',
-    'ko': 'korean', 'hi': 'hindi', 'tr': 'turkish', 'ru': 'russian',
-  };
-  return names[c.primaryLocale] ?? 'locale_${c.primaryLocale}';
-}
 
 String _localeToggleMethod(ProjectConfig c) {
   // Always use cycleLocale for consistency
