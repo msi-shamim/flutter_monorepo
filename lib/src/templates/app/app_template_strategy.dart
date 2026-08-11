@@ -46,6 +46,38 @@ abstract final class AppRoutes {
 }
 ''';
 
+/// Starter test for the app package, valid for every state management choice.
+String appStarterTest(ProjectConfig c) => '''
+import 'package:flutter_test/flutter_test.dart';
+import 'package:${c.l10n}/${c.l10n}.dart';
+
+import 'package:${c.app}/app/routes/app_routes.dart';
+
+void main() {
+  group('AppRoutes', () {
+    test('declares the initial route', () {
+      expect(AppRoutes.home, '/home');
+    });
+  });
+
+  group('Localizations', () {
+    test('every configured locale is supported', () {
+      final codes = AppLocalizations.supportedLocales
+          .map((l) => l.countryCode == null
+              ? l.languageCode
+              : '\${l.languageCode}_\${l.countryCode}')
+          .toSet();
+      for (final expected in ${_localeListLiteral(c)}) {
+        expect(codes, contains(expected));
+      }
+    });
+  });
+}
+''';
+
+String _localeListLiteral(ProjectConfig c) =>
+    '[${c.locales.map((l) => "'$l'").join(', ')}]';
+
 /// Helper to generate dynamic locale constants for any framework.
 String localeConstants(ProjectConfig c) {
   final buf = StringBuffer();

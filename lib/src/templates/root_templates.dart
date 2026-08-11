@@ -246,8 +246,8 @@ flutter run
 ```bash
 # Run all tests from workspace root
 dart test packages/core/test
-dart test packages/ui/test
-dart test packages/network/test
+flutter test packages/ui/test
+flutter test packages/network/test
 flutter test ${c.app}/test
 ```
 
@@ -331,7 +331,7 @@ dart test packages/core/test
 flutter test packages/ui/test
 
 # Network package
-dart test packages/network/test
+flutter test packages/network/test
 
 # App
 flutter test ${c.app}/test

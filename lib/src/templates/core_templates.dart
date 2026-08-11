@@ -16,6 +16,50 @@ dev_dependencies:
   flutter_lints: ${c.versions['flutter_lints']}
 ''';
 
+/// Starter test proving core is testable with `dart test` and no Flutter.
+String coreStarterTest(ProjectConfig c) => '''
+import 'package:${c.core}/${c.core}.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('Result', () {
+    test('success carries its data', () {
+      const result = Result<int>.success(42);
+      expect(result.isSuccess, isTrue);
+      expect(result.when(success: (d) => d, failure: (_) => -1), 42);
+    });
+
+    test('failure carries its exception', () {
+      const result = Result<int>.failure(NetworkException());
+      expect(result.isFailure, isTrue);
+      expect(
+        result.when(success: (_) => '', failure: (e) => e.message),
+        'No internet connection',
+      );
+    });
+
+    test('map transforms success and passes failure through', () {
+      expect(const Result<int>.success(2).map((d) => d * 2).isSuccess, isTrue);
+      expect(
+        const Result<int>.failure(NetworkException()).map((d) => d * 2).isFailure,
+        isTrue,
+      );
+    });
+  });
+
+  group('String extensions', () {
+    test('capitalized upper-cases the first character', () {
+      expect('hello'.capitalized, 'Hello');
+    });
+
+    test('isValidEmail accepts and rejects', () {
+      expect('user@example.com'.isValidEmail, isTrue);
+      expect('not-an-email'.isValidEmail, isFalse);
+    });
+  });
+}
+''';
+
 String coreBarrel(ProjectConfig c) => '''
 // ── Exceptions ───────────────────────────────────────────
 export 'exceptions/app_exception.dart';

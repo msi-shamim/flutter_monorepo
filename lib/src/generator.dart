@@ -50,6 +50,7 @@ class Generator {
     _writeSkills();
     await _resolveDependencies();
     await _generateL10n();
+    await _formatCode();
     await _analyze();
     await _initializeGit();
 
@@ -236,6 +237,7 @@ class Generator {
     _write('packages/core/lib/extensions/string_extensions.dart', core.stringExtensions());
     _write('packages/core/lib/extensions/date_extensions.dart', core.dateExtensions());
     _write('packages/core/lib/extensions/list_extensions.dart', core.listExtensions());
+    _write('packages/core/test/core_test.dart', core.coreStarterTest(config));
   }
 
   // ── UI package ──────────────────────────────────────────
@@ -254,6 +256,7 @@ class Generator {
     _write('packages/ui/lib/theme/app_spacing.dart', ui.appSpacing());
     _write('packages/ui/lib/theme/app_typography.dart', ui.appTypography());
     _write('packages/ui/lib/theme/app_theme.dart', ui.appTheme());
+    _write('packages/ui/test/theme_test.dart', ui.uiStarterTest(config));
   }
 
   // ── Network package ─────────────────────────────────────
@@ -265,6 +268,7 @@ class Generator {
     _write('packages/network/lib/client/api_client.dart', net.apiClient(config));
     _write('packages/network/lib/interceptors/auth_interceptor.dart', net.authInterceptor(config));
     _write('packages/network/lib/interceptors/logging_interceptor.dart', net.loggingInterceptor(config));
+    _write('packages/network/test/api_client_test.dart', net.networkStarterTest(config));
   }
 
   // ── L10n package ────────────────────────────────────────
@@ -341,9 +345,11 @@ class Generator {
     _writeIfNotEmpty('${config.app}/lib/screens/home/home_controller.dart', tmpl.homeController(config));
     _write('${config.app}/lib/screens/home/home_screen.dart', tmpl.homeScreen(config));
 
-    // Remove flutter create's default test
+    // Replace flutter create's default test, which references a counter app
+    // that does not exist here, with one that exercises the generated code.
     final widgetTest = File('$rootPath/${config.app}/test/widget_test.dart');
     if (widgetTest.existsSync()) widgetTest.deleteSync();
+    _write('${config.app}/test/app_test.dart', appStarterTest(config));
   }
 
   // ── AI Agent Skills ──────────────────────────────────────
@@ -382,6 +388,25 @@ class Generator {
       // The app package does not set `generate: true`, so building the app
       // will not produce these files later — the failure is terminal.
       _fail('flutter gen-l10n failed — AppLocalizations was not generated');
+    }
+  }
+
+  /// Formats the generated tree.
+  ///
+  /// The templates are written for readability as source strings, not to match
+  /// dart format's output, so the generated CI's `dart format
+  /// --set-exit-if-changed` step failed on a freshly generated project.
+  /// Formatting here keeps that guarantee without constraining the templates.
+  Future<void> _formatCode() async {
+    _log('Formatting generated code...');
+    final result = await Process.run(
+      'dart', ['format', '.'],
+      workingDirectory: rootPath,
+      runInShell: true,
+    );
+    if (result.exitCode != 0) {
+      stderr.writeln(result.stderr);
+      _fail('dart format failed — generated code is not format-clean');
     }
   }
 

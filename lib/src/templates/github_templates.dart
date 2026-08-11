@@ -219,7 +219,7 @@ jobs:
         run: flutter test packages/ui/test
 
       - name: Test network package
-        run: dart test packages/network/test
+        run: flutter test packages/network/test
 
       - name: Test app
         run: flutter test ${c.app}/test

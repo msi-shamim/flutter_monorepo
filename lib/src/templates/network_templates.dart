@@ -32,6 +32,29 @@ dev_dependencies:
 ''';
 }
 
+/// Starter test for the network package.
+String networkStarterTest(ProjectConfig c) => '''
+import 'package:flutter_test/flutter_test.dart';
+import 'package:${c.core}/${c.core}.dart';
+import 'package:${c.network}/${c.network}.dart';
+
+void main() {
+  group('ApiClient', () {
+    test('is constructed with the configured base URL', () {
+      final client = ApiClient(baseUrl: 'https://example.test');
+      expect(client, isNotNull);
+    });
+  });
+
+  group('Failure mapping', () {
+    test('network failures carry a message', () {
+      const failure = Result<int>.failure(NetworkException());
+      expect(failure.isFailure, isTrue);
+    });
+  });
+}
+''';
+
 String networkBarrel() => '''
 export 'client/api_client.dart';
 export 'interceptors/auth_interceptor.dart';

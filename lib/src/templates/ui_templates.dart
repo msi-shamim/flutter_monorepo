@@ -36,6 +36,49 @@ flutter:
   #         weight: 700
 ''';
 
+/// Starter widget test for the shared UI package.
+String uiStarterTest(ProjectConfig c) => '''
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:${c.ui}/${c.ui}.dart';
+
+void main() {
+  group('AppTheme', () {
+    test('light and dark are Material 3 and differ in brightness', () {
+      expect(AppTheme.light.useMaterial3, isTrue);
+      expect(AppTheme.dark.useMaterial3, isTrue);
+      expect(AppTheme.light.brightness, Brightness.light);
+      expect(AppTheme.dark.brightness, Brightness.dark);
+    });
+  });
+
+  group('Breakpoints', () {
+    testWidgets('ResponsiveBuilder selects by available width', (tester) async {
+      Widget sized(double width) => MaterialApp(
+            home: Center(
+              child: SizedBox(
+                width: width,
+                child: ResponsiveBuilder(
+                  mobile: (_) => const Text('mobile'),
+                  tablet: (_) => const Text('tablet'),
+                  desktop: (_) => const Text('desktop'),
+                ),
+              ),
+            ),
+          );
+
+      // Widths stay inside the default 800x600 test surface, which would
+      // otherwise clamp the SizedBox and defeat the assertion.
+      await tester.pumpWidget(sized(400));
+      expect(find.text('mobile'), findsOneWidget);
+
+      await tester.pumpWidget(sized(Breakpoints.mobile + 100));
+      expect(find.text('tablet'), findsOneWidget);
+    });
+  });
+}
+''';
+
 String uiBarrel() => '''
 // ── Assets ───────────────────────────────────────────────
 export 'assets/app_fonts.dart';
