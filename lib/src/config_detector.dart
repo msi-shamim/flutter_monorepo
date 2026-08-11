@@ -15,6 +15,8 @@ ProjectConfig? detectProjectConfig(String rootPath) {
   if (!rootPubspec.existsSync()) return null;
 
   final rootContent = rootPubspec.readAsStringSync();
+  if (!_looksLikeMonorepo(rootPath, rootContent)) return null;
+
   final name =
       _extractYamlValue(rootContent, 'name')?.replaceAll('_workspace', '');
   if (name == null) return null;
@@ -35,6 +37,20 @@ ProjectConfig? detectProjectConfig(String rootPath) {
     httpClient: httpClient,
     locales: locales,
   );
+}
+
+/// Whether [rootPath] carries the structure this generator produces.
+///
+/// Used only for projects predating [projectMarkerFile]. Without it, any
+/// directory holding a `pubspec.yaml` — an ordinary Dart package, or the app
+/// package one level inside a real monorepo — was treated as a monorepo root,
+/// and `doctor --fix` would scaffold a phantom tree into it.
+bool _looksLikeMonorepo(String rootPath, String rootPubspecContent) {
+  if (!rootPubspecContent.contains(RegExp(r'^workspace:', multiLine: true))) {
+    return false;
+  }
+  return Directory('$rootPath/packages/core').existsSync() &&
+      Directory('$rootPath/packages/l10n').existsSync();
 }
 
 /// Reads the generator's marker file, if this project carries one.

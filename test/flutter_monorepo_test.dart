@@ -82,6 +82,40 @@ void main() {
     });
   });
 
+  group('Monorepo detection', () {
+    test('rejects an ordinary Dart package', () {
+      final dir = Directory.systemTemp.createTempSync('fm_plain_pkg');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/pubspec.yaml')
+          .writeAsStringSync('name: my_cool_tool\nversion: 1.0.0\n');
+      Directory('${dir.path}/lib').createSync();
+
+      expect(detectProjectConfig(dir.path), isNull);
+    });
+
+    test('rejects a workspace root with no package tree', () {
+      final dir = Directory.systemTemp.createTempSync('fm_bare_ws');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/pubspec.yaml')
+          .writeAsStringSync('name: thing_workspace\nworkspace:\n  - app\n');
+
+      expect(detectProjectConfig(dir.path), isNull);
+    });
+
+    test('accepts a pre-marker monorepo by its structure', () {
+      final dir = Directory.systemTemp.createTempSync('fm_legacy');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/pubspec.yaml').writeAsStringSync(
+          'name: my_app_workspace\nworkspace:\n  - my_app_app\n');
+      Directory('${dir.path}/packages/core').createSync(recursive: true);
+      Directory('${dir.path}/packages/l10n').createSync(recursive: true);
+
+      final detected = detectProjectConfig(dir.path);
+      expect(detected, isNotNull);
+      expect(detected!.name, 'my_app');
+    });
+  });
+
   group('ProjectConfig', () {
     test('derives all package names from project name', () {
       final config = ProjectConfig(name: 'my_app', org: 'com.example');
