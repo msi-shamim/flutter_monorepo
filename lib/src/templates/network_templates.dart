@@ -118,12 +118,15 @@ class ApiClient {
 
 String _httpApiClient(ProjectConfig c) => '''
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:${c.core}/${c.core}.dart';
 
 import '../interceptors/logging_interceptor.dart';
+
+// Transport failures surface as http.ClientException on every platform.
+// dart:io's SocketException is deliberately not used: it does not exist on
+// web, and importing dart:io here would break `flutter build web`.
 
 class ApiClient {
   ApiClient({
@@ -144,10 +147,8 @@ class ApiClient {
       final uri = _buildUri(path, queryParameters);
       final response = await _client.get(uri, headers: _headers);
       return _handleResponse(response, fromJson);
-    } on SocketException {
-      return const Result.failure(NetworkException());
     } on http.ClientException catch (e) {
-      return Result.failure(ApiException(e.message));
+      return Result.failure(NetworkException(e.message));
     }
   }
 
@@ -160,10 +161,8 @@ class ApiClient {
         return Result.success(list.map(fromJson).toList());
       }
       return Result.failure(ApiException(response.reasonPhrase ?? 'Request failed', statusCode: response.statusCode));
-    } on SocketException {
-      return const Result.failure(NetworkException());
     } on http.ClientException catch (e) {
-      return Result.failure(ApiException(e.message));
+      return Result.failure(NetworkException(e.message));
     }
   }
 
@@ -171,10 +170,8 @@ class ApiClient {
     try {
       final response = await _client.post(_buildUri(path), headers: _headers, body: data != null ? jsonEncode(data) : null);
       return _handleResponse(response, fromJson);
-    } on SocketException {
-      return const Result.failure(NetworkException());
     } on http.ClientException catch (e) {
-      return Result.failure(ApiException(e.message));
+      return Result.failure(NetworkException(e.message));
     }
   }
 
@@ -182,10 +179,8 @@ class ApiClient {
     try {
       final response = await _client.put(_buildUri(path), headers: _headers, body: data != null ? jsonEncode(data) : null);
       return _handleResponse(response, fromJson);
-    } on SocketException {
-      return const Result.failure(NetworkException());
     } on http.ClientException catch (e) {
-      return Result.failure(ApiException(e.message));
+      return Result.failure(NetworkException(e.message));
     }
   }
 
@@ -196,10 +191,8 @@ class ApiClient {
         return const Result.success(null);
       }
       return Result.failure(ApiException(response.reasonPhrase ?? 'Request failed', statusCode: response.statusCode));
-    } on SocketException {
-      return const Result.failure(NetworkException());
     } on http.ClientException catch (e) {
-      return Result.failure(ApiException(e.message));
+      return Result.failure(NetworkException(e.message));
     }
   }
 
