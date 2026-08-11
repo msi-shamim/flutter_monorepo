@@ -40,6 +40,7 @@ platforms: ${c.platforms.join(',')}
 github: ${c.githubFiles}
 ci: ${c.ci.cliName}
 test: ${c.testScope.cliName}
+storage: ${c.storage.cliName}
 generator_version: $packageVersion
 ''';
 

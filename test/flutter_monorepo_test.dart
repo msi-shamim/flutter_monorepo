@@ -804,7 +804,7 @@ void main() {
         config.versions = VersionResolver();
       });
 
-      test('appPubspec includes get and get_storage', () {
+      test('appPubspec includes get and the default storage backend', () {
         final pubspec = tmpl.appPubspec(config);
         expect(pubspec, contains('get:'));
         expect(pubspec, contains('get_storage:'));
@@ -815,7 +815,7 @@ void main() {
       test('mainDart uses GetMaterialApp', () {
         final main = tmpl.mainDart(config);
         expect(main, contains('GetMaterialApp'));
-        expect(main, contains('GetStorage.init()'));
+        expect(main, contains('initAppStore()'));
       });
 
       test('initialBinding returns non-empty content', () {

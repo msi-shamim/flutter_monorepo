@@ -1,5 +1,6 @@
 import '../../project_config.dart';
 import '../../version.dart';
+import '../storage_templates.dart';
 import 'app_template_strategy.dart';
 
 class BlocTemplateStrategy extends AppTemplateStrategy {
@@ -24,8 +25,7 @@ dependencies:
   flutter_bloc: ${c.versions['flutter_bloc']}
   hydrated_bloc: ${c.versions['hydrated_bloc']}
   go_router: ${c.versions['go_router']}
-  path_provider: ${c.versions['path_provider']}
-  # Pre-wired workspace packages. core and network are not imported by the
+${storageDependency(c)}  # Pre-wired workspace packages. core and network are not imported by the
   # generated screens yet; they are declared so feature code can import
   # them without editing this pubspec first.
   ${c.core}:
@@ -53,19 +53,20 @@ flutter:
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
 import 'package:${c.ui}/${c.ui}.dart';
 
 import 'app/blocs/locale_bloc.dart';
 import 'app/blocs/theme_bloc.dart';
 import 'app/router/app_router.dart';
+import 'app/storage/app_store.dart';
+import 'app/storage/hydrated_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: HydratedStorageDirectory((await getApplicationDocumentsDirectory()).path),
-  );
+  await initAppStore();
+  // Bloc hydration goes through the same backend as everything else.
+  HydratedBloc.storage = KeyValueHydratedStorage(appStore);
   runApp(const MainApp());
 }
 
@@ -224,38 +225,6 @@ final appRouter = GoRouter(
 
   @override
   String homeController(ProjectConfig c) => ''; // State lives in Blocs
-
-  @override
-  String testSetup(ProjectConfig c) => '''
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter_test/flutter_test.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
-
-/// Runs automatically before every test in this directory.
-///
-/// The theme and locale blocs are HydratedBlocs, so constructing them without
-/// HydratedBloc.storage set throws before any widget renders. Tests get a
-/// throwaway storage directory rather than the app's real one.
-Future<void> testExecutable(FutureOr<void> Function() testMain) async {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  final dir = Directory.systemTemp.createTempSync('app_test_storage');
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: HydratedStorageDirectory(dir.path),
-  );
-  await testMain();
-
-  // Close before removing: the storage keeps its files open, and on Windows
-  // deleting them while open fails and would report as a test failure.
-  await HydratedBloc.storage.close();
-  try {
-    dir.deleteSync(recursive: true);
-  } on FileSystemException {
-    // A leftover temp directory is not worth failing a test run over.
-  }
-}
-''';
 
   @override
   String homeScreen(ProjectConfig c) =>

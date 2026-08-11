@@ -158,6 +158,11 @@ Future<void> _runCreate(List<String> arguments) async {
       help: 'License type for the project',
     )
     ..addOption(
+      'storage',
+      allowed: StorageBackend.cliNames,
+      help: 'Key-value storage backend (defaults to the framework default)',
+    )
+    ..addOption(
       'test',
       defaultsTo: TestScope.unit.cliName,
       allowed: TestScope.cliNames,
@@ -320,6 +325,9 @@ Future<void> _runCreate(List<String> arguments) async {
     githubFiles: githubFiles,
     ci: ci,
     testScope: TestScope.fromCliName(args['test'] as String),
+    storage: args.wasParsed('storage')
+        ? StorageBackend.fromCliName(args['storage'] as String)
+        : null,
   );
 
   final targetDir = Directory('${Directory.current.path}/$projectName');

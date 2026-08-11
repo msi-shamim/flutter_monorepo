@@ -103,6 +103,7 @@ ProjectConfig? _readMarker(String rootPath) {
     testScope:
         _parseEnum(_extractYamlValue(content, 'test'), TestScope.values) ??
         TestScope.unit,
+    storage: _parseStorage(_extractYamlValue(content, 'storage')),
   );
 }
 
@@ -110,6 +111,14 @@ T? _parseEnum<T extends Enum>(String? value, List<T> values) {
   if (value == null) return null;
   for (final v in values) {
     if (v.name == value) return v;
+  }
+  return null;
+}
+
+StorageBackend? _parseStorage(String? value) {
+  if (value == null) return null;
+  for (final backend in StorageBackend.values) {
+    if (backend.cliName == value) return backend;
   }
   return null;
 }

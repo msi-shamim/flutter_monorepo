@@ -1,5 +1,6 @@
 import '../../project_config.dart';
 import '../../version.dart';
+import '../storage_templates.dart';
 import 'app_template_strategy.dart';
 
 class RiverpodTemplateStrategy extends AppTemplateStrategy {
@@ -23,8 +24,7 @@ dependencies:
   cupertino_icons: ${c.versions['cupertino_icons']}
   flutter_riverpod: ${c.versions['flutter_riverpod']}
   go_router: ${c.versions['go_router']}
-  shared_preferences: ${c.versions['shared_preferences']}
-  # Pre-wired workspace packages. core and network are not imported by the
+${storageDependency(c)}  # Pre-wired workspace packages. core and network are not imported by the
   # generated screens yet; they are declared so feature code can import
   # them without editing this pubspec first.
   ${c.core}:
@@ -57,8 +57,11 @@ import 'package:${c.ui}/${c.ui}.dart';
 import 'app/providers/locale_provider.dart';
 import 'app/providers/theme_provider.dart';
 import 'app/router/app_router.dart';
+import 'app/storage/app_store.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initAppStore();
   runApp(const ProviderScope(child: MainApp()));
 }
 
@@ -92,7 +95,8 @@ class MainApp extends ConsumerWidget {
   String themeController(ProjectConfig c) => '''
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../storage/app_store.dart';
 
 final themeModeProvider =
     NotifierProvider<ThemeModeNotifier, ThemeMode>(ThemeModeNotifier.new);
@@ -102,13 +106,18 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
 
   @override
   ThemeMode build() {
-    _loadTheme();
+    // Synchronous: the store is loaded before runApp, so restoring state
+    // needs no async gap and no second frame.
+    final stored = appStore.read<int>(_storageKey);
+    if (stored != null && stored >= 0 && stored < ThemeMode.values.length) {
+      return ThemeMode.values[stored];
+    }
     return ThemeMode.system;
   }
 
   void setThemeMode(ThemeMode mode) {
     state = mode;
-    SharedPreferencesAsync().setInt(_storageKey, mode.index);
+    appStore.write(_storageKey, mode.index);
   }
 
   void toggleTheme() {
@@ -118,13 +127,6 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
                 Brightness.dark);
     setThemeMode(isDark ? ThemeMode.light : ThemeMode.dark);
   }
-
-  Future<void> _loadTheme() async {
-    final stored = await SharedPreferencesAsync().getInt(_storageKey);
-    if (stored != null && stored >= 0 && stored < ThemeMode.values.length) {
-      state = ThemeMode.values[stored];
-    }
-  }
 }
 ''';
 
@@ -133,7 +135,8 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
       '''
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../storage/app_store.dart';
 
 final localeProvider =
     NotifierProvider<LocaleNotifier, Locale>(LocaleNotifier.new);
@@ -144,30 +147,25 @@ ${localeConstants(c)}
 
   @override
   Locale build() {
-    _loadLocale();
+    final stored = appStore.read<String>(_storageKey);
+    if (stored != null) {
+      return supportedLocales.firstWhere(
+        (l) => l.languageCode == stored,
+        orElse: () => supportedLocales.first,
+      );
+    }
     return supportedLocales.first;
   }
 
   void setLocale(Locale locale) {
     state = locale;
-    SharedPreferencesAsync().setString(_storageKey, locale.languageCode);
+    appStore.write(_storageKey, locale.languageCode);
   }
 
   void cycleLocale() {
     final idx = supportedLocales.indexOf(state);
     final next = (idx + 1) % supportedLocales.length;
     setLocale(supportedLocales[next]);
-  }
-
-  Future<void> _loadLocale() async {
-    final stored = await SharedPreferencesAsync().getString(_storageKey);
-    if (stored != null) {
-      final locale = supportedLocales.firstWhere(
-        (l) => l.languageCode == stored,
-        orElse: () => supportedLocales.first,
-      );
-      state = locale;
-    }
   }
 }
 ''';
@@ -207,30 +205,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   @override
   String homeBinding(ProjectConfig c) => ''; // No bindings in Riverpod
-
-  @override
-  String testDevDependencies(ProjectConfig c) =>
-      '  shared_preferences_platform_interface: any\n';
-
-  @override
-  String testSetup(ProjectConfig c) => '''
-import 'dart:async';
-
-import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
-import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
-
-/// Runs automatically before every test in this directory.
-///
-/// The theme and locale providers read SharedPreferences while they build, and
-/// plugins are not registered under `flutter test`, so without this any widget
-/// test that pumps the app fails with "The SharedPreferencesAsyncPlatform
-/// instance must be set" before rendering a frame.
-Future<void> testExecutable(FutureOr<void> Function() testMain) async {
-  SharedPreferencesAsyncPlatform.instance =
-      InMemorySharedPreferencesAsync.empty();
-  await testMain();
-}
-''';
 
   @override
   String homeController(ProjectConfig c) => ''; // State lives in providers

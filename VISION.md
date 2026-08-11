@@ -67,12 +67,15 @@ flutter_monorepo my_app --http chopper
 
 ## Planned — Production-Ready (not implemented)
 
-### `--storage` — Local Persistence Choice
+### `--storage` — Local Persistence Choice — **shipped in v1.5**
 ```bash
-flutter_monorepo my_app --storage get_storage      # default
+flutter_monorepo my_app --storage get_storage
 flutter_monorepo my_app --storage shared_prefs
-flutter_monorepo my_app --storage hive
+flutter_monorepo my_app --storage hive          # hive_ce
 ```
+Persistence goes through a `KeyValueStore` interface in `packages/core`, so
+the backend is a wiring change in one file. Omitting the flag keeps each
+framework's original backend.
 
 ### `--ci` — CI/CD Templates — **shipped in v1.5**
 ```bash

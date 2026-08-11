@@ -13,6 +13,7 @@ import 'templates/skills_templates.dart' as skills;
 import 'templates/license_templates.dart' as license;
 import 'templates/github_templates.dart' as github;
 import 'templates/ci_templates.dart' as ci;
+import 'templates/storage_templates.dart' as storage;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -128,6 +129,7 @@ class Generator {
       'packages/core/lib/usecases',
       'packages/core/lib/utils',
       'packages/core/lib/extensions',
+      'packages/core/lib/storage',
       // UI
       'packages/ui/lib/assets',
       'packages/ui/lib/responsive',
@@ -147,6 +149,7 @@ class Generator {
       'packages/l10n/lib/l10n/generated',
       // App — routes + screens always exist
       '${config.app}/lib/app/routes',
+      '${config.app}/lib/app/storage',
       '${config.app}/lib/screens/home',
       // Test directories (tests written during development)
       'packages/core/test/states',
@@ -260,6 +263,10 @@ class Generator {
     );
     _write('packages/core/lib/usecases/use_case.dart', core.useCase(config));
     _write('packages/core/lib/utils/result.dart', core.result(config));
+    _write(
+      'packages/core/lib/storage/key_value_store.dart',
+      core.keyValueStore(config),
+    );
     _write(
       'packages/core/lib/extensions/string_extensions.dart',
       core.stringExtensions(),
@@ -451,6 +458,24 @@ class Generator {
       '${config.app}/test/flutter_test_config.dart',
       tmpl.testSetup(config),
     );
+
+    // Storage: one implementation of core's interface, plus the single place
+    // that names it. Bloc and Cubit also get the hydrated_bloc adapter.
+    _write(
+      '${config.app}/lib/app/storage/${storage.keyValueStoreFileName(config)}',
+      storage.keyValueStoreImpl(config),
+    );
+    _write(
+      '${config.app}/lib/app/storage/app_store.dart',
+      storage.appStore(config),
+    );
+    if (config.stateManagement == StateManagement.bloc ||
+        config.stateManagement == StateManagement.cubit) {
+      _write(
+        '${config.app}/lib/app/storage/hydrated_store.dart',
+        storage.hydratedStorageAdapter(config),
+      );
+    }
     if (config.testScope == TestScope.full) {
       _write(
         '${config.app}/integration_test/app_test.dart',

@@ -28,6 +28,8 @@ class VersionResolver {
     'go_router': '^17.5.0',
     // Storage
     'shared_preferences': '^2.5.3',
+    'hive_ce': '^2.19.3',
+    'hive_ce_flutter': '^2.3.4',
     'path_provider': '^2.1.5',
     // L10n
     'intl': '^0.20.2',

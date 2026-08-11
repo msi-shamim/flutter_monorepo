@@ -56,6 +56,63 @@ enum CiProvider {
   );
 }
 
+/// Backend implementing the generated `KeyValueStore`.
+enum StorageBackend {
+  /// GetStorage — synchronous, GetX's companion package.
+  getStorage,
+
+  /// shared_preferences — the platform-idiomatic default.
+  sharedPrefs,
+
+  /// hive_ce — the maintained fork of hive.
+  ///
+  /// `hive` itself declares `sdk <3.0.0` and has not been published since
+  /// 2022, so it cannot resolve on Dart 3 at all.
+  hive;
+
+  /// CLI-friendly identifier used in the `--storage` flag.
+  String get cliName => switch (this) {
+    getStorage => 'get_storage',
+    sharedPrefs => 'shared_prefs',
+    hive => 'hive',
+  };
+
+  /// The pub.dev package this backend needs.
+  String get package => switch (this) {
+    getStorage => 'get_storage',
+    sharedPrefs => 'shared_preferences',
+    hive => 'hive_ce',
+  };
+
+  /// All valid `--storage` identifiers, in declaration order.
+  static List<String> get cliNames =>
+      values.map((e) => e.cliName).toList(growable: false);
+
+  /// Parse from CLI string.
+  ///
+  /// Throws an [ArgumentError] listing the valid identifiers when [name]
+  /// matches no backend.
+  static StorageBackend fromCliName(String name) => values.firstWhere(
+    (e) => e.cliName == name,
+    orElse: () => throw ArgumentError.value(
+      name,
+      'name',
+      'Unknown storage backend. Valid values: ${cliNames.join(', ')}',
+    ),
+  );
+
+  /// The backend a framework uses when `--storage` is not given.
+  ///
+  /// Chosen to preserve what each framework already shipped, so omitting the
+  /// flag changes nothing about a generated project.
+  static StorageBackend defaultFor(StateManagement sm) => switch (sm) {
+    StateManagement.getx => getStorage,
+    StateManagement.riverpod => sharedPrefs,
+    // HydratedStorage was hive-backed, so hive_ce is the closest equivalent.
+    StateManagement.bloc || StateManagement.cubit => hive,
+  };
+}
+
 /// How much test scaffolding the generator writes.
 enum TestScope {
   /// Starter unit and widget tests only.
@@ -201,7 +258,9 @@ class ProjectConfig {
     this.githubFiles = false,
     this.ci = CiProvider.none,
     this.testScope = TestScope.unit,
-  }) : app = '${name}_app',
+    StorageBackend? storage,
+  }) : storage = storage ?? StorageBackend.defaultFor(stateManagement),
+       app = '${name}_app',
        core = '${name}_core',
        ui = '${name}_ui',
        network = '${name}_network',
@@ -240,6 +299,9 @@ class ProjectConfig {
 
   /// How much test scaffolding is generated.
   final TestScope testScope;
+
+  /// Backend behind the generated `KeyValueStore`.
+  final StorageBackend storage;
 
   /// Populated by [VersionResolver] before template generation.
   late final VersionResolver versions;
@@ -281,9 +343,9 @@ class ProjectConfig {
     }
     switch (stateManagement) {
       case StateManagement.getx:
-        pkgs.addAll(['get', 'get_storage']);
+        pkgs.add('get');
       case StateManagement.riverpod:
-        pkgs.addAll(['flutter_riverpod', 'go_router', 'shared_preferences']);
+        pkgs.addAll(['flutter_riverpod', 'go_router']);
       case StateManagement.bloc:
       case StateManagement.cubit:
         pkgs.addAll([
@@ -293,6 +355,8 @@ class ProjectConfig {
           'path_provider',
         ]);
     }
+    pkgs.add(storage.package);
+    if (storage == StorageBackend.hive) pkgs.add('hive_ce_flutter');
     return pkgs;
   }
 

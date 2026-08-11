@@ -1,5 +1,6 @@
 import '../../project_config.dart';
 import '../../version.dart';
+import '../storage_templates.dart';
 import 'app_template_strategy.dart';
 
 class GetxTemplateStrategy extends AppTemplateStrategy {
@@ -22,8 +23,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ${c.versions['cupertino_icons']}
   get: ${c.versions['get']}
-  get_storage: ${c.versions['get_storage']}
-  # Pre-wired workspace packages. core and network are not imported by the
+${storageDependency(c)}  # Pre-wired workspace packages. core and network are not imported by the
   # generated screens yet; they are declared so feature code can import
   # them without editing this pubspec first.
   ${c.core}:
@@ -50,16 +50,16 @@ flutter:
       '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:${c.l10n}/${c.l10n}.dart';
 import 'package:${c.ui}/${c.ui}.dart';
 
 import 'app/bindings/initial_binding.dart';
 import 'app/routes/app_pages.dart';
+import 'app/storage/app_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GetStorage.init();
+  await initAppStore();
   runApp(const MainApp());
 }
 
@@ -104,12 +104,11 @@ class InitialBinding extends Bindings {
   String themeController(ProjectConfig c) => '''
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+
+import '../storage/app_store.dart';
 
 class ThemeController extends GetxController {
   static const _storageKey = 'theme_mode';
-
-  final _storage = GetStorage();
   final _themeMode = ThemeMode.system.obs;
 
   ThemeMode get themeMode => _themeMode.value;
@@ -128,13 +127,13 @@ class ThemeController extends GetxController {
   void setThemeMode(ThemeMode mode) {
     _themeMode.value = mode;
     Get.changeThemeMode(mode);
-    _storage.write(_storageKey, mode.index);
+    appStore.write(_storageKey, mode.index);
   }
 
   void toggleTheme() => setThemeMode(isDarkMode ? ThemeMode.light : ThemeMode.dark);
 
   void _loadTheme() {
-    final stored = _storage.read<int>(_storageKey);
+    final stored = appStore.read<int>(_storageKey);
     if (stored != null && stored >= 0 && stored < ThemeMode.values.length) {
       _themeMode.value = ThemeMode.values[stored];
       Get.changeThemeMode(_themeMode.value);
@@ -150,13 +149,12 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+
+import '../storage/app_store.dart';
 
 class LocaleController extends GetxController {
 ${localeConstants(c)}
   static const _storageKey = 'locale';
-
-  final _storage = GetStorage();
   final _locale = ${localeVarName(c.primaryLocale)}.obs;
 
   Locale get locale => _locale.value;
@@ -171,7 +169,7 @@ ${localeConstants(c)}
   void setLocale(Locale locale) {
     _locale.value = locale;
     Get.updateLocale(locale);
-    _storage.write(_storageKey, locale.languageCode);
+    appStore.write(_storageKey, locale.languageCode);
   }
 
 ${_localeToggleMethod(c)}
@@ -180,7 +178,7 @@ ${_localeToggleMethod(c)}
       isRTL ? ui.TextDirection.rtl : ui.TextDirection.ltr;
 
   void _loadLocale() {
-    final stored = _storage.read<String>(_storageKey);
+    final stored = appStore.read<String>(_storageKey);
     if (stored != null) {
       final locale = supportedLocales.firstWhere(
         (l) => l.languageCode == stored,
@@ -271,59 +269,6 @@ class HomeBinding extends Bindings {
   void dependencies() {
     Get.lazyPut(() => HomeController());
   }
-}
-''';
-
-  @override
-  String testDevDependencies(ProjectConfig c) =>
-      '  path_provider_platform_interface: any\n';
-
-  @override
-  String testSetup(ProjectConfig c) => '''
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter_test/flutter_test.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
-/// Runs automatically before every test in this directory.
-///
-/// The controllers read GetStorage as they initialise, and GetStorage resolves
-/// its location through path_provider, which is not registered under
-/// `flutter test`. Without this, any widget test that pumps the app fails
-/// before rendering a frame.
-Future<void> testExecutable(FutureOr<void> Function() testMain) async {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  final dir = Directory.systemTemp.createTempSync('app_test_storage');
-  PathProviderPlatform.instance = _TestPathProvider(dir.path);
-  await GetStorage.init();
-  await testMain();
-
-  // Best effort: GetStorage keeps its file open, and on Windows deleting an
-  // open file fails and would surface as a test failure.
-  try {
-    dir.deleteSync(recursive: true);
-  } on FileSystemException {
-    // A leftover temp directory is not worth failing a test run over.
-  }
-}
-
-class _TestPathProvider extends PathProviderPlatform
-    with MockPlatformInterfaceMixin {
-  _TestPathProvider(this.path);
-
-  final String path;
-
-  @override
-  Future<String?> getApplicationDocumentsPath() async => path;
-
-  @override
-  Future<String?> getApplicationSupportPath() async => path;
-
-  @override
-  Future<String?> getTemporaryPath() async => path;
 }
 ''';
 

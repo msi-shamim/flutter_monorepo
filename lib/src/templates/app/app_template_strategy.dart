@@ -1,4 +1,5 @@
 import '../../project_config.dart';
+import '../storage_templates.dart';
 
 /// Interface for state-management-specific app templates.
 ///
@@ -46,10 +47,12 @@ abstract class AppTemplateStrategy {
   /// instance before it renders anything. Flutter runs this file
   /// automatically for every test in the directory, so the in-memory
   /// substitute is installed without each test having to know about it.
-  String testSetup(ProjectConfig c);
+  /// The substitute depends on the storage backend, not on the framework, so
+  /// this delegates rather than each strategy repeating it.
+  String testSetup(ProjectConfig c) => storageTestSetup(c);
 
   /// Extra dev dependencies the generated tests require, as pubspec lines.
-  String testDevDependencies(ProjectConfig c) => '';
+  String testDevDependencies(ProjectConfig c) => storageTestDependencies(c);
 }
 
 /// The integration_test dev dependency, for `--test full` only.

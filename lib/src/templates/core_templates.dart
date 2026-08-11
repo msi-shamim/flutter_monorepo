@@ -62,6 +62,37 @@ void main() {
 }
 ''';
 
+/// The persistence boundary: an interface in core, implementations in the app.
+///
+/// Theme and locale state name this rather than a storage package, so
+/// switching backend is a wiring change in one file instead of an edit to
+/// every call site. It is deliberately pure Dart, like the rest of core.
+String keyValueStore(ProjectConfig c) => '''
+/// A minimal key-value persistence contract.
+///
+/// [read] is synchronous so callers can restore state during construction
+/// without an async gap; implementations load into memory in [init].
+abstract interface class KeyValueStore {
+  /// Prepares the store. Must complete before any other member is used.
+  Future<void> init();
+
+  /// The value stored under [key], or null.
+  T? read<T>(String key);
+
+  /// Stores [value] under [key].
+  Future<void> write(String key, Object? value);
+
+  /// Removes [key].
+  Future<void> delete(String key);
+
+  /// Removes everything this store owns.
+  Future<void> clear();
+
+  /// Releases resources. The store cannot be used afterwards.
+  Future<void> close();
+}
+''';
+
 String coreBarrel(ProjectConfig c) => '''
 // ── Exceptions ───────────────────────────────────────────
 export 'exceptions/app_exception.dart';
@@ -74,6 +105,9 @@ export 'repositories/base_repository.dart';
 
 // ── Use Cases ────────────────────────────────────────────
 export 'usecases/use_case.dart';
+
+// ── Storage ──────────────────────────────────────────────
+export 'storage/key_value_store.dart';
 
 // ── Utils ────────────────────────────────────────────────
 export 'utils/result.dart';
