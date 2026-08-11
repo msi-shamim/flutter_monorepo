@@ -282,11 +282,18 @@ class Generator {
       if (base != locale) arbLocales.add(base);
       arbLocales.add(locale);
     }
+    final untranslated = <String>[];
     for (final locale in arbLocales) {
       _write(
         'packages/l10n/lib/l10n/arb/app_$locale.arb',
         l10n.arbFile(config, locale),
       );
+      if (!l10n.hasTranslation(locale)) untranslated.add(locale);
+    }
+    if (untranslated.isNotEmpty) {
+      stdout.writeln('  Note: no built-in strings for '
+          '${untranslated.join(', ')} — those ARB files contain English '
+          'placeholders and are marked for translation.');
     }
     _write('packages/l10n/lib/formatters/date_formatter.dart', l10n.dateFormatter());
     _write('packages/l10n/lib/formatters/number_formatter.dart', l10n.numberFormatter());

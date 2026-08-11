@@ -43,6 +43,12 @@ export 'widgets/directionality_builder.dart';
 ''';
 
 /// Generates an ARB file for the given [locale].
+/// Whether built-in strings exist for [locale], directly or via its base
+/// language. When false, [arbFile] emits English placeholders and says so.
+bool hasTranslation(String locale) =>
+    _translations.containsKey(locale) ||
+    _translations.containsKey(locale.split('_').first);
+
 /// The primary locale (first in list) gets `@` description annotations.
 String arbFile(ProjectConfig c, String locale) {
   final isPrimary = locale == c.primaryLocale;
@@ -75,6 +81,12 @@ String arbFile(ProjectConfig c, String locale) {
   final buf = StringBuffer();
   buf.writeln('{');
   buf.writeln('  "@@locale": "$locale",');
+  if (!hasTranslation(locale)) {
+    // ARB is JSON, so this cannot be a // comment. @@x- attributes are the
+    // documented extension point and are ignored by gen-l10n.
+    buf.writeln('  "@@x-untranslated": '
+        '"Values below are English placeholders — translate before shipping.",');
+  }
 
   final keys = entries.keys.toList();
   for (var i = 0; i < keys.length; i++) {

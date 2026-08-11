@@ -175,7 +175,7 @@ All three HTTP clients generate the same `ApiClient` API surface — every metho
 
 12 languages have built-in translations: **en, ar, es, fr, de, pt, zh, ja, ko, hi, tr, ru**
 
-Unknown locale codes generate English placeholder values with `// TODO: translate` markers.
+Unknown locale codes generate English placeholder values. Those ARB files carry an `@@x-untranslated` attribute, and the generator prints a note listing them.
 
 ```bash
 flutter_monorepo my_app --locales en,es,fr,de,ja
