@@ -98,6 +98,8 @@ class Doctor {
           stdout.writeln(
               '$_unrestorable file(s) have no template and were left absent — '
               'restore them from version control.');
+        } else {
+          stdout.writeln('Structure is now intact.');
         }
       } else {
         stdout.writeln(
@@ -105,7 +107,10 @@ class Doctor {
       }
     }
 
-    return _missing == 0;
+    // After a --fix run, what matters is what is still missing, not what was
+    // missing on entry. Reporting failure for items we just restored makes
+    // `doctor --fix && next-step` unusable.
+    return _missing - _restored == 0;
   }
 
   void _check(String relativePath, {required bool isDirectory}) {
