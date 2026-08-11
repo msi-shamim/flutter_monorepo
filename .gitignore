@@ -34,9 +34,6 @@ doc/api/
 /example/build/
 /example/pubspec.lock
 
-# Internal
-VISION.md
-
 # Env
 .env
 .env.*
