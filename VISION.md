@@ -143,7 +143,7 @@ Shipped with:
 - GitHub community files with `--github` (issue/PR templates, CI workflow, code of conduct)
 - Auto-generated README.md, LICENSE, and CONTRIBUTING.md
 - 4 shared packages (core, ui, network, l10n) — all framework-agnostic
-- Full Material 3 theme (light + dark, 24 component themes)
+- Full Material 3 theme (light + dark, 32 component themes)
 - Responsive design utilities
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>

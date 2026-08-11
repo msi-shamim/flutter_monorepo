@@ -15,7 +15,7 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Multi-HTTP client** — Dio, http, or Chopper via `--http`
 - **Dynamic localization** — 12 built-in languages with locale-aware date/number formatters and RTL support
 - **Flexible platforms** — any combination of Android, iOS, Web, Linux, macOS, Windows
-- **Full Material 3 design system** — light + dark themes with 24 component themes, responsive utilities, centralized asset management
+- **Full Material 3 design system** — light + dark themes with 32 component themes, responsive utilities, centralized asset management
 - **Sealed error handling** — `AppException` hierarchy + `Result<T>` (Success | Failure) throughout
 - **Clean architecture** — 4 framework-agnostic shared packages (core, ui, network, l10n) + 1 app package
 - **Auto version resolution** — fetches latest compatible dependency versions from pub.dev at generation time
@@ -226,7 +226,7 @@ my_app/
 │   ├── ui/                      # Design system
 │   │   ├── assets/              # Icons, fonts, images
 │   │   └── lib/
-│   │       ├── theme/           # Material 3 light + dark (24 components)
+│   │       ├── theme/           # Material 3 light + dark (32 components)
 │   │       ├── responsive/      # Breakpoints, ResponsiveBuilder
 │   │       ├── assets/          # Type-safe asset constants
 │   │       └── widgets/         # Reusable stateless widgets

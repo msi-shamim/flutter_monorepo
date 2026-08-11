@@ -368,6 +368,14 @@ abstract final class AppTheme {
     dividerTheme: DividerThemeData(color: AppColors.textSecondary.withValues(alpha: 0.12), thickness: 1, space: 1),
     chipTheme: ChipThemeData(shape: _shapeMedium, side: BorderSide.none),
     tooltipTheme: TooltipThemeData(decoration: BoxDecoration(color: AppColors.textPrimary, borderRadius: BorderRadius.circular(AppSpacing.radiusSm))),
+    listTileTheme: ListTileThemeData(shape: _shapeMedium, iconColor: AppColors.textSecondary),
+    expansionTileTheme: ExpansionTileThemeData(shape: _shapeMedium, collapsedShape: _shapeMedium),
+    popupMenuTheme: PopupMenuThemeData(shape: _shapeMedium, elevation: 3),
+    sliderTheme: const SliderThemeData(activeTrackColor: AppColors.primary, thumbColor: AppColors.primary),
+    segmentedButtonTheme: SegmentedButtonThemeData(style: ButtonStyle(shape: WidgetStatePropertyAll(_shapeMedium))),
+    searchBarTheme: SearchBarThemeData(shape: WidgetStatePropertyAll(_shapeMedium), elevation: const WidgetStatePropertyAll(1)),
+    datePickerTheme: DatePickerThemeData(shape: _shapeLarge, headerBackgroundColor: AppColors.primary, headerForegroundColor: AppColors.white),
+    timePickerTheme: TimePickerThemeData(shape: _shapeLarge),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.primary),
   );
 
@@ -397,6 +405,14 @@ abstract final class AppTheme {
     dividerTheme: DividerThemeData(color: AppColors.textSecondaryDark.withValues(alpha: 0.12), thickness: 1, space: 1),
     chipTheme: ChipThemeData(shape: _shapeMedium, side: BorderSide.none),
     tooltipTheme: TooltipThemeData(decoration: BoxDecoration(color: AppColors.textPrimaryDark, borderRadius: BorderRadius.circular(AppSpacing.radiusSm))),
+    listTileTheme: ListTileThemeData(shape: _shapeMedium, iconColor: AppColors.textSecondaryDark),
+    expansionTileTheme: ExpansionTileThemeData(shape: _shapeMedium, collapsedShape: _shapeMedium),
+    popupMenuTheme: PopupMenuThemeData(shape: _shapeMedium, elevation: 3),
+    sliderTheme: const SliderThemeData(activeTrackColor: AppColors.primaryLight, thumbColor: AppColors.primaryLight),
+    segmentedButtonTheme: SegmentedButtonThemeData(style: ButtonStyle(shape: WidgetStatePropertyAll(_shapeMedium))),
+    searchBarTheme: SearchBarThemeData(shape: WidgetStatePropertyAll(_shapeMedium), elevation: const WidgetStatePropertyAll(1)),
+    datePickerTheme: DatePickerThemeData(shape: _shapeLarge, headerBackgroundColor: AppColors.primaryLight, headerForegroundColor: AppColors.backgroundDark),
+    timePickerTheme: TimePickerThemeData(shape: _shapeLarge),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: AppColors.primaryLight),
   );
 }
