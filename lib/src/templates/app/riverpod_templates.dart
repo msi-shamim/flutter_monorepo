@@ -19,6 +19,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  cupertino_icons: ${c.versions['cupertino_icons']}
   flutter_riverpod: ${c.versions['flutter_riverpod']}
   go_router: ${c.versions['go_router']}
   shared_preferences: ${c.versions['shared_preferences']}

@@ -19,6 +19,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  cupertino_icons: ${c.versions['cupertino_icons']}
   get: ${c.versions['get']}
   get_storage: ${c.versions['get_storage']}
   # Pre-wired workspace packages. core and network are not imported by the

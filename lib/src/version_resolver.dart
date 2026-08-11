@@ -31,6 +31,8 @@ class VersionResolver {
     'path_provider': '^2.1.5',
     // L10n
     'intl': '^0.20.2',
+    // Icons
+    'cupertino_icons': '^1.0.8',
     // Linting
     'flutter_lints': '^6.0.0',
     // Testing (pure Dart packages cannot use flutter_test)

@@ -19,6 +19,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  cupertino_icons: ${c.versions['cupertino_icons']}
   flutter_bloc: ${c.versions['flutter_bloc']}
   hydrated_bloc: ${c.versions['hydrated_bloc']}
   go_router: ${c.versions['go_router']}

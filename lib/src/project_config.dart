@@ -201,7 +201,7 @@ class ProjectConfig {
 
   /// Returns the list of pub.dev packages needed for this configuration.
   List<String> get requiredPackages {
-    final pkgs = <String>['flutter_lints', 'intl', 'test'];
+    final pkgs = <String>['flutter_lints', 'intl', 'test', 'cupertino_icons'];
     switch (httpClient) {
       case HttpClient.dio:
         pkgs.add('dio');

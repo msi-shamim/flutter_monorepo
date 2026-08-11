@@ -115,7 +115,10 @@ String rootGitignore() => '''
 .dart_tool/
 .packages
 build/
-pubspec.lock
+
+# pubspec.lock is intentionally NOT ignored. This is an application
+# workspace, not a published library, so the lockfile is committed to keep
+# builds reproducible across machines and CI.
 
 # IDE
 .idea/
