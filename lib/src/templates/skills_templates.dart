@@ -110,7 +110,7 @@ Run these commands after implementation:
 '''
       '```bash\n'
       'dart analyze\n'
-      'dart test packages/ui/test/\n'
+      'flutter test packages/ui/test/\n'
       'dart test packages/core/test/\n'
       '```\n';
 }
@@ -501,7 +501,7 @@ Controllers pattern-match on Result to update UI state.
       '```bash\n'
       'dart analyze\n'
       'dart test packages/core/test/\n'
-      'dart test packages/network/test/\n'
+      'flutter test packages/network/test/\n'
       'flutter test ${c.app}/test/\n'
       '```\n';
 }
