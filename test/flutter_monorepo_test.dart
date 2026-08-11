@@ -103,6 +103,17 @@ void main() {
       expect(detectProjectConfig(dir.path), isNull);
     });
 
+    test('strips only the trailing _workspace suffix', () {
+      final dir = Directory.systemTemp.createTempSync('fm_ws_name');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/pubspec.yaml').writeAsStringSync(
+          'name: task_workspace_workspace\nworkspace:\n  - task_workspace_app\n');
+      Directory('${dir.path}/packages/core').createSync(recursive: true);
+      Directory('${dir.path}/packages/l10n').createSync(recursive: true);
+
+      expect(detectProjectConfig(dir.path)!.name, 'task_workspace');
+    });
+
     test('accepts a pre-marker monorepo by its structure', () {
       final dir = Directory.systemTemp.createTempSync('fm_legacy');
       addTearDown(() => dir.deleteSync(recursive: true));

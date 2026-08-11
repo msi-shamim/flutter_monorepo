@@ -17,8 +17,11 @@ ProjectConfig? detectProjectConfig(String rootPath) {
   final rootContent = rootPubspec.readAsStringSync();
   if (!_looksLikeMonorepo(rootPath, rootContent)) return null;
 
-  final name =
-      _extractYamlValue(rootContent, 'name')?.replaceAll('_workspace', '');
+  // Strip only the suffix the generator appends. replaceAll would turn
+  // task_workspace_workspace into "task", pointing every subsequent check at
+  // a project that does not exist.
+  final name = _extractYamlValue(rootContent, 'name')
+      ?.replaceFirst(RegExp(r'_workspace$'), '');
   if (name == null) return null;
 
   final appPubspecFile = File('$rootPath/${name}_app/pubspec.yaml');
