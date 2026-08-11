@@ -24,6 +24,38 @@ enum StateManagement {
   cubit,
 }
 
+/// CI provider whose pipeline definition the generator writes.
+enum CiProvider {
+  /// No pipeline file.
+  none,
+
+  /// GitHub Actions — `.github/workflows/ci.yml`.
+  github,
+
+  /// GitLab CI — `.gitlab-ci.yml`.
+  gitlab;
+
+  /// CLI-friendly identifier used in the `--ci` flag.
+  String get cliName => name;
+
+  /// All valid `--ci` identifiers, in declaration order.
+  static List<String> get cliNames =>
+      values.map((e) => e.cliName).toList(growable: false);
+
+  /// Parse from CLI string.
+  ///
+  /// Throws an [ArgumentError] listing the valid identifiers when [name]
+  /// matches no provider.
+  static CiProvider fromCliName(String name) => values.firstWhere(
+    (e) => e.cliName == name,
+    orElse: () => throw ArgumentError.value(
+      name,
+      'name',
+      'Unknown CI provider. Valid values: ${cliNames.join(', ')}',
+    ),
+  );
+}
+
 /// Supported HTTP client libraries.
 enum HttpClient {
   /// Dio — feature-rich HTTP client with interceptors.
@@ -138,6 +170,7 @@ class ProjectConfig {
     this.licenseType = LicenseType.proprietary,
     this.gitInit = true,
     this.githubFiles = false,
+    this.ci = CiProvider.none,
   }) : app = '${name}_app',
        core = '${name}_core',
        ui = '${name}_ui',
@@ -171,6 +204,9 @@ class ProjectConfig {
 
   /// Whether to generate GitHub community files (.github/ directory).
   final bool githubFiles;
+
+  /// CI provider whose pipeline file is generated, if any.
+  final CiProvider ci;
 
   /// Populated by [VersionResolver] before template generation.
   late final VersionResolver versions;

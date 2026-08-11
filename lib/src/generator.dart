@@ -12,6 +12,7 @@ import 'templates/app/app_template_strategy.dart';
 import 'templates/skills_templates.dart' as skills;
 import 'templates/license_templates.dart' as license;
 import 'templates/github_templates.dart' as github;
+import 'templates/ci_templates.dart' as ci;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -42,6 +43,7 @@ class Generator {
     _createDirectories();
     _writeRootFiles();
     _writeGithubFiles();
+    _writeCiPipeline();
     _writeCorePackage();
     _writeUiPackage();
     _writeNetworkPackage();
@@ -225,7 +227,20 @@ class Generator {
       '.github/pull_request_template.md',
       github.pullRequestTemplate(config),
     );
-    _write('.github/workflows/ci.yml', github.ciWorkflow(config));
+  }
+
+  // ── CI pipeline ─────────────────────────────────────────
+  void _writeCiPipeline() {
+    switch (config.ci) {
+      case CiProvider.none:
+        return;
+      case CiProvider.github:
+        _log('Writing GitHub Actions workflow...');
+        _write('.github/workflows/ci.yml', github.ciWorkflow(config));
+      case CiProvider.gitlab:
+        _log('Writing GitLab CI pipeline...');
+        _write('.gitlab-ci.yml', ci.gitlabCi(config));
+    }
   }
 
   // ── Core package ────────────────────────────────────────

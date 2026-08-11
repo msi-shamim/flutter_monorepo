@@ -38,6 +38,7 @@ license: ${c.licenseType.cliName}
 locales: ${c.locales.join(',')}
 platforms: ${c.platforms.join(',')}
 github: ${c.githubFiles}
+ci: ${c.ci.cliName}
 generator_version: $packageVersion
 ''';
 

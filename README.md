@@ -23,7 +23,8 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Complete documentation** — `ARCHITECTURE.md` + `PACKAGE.md` for every generated package
 - **Auto git init** — initializes repository with first commit (optional)
 - **Project metadata** — auto-generated `README.md`, `LICENSE`, and `CONTRIBUTING.md` with 11 license types via `--license` (default: proprietary)
-- **GitHub community setup** — opt-in `--github` flag generates issue templates, PR template, CI workflow, code of conduct, and funding placeholder
+- **CI pipelines** — `--ci github` or `--ci gitlab` generates a pipeline that analyzes, checks formatting and runs every package's tests
+- **GitHub community setup** — opt-in `--github` flag generates issue templates, PR template, code of conduct, and funding placeholder
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 - **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
 - **Test-during-development** — every workflow includes a test step; test directories are pre-created so tests are written alongside code, not bolted on later
@@ -135,7 +136,8 @@ packages/network/test/                         # API client tests
 | `--platforms` | `-p` | `android,ios` | Comma-separated platforms, or `all` for every supported platform |
 | `--org` | `-o` | `com.example` | Organization identifier for Android/iOS bundle |
 | `--[no-]git` | | on | Initialize git repository with first commit |
-| `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, CI, code of conduct) |
+| `--ci` | | `none` | CI pipeline: `none`, `github` (Actions), `gitlab`. `--github` implies `github` |
+| `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, code of conduct) |
 | `--help` | `-h` | | Show help message |
 | `--version` | | | Show version |
 

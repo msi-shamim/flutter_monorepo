@@ -74,13 +74,14 @@ flutter_monorepo my_app --storage shared_prefs
 flutter_monorepo my_app --storage hive
 ```
 
-### `--ci` — CI/CD Templates
+### `--ci` — CI/CD Templates — **shipped in v1.5**
 ```bash
 flutter_monorepo my_app --ci github       # GitHub Actions
 flutter_monorepo my_app --ci gitlab
 flutter_monorepo my_app --ci none         # default
 ```
-Generates workflow files for lint, test, build.
+Generates a pipeline that analyzes, checks formatting and runs every
+package's tests. `--github` implies `--ci github`.
 
 ### `--flavor` — Build Flavors (dev/staging/prod)
 ```bash

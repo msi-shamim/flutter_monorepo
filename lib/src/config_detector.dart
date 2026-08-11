@@ -97,6 +97,9 @@ ProjectConfig? _readMarker(String rootPath) {
     locales: locales.isEmpty ? const ['en', 'ar'] : locales,
     platforms: platforms.isEmpty ? const ['android', 'ios'] : platforms,
     githubFiles: _extractYamlValue(content, 'github') == 'true',
+    ci:
+        _parseEnum(_extractYamlValue(content, 'ci'), CiProvider.values) ??
+        CiProvider.none,
   );
 }
 

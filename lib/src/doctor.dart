@@ -6,6 +6,7 @@ import 'templates/skills_templates.dart' as skills;
 import 'templates/root_templates.dart' as root;
 import 'templates/license_templates.dart' as license;
 import 'templates/github_templates.dart' as github;
+import 'templates/ci_templates.dart' as ci;
 
 /// Diagnoses a generated monorepo's structure integrity.
 ///
@@ -84,8 +85,18 @@ class Doctor {
         '.github/ISSUE_TEMPLATE/feature_request.md': github
             .featureRequestTemplate(config),
         '.github/pull_request_template.md': github.pullRequestTemplate(config),
-        '.github/workflows/ci.yml': github.ciWorkflow(config),
       });
+    }
+
+    switch (config.ci) {
+      case CiProvider.none:
+        break;
+      case CiProvider.github:
+        _restorableFiles['.github/workflows/ci.yml'] = github.ciWorkflow(
+          config,
+        );
+      case CiProvider.gitlab:
+        _restorableFiles['.gitlab-ci.yml'] = ci.gitlabCi(config);
     }
 
     stdout.writeln('');
@@ -269,10 +280,16 @@ class Doctor {
 
     // GitHub community directories
     if (c.githubFiles) {
-      dirs.addAll(['.github', '.github/ISSUE_TEMPLATE', '.github/workflows']);
+      dirs.addAll(['.github', '.github/ISSUE_TEMPLATE']);
+    }
+    // The workflows directory belongs to the CI choice, not the community
+    // files: --ci github without --github still produces it.
+    if (c.ci == CiProvider.github) {
+      dirs.addAll(['.github', '.github/workflows']);
     }
 
-    return dirs;
+    // --github and --ci github both want .github; check it once.
+    return dirs.toSet().toList();
   }
 
   List<String> _expectedFiles(ProjectConfig c) {
@@ -382,8 +399,16 @@ class Doctor {
         '.github/ISSUE_TEMPLATE/bug_report.md',
         '.github/ISSUE_TEMPLATE/feature_request.md',
         '.github/pull_request_template.md',
-        '.github/workflows/ci.yml',
       ]);
+    }
+
+    switch (c.ci) {
+      case CiProvider.none:
+        break;
+      case CiProvider.github:
+        files.add('.github/workflows/ci.yml');
+      case CiProvider.gitlab:
+        files.add('.gitlab-ci.yml');
     }
 
     return files;

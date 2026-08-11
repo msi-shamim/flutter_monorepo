@@ -157,6 +157,12 @@ Future<void> _runCreate(List<String> arguments) async {
       allowed: LicenseType.cliNames,
       help: 'License type for the project',
     )
+    ..addOption(
+      'ci',
+      defaultsTo: CiProvider.none.cliName,
+      allowed: CiProvider.cliNames,
+      help: 'CI pipeline to generate (--github implies github)',
+    )
     ..addFlag(
       'github',
       defaultsTo: false,
@@ -287,6 +293,14 @@ Future<void> _runCreate(List<String> arguments) async {
   );
   final httpClient = HttpClient.values.byName(args['http'] as String);
   final licenseType = LicenseType.fromCliName(args['license'] as String);
+  final githubFiles = args['github'] as bool;
+
+  // --github has always generated a workflow, so it keeps implying GitHub
+  // Actions. An explicit --ci wins, which is what lets --github --ci gitlab
+  // produce community files on GitHub with the pipeline on GitLab.
+  final ci = args.wasParsed('ci')
+      ? CiProvider.fromCliName(args['ci'] as String)
+      : (githubFiles ? CiProvider.github : CiProvider.none);
 
   final config = ProjectConfig(
     name: projectName,
@@ -297,7 +311,8 @@ Future<void> _runCreate(List<String> arguments) async {
     locales: locales,
     platforms: platforms,
     gitInit: args['git'] as bool,
-    githubFiles: args['github'] as bool,
+    githubFiles: githubFiles,
+    ci: ci,
   );
 
   final targetDir = Directory('${Directory.current.path}/$projectName');
@@ -319,6 +334,7 @@ Future<void> _runCreate(List<String> arguments) async {
   stdout.writeln('║  License:    ${config.licenseType.displayName}');
   stdout.writeln('║  Git:        ${config.gitInit ? 'yes' : 'no'}');
   stdout.writeln('║  GitHub:     ${config.githubFiles ? 'yes' : 'no'}');
+  stdout.writeln('║  CI:         ${config.ci.cliName}');
   stdout.writeln('║  Path:       ${targetDir.path}');
   stdout.writeln('╚══════════════════════════════════════════════════╝');
   stdout.writeln('');

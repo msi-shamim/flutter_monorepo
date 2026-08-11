@@ -7,6 +7,8 @@ import 'package:flutter_monorepo/src/templates/root_templates.dart' as root;
 import 'package:flutter_monorepo/src/templates/core_templates.dart' as core;
 import 'package:flutter_monorepo/src/templates/github_templates.dart' as github;
 import 'package:flutter_monorepo/src/templates/skills_templates.dart' as skills;
+import 'package:flutter_monorepo/src/templates/ci_templates.dart'
+    as ci_templates;
 import 'package:test/test.dart';
 
 void main() {
@@ -422,6 +424,48 @@ void main() {
         }
       });
     }
+  });
+
+  group('CiProvider', () {
+    test('cliName round-trips for every value', () {
+      for (final provider in CiProvider.values) {
+        expect(CiProvider.fromCliName(provider.cliName), provider);
+      }
+    });
+
+    test('fromCliName throws ArgumentError listing valid values', () {
+      expect(
+        () => CiProvider.fromCliName('jenkins'),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('gitlab'),
+          ),
+        ),
+      );
+    });
+
+    test('the marker records the choice', () {
+      final marker = root.projectMarker(
+        ProjectConfig(name: 'a', org: 'o', ci: CiProvider.gitlab),
+      );
+      expect(marker, contains('ci: gitlab'));
+    });
+
+    test('gitlab pipeline runs the same checks as the GitHub workflow', () {
+      final config = ProjectConfig(name: 'my_app', org: 'com.example')
+        ..versions = VersionResolver();
+      final gitlab = ci_templates.gitlabCi(config);
+
+      // Flutter-dependent packages must not be run with dart test.
+      expect(gitlab, contains('dart test packages/core/test'));
+      expect(gitlab, contains('flutter test packages/ui/test'));
+      expect(gitlab, contains('flutter test packages/network/test'));
+      expect(gitlab, contains('flutter test my_app_app/test'));
+      expect(gitlab, contains('dart analyze --fatal-infos'));
+      expect(gitlab, contains('set-exit-if-changed'));
+    });
   });
 
   group('ProjectConfig', () {
