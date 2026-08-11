@@ -69,13 +69,42 @@ Future<void> _runDoctor(List<String> arguments) async {
 // ── WORKFLOW ─────────────────────────────────────────────
 // ═════════════════════════════════════════════════════════
 
+const _workflowFlows = {'a', 'b', 'c'};
+
 void _runWorkflow(List<String> arguments) {
-  final flow = arguments.isNotEmpty ? arguments.first : null;
+  final flow = arguments.isNotEmpty ? arguments.first.toLowerCase() : null;
+
+  if (flow == '--help' || flow == '-h') {
+    _printWorkflowUsage(stdout);
+    exit(0);
+  }
+
+  // Falling through to the overview for any input made a typo indistinguishable
+  // from a flow that ran.
+  if (flow != null && !_workflowFlows.contains(flow)) {
+    stderr.writeln('Error: Unknown workflow "${arguments.first}".');
+    stderr.writeln('');
+    _printWorkflowUsage(stderr);
+    exit(1);
+  }
+
   final config = detectProjectConfig(Directory.current.path);
   if (config != null) {
     stdout.writeln('→ Detected: ${config.stateManagement.name}');
   }
   Workflow().run(flow, config: config);
+}
+
+void _printWorkflowUsage(IOSink out) {
+  out.writeln('Usage: flutter_monorepo workflow [a|b|c]');
+  out.writeln('');
+  out.writeln('Shows development workflow guides. Run from inside a generated');
+  out.writeln('project for instructions tailored to its state management.');
+  out.writeln('');
+  out.writeln('  (no argument)  Overview of all workflows');
+  out.writeln('  a              Component design flow');
+  out.writeln('  b              Screen design flow');
+  out.writeln('  c              Business logic flow');
 }
 
 // ═════════════════════════════════════════════════════════
