@@ -11,13 +11,8 @@ resolution: workspace
 environment:
   sdk: $generatedSdkConstraint
 
-dependencies:
-  flutter:
-    sdk: flutter
-
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  test: ${c.versions['test']}
   flutter_lints: ${c.versions['flutter_lints']}
 ''';
 

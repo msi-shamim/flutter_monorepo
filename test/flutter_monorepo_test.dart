@@ -4,6 +4,7 @@ import 'package:flutter_monorepo/flutter_monorepo.dart';
 import 'package:flutter_monorepo/src/templates/license_templates.dart'
     as license;
 import 'package:flutter_monorepo/src/templates/root_templates.dart' as root;
+import 'package:flutter_monorepo/src/templates/core_templates.dart' as core;
 import 'package:flutter_monorepo/src/templates/github_templates.dart'
     as github;
 import 'package:test/test.dart';
@@ -654,6 +655,39 @@ void main() {
         expect(screen, contains('BlocBuilder<ThemeCubit'));
         expect(screen, contains('BlocBuilder<LocaleCubit'));
       });
+    });
+  });
+
+  group('core package purity', () {
+    final config = ProjectConfig(name: 'my_app', org: 'com.example')
+      ..versions = VersionResolver();
+
+    test('declares no dependency on the Flutter SDK', () {
+      final pubspec = core.corePubspec(config);
+      expect(pubspec, isNot(contains('flutter:\n    sdk: flutter')));
+      expect(pubspec, isNot(contains('flutter_test')));
+    });
+
+    test('uses package:test so dart test can run against it', () {
+      expect(core.corePubspec(config), contains('test: '));
+    });
+
+    test('no core source file imports Flutter', () {
+      final sources = <String>[
+        core.appException(),
+        core.baseModel(),
+        core.baseRepository(),
+        core.useCase(config),
+        core.result(config),
+        core.stringExtensions(),
+        core.dateExtensions(),
+        core.listExtensions(),
+        core.coreBarrel(config),
+      ];
+      for (final source in sources) {
+        expect(source, isNot(contains('package:flutter/')));
+        expect(source, isNot(contains('dart:ui')));
+      }
     });
   });
 

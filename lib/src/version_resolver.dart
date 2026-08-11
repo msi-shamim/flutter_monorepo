@@ -33,6 +33,8 @@ class VersionResolver {
     'intl': '^0.20.2',
     // Linting
     'flutter_lints': '^6.0.0',
+    // Testing (pure Dart packages cannot use flutter_test)
+    'test': '^1.25.0',
   };
 
   /// Packages whose version is dictated by the Flutter SDK itself.
@@ -41,7 +43,10 @@ class VersionResolver {
   /// constraint we resolve that excludes it makes `pub get` fail outright.
   /// These are never fetched — the tested [fallbacks] entry is authoritative
   /// because it is the version the pinned SDK package ships against.
-  static const sdkPinned = <String>{'intl'};
+  /// `flutter_test` pins `test_api`, which transitively constrains `test` for
+  /// every package sharing the workspace resolution, so `test` belongs here
+  /// too even though nothing in the SDK depends on it directly.
+  static const sdkPinned = <String>{'intl', 'test'};
 
   /// Resolves latest compatible versions for all needed packages.
   Future<void> resolveAll(List<String> packageNames) async {
