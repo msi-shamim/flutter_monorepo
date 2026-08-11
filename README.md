@@ -15,11 +15,11 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Multi-HTTP client** — Dio, http, or Chopper via `--http`
 - **Dynamic localization** — 12 built-in languages with locale-aware date/number formatters and RTL support
 - **Flexible platforms** — any combination of Android, iOS, Web, Linux, macOS, Windows
-- **Full Material 3 design system** — light + dark themes with 30+ component themes, responsive utilities, centralized asset management
+- **Full Material 3 design system** — light + dark themes with 24 component themes, responsive utilities, centralized asset management
 - **Sealed error handling** — `AppException` hierarchy + `Result<T>` (Success | Failure) throughout
 - **Clean architecture** — 4 framework-agnostic shared packages (core, ui, network, l10n) + 1 app package
 - **Auto version resolution** — fetches latest compatible dependency versions from pub.dev at generation time
-- **Production linting** — `strict-casts`, `strict-raw-types`, `strict-inference` + 30 lint rules
+- **Production linting** — `strict-casts`, `strict-raw-types`, `strict-inference` + 38 lint rules
 - **Complete documentation** — `ARCHITECTURE.md` + `PACKAGE.md` for every generated package
 - **Auto git init** — initializes repository with first commit (optional)
 - **Project metadata** — auto-generated `README.md`, `LICENSE`, and `CONTRIBUTING.md` with 11 license types via `--license` (default: proprietary)
@@ -144,7 +144,7 @@ You can use `--no-git` to skip git initialization, or `--github` to include GitH
 | Command | Description |
 |---------|-------------|
 | `doctor` | Check structure integrity of current monorepo |
-| `doctor --fix` | Auto-restore missing items (skill files restored with full content) |
+| `doctor --fix` | Restore missing items from templates; files with no template are reported, never stubbed |
 | `workflow` | Show development workflow overview + quick reference |
 | `workflow a` | Component Design Flow (widget + companion state) |
 | `workflow b` | Screen Design Flow (adapts to GetX/Riverpod/Bloc/Cubit) |
@@ -226,7 +226,7 @@ my_app/
 │   ├── ui/                      # Design system
 │   │   ├── assets/              # Icons, fonts, images
 │   │   └── lib/
-│   │       ├── theme/           # Material 3 light + dark (30+ components)
+│   │       ├── theme/           # Material 3 light + dark (24 components)
 │   │       ├── responsive/      # Breakpoints, ResponsiveBuilder
 │   │       ├── assets/          # Type-safe asset constants
 │   │       └── widgets/         # Reusable stateless widgets
