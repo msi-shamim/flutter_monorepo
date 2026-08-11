@@ -197,6 +197,7 @@ class Generator {
   // ── Root files ──────────────────────────────────────────
   void _writeRootFiles() {
     _log('Writing root configuration...');
+    _write(projectMarkerFile, root.projectMarker(config));
     _write('pubspec.yaml', root.rootPubspec(config));
     _write('.gitignore', root.rootGitignore());
     _write('analysis_options.yaml', root.analysisOptions());

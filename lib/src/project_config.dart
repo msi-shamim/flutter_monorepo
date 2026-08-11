@@ -1,5 +1,14 @@
 import 'version_resolver.dart';
 
+/// Filename of the marker a generated monorepo carries at its root.
+///
+/// It records the choices made at generation time so `doctor` and `workflow`
+/// can read the project's configuration instead of inferring it. Several
+/// options — the license and the target platforms above all — leave no
+/// recoverable trace in the generated tree, so without this file any
+/// restoration based on them is a guess.
+const projectMarkerFile = '.flutter_monorepo.yaml';
+
 /// Supported state management frameworks.
 enum StateManagement {
   /// GetX — reactive state, navigation, and DI in one package.

@@ -23,6 +23,65 @@ void main() {
     });
   });
 
+  group('Project marker', () {
+    final config = ProjectConfig(
+      name: 'my_shop',
+      org: 'com.acme',
+      stateManagement: StateManagement.riverpod,
+      httpClient: HttpClient.chopper,
+      licenseType: LicenseType.mit,
+      locales: ['en', 'es', 'fr'],
+      platforms: ['android', 'ios', 'web'],
+      githubFiles: true,
+    );
+
+    test('records every choice that cannot be inferred from the tree', () {
+      final marker = root.projectMarker(config);
+      expect(marker, contains('name: my_shop'));
+      expect(marker, contains('org: com.acme'));
+      expect(marker, contains('state: riverpod'));
+      expect(marker, contains('http: chopper'));
+      expect(marker, contains('license: mit'));
+      expect(marker, contains('locales: en,es,fr'));
+      expect(marker, contains('platforms: android,ios,web'));
+      expect(marker, contains('github: true'));
+    });
+
+    test('round-trips through detectProjectConfig', () {
+      final dir = Directory.systemTemp.createTempSync('fm_marker_test');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/$projectMarkerFile')
+          .writeAsStringSync(root.projectMarker(config));
+
+      final detected = detectProjectConfig(dir.path);
+      expect(detected, isNotNull);
+      expect(detected!.name, 'my_shop');
+      expect(detected.org, 'com.acme');
+      expect(detected.stateManagement, StateManagement.riverpod);
+      expect(detected.httpClient, HttpClient.chopper);
+      expect(detected.licenseType, LicenseType.mit);
+      expect(detected.locales, ['en', 'es', 'fr']);
+      expect(detected.platforms, ['android', 'ios', 'web']);
+      expect(detected.githubFiles, isTrue);
+    });
+
+    test('preserves locale order rather than filesystem order', () {
+      final dir = Directory.systemTemp.createTempSync('fm_marker_order');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final ordered = ProjectConfig(
+        name: 'app',
+        org: 'com.example',
+        locales: ['en', 'ar'],
+      );
+      File('${dir.path}/$projectMarkerFile')
+          .writeAsStringSync(root.projectMarker(ordered));
+
+      final detected = detectProjectConfig(dir.path);
+      expect(detected!.locales, ['en', 'ar']);
+      expect(detected.primaryLocale, 'en');
+    });
+  });
+
   group('ProjectConfig', () {
     test('derives all package names from project name', () {
       final config = ProjectConfig(name: 'my_app', org: 'com.example');

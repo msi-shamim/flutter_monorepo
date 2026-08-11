@@ -251,6 +251,7 @@ class Doctor {
   List<String> _expectedFiles(ProjectConfig c) {
     final files = <String>[
       // Root
+      projectMarkerFile,
       'pubspec.yaml',
       'analysis_options.yaml',
       'README.md',
