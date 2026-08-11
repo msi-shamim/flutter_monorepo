@@ -193,7 +193,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     // TODO: Add redirect for auth guard
     // redirect: (context, state) {
     //   final isLoggedIn = ref.read(authProvider);
-    //   if (!isLoggedIn) return '/login';
+    //   if (!isLoggedIn) return AppRoutes.login;
     //   return null;
     // },
   );

@@ -208,7 +208,7 @@ final appRouter = GoRouter(
   // TODO: Add redirect for auth guard
   // redirect: (context, state) {
   //   final isLoggedIn = context.read<AuthBloc>().state.isLoggedIn;
-  //   if (!isLoggedIn) return '/login';
+  //   if (!isLoggedIn) return AppRoutes.login;
   //   return null;
   // },
 );

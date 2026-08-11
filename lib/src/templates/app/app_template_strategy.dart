@@ -43,6 +43,11 @@ abstract class AppTemplateStrategy {
 String appRoutes() => '''
 abstract final class AppRoutes {
   static const String home = '/home';
+
+  /// Target for the auth guard. Build the screen and register the route
+  /// before enabling the guard, or it will redirect to a route that
+  /// does not exist.
+  static const String login = '/login';
 }
 ''';
 

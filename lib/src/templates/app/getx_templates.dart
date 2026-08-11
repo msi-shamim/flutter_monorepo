@@ -195,16 +195,27 @@ import 'package:get/get.dart';
 
 import '../routes/app_routes.dart';
 
+/// Route guard. Not attached to any route yet — add it to the pages that
+/// require authentication:
+///
+///     GetPage(
+///       name: AppRoutes.home,
+///       page: () => const HomeScreen(),
+///       binding: HomeBinding(),
+///       middlewares: [AuthMiddleware()],
+///     )
+///
+/// Build the login screen and register AppRoutes.login first.
 class AuthMiddleware extends GetMiddleware {
   @override
   int? get priority => 1;
 
   @override
   RouteSettings? redirect(String? route) {
-    // TODO: Replace with actual auth check
+    // TODO: Replace with a real auth check.
     final isAuthenticated = _checkAuth();
     if (!isAuthenticated) {
-      return RouteSettings(name: AppRoutes.home);
+      return const RouteSettings(name: AppRoutes.login);
     }
     return null;
   }
