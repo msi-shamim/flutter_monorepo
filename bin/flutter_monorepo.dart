@@ -5,6 +5,9 @@ import 'package:flutter_monorepo/flutter_monorepo.dart';
 
 const _validPlatforms = {'android', 'ios', 'web', 'linux', 'macos', 'windows'};
 
+/// Shorthand accepted by `--platforms` meaning every entry in [_validPlatforms].
+const _allPlatforms = 'all';
+
 void main(List<String> arguments) async {
   // ── Subcommands ────────────────────────────────────────
   if (arguments.isNotEmpty && arguments.first == 'doctor') {
@@ -138,7 +141,9 @@ Future<void> _runCreate(List<String> arguments) async {
       'platforms',
       abbr: 'p',
       defaultsTo: 'android,ios',
-      help: 'Comma-separated platforms (android,ios,web,linux,macos,windows)',
+      help:
+          'Comma-separated platforms, or "all" '
+          '(android,ios,web,linux,macos,windows)',
     )
     ..addOption(
       'http',
@@ -243,22 +248,38 @@ Future<void> _runCreate(List<String> arguments) async {
   }
 
   // Parse & validate platforms
-  final platforms = (args['platforms'] as String)
+  final requested = (args['platforms'] as String)
       .split(',')
-      .map((p) => p.trim())
+      .map((p) => p.trim().toLowerCase())
       .where((p) => p.isNotEmpty)
       .toList();
-  if (platforms.isEmpty) {
+  if (requested.isEmpty) {
     stderr.writeln('Error: At least one platform is required.');
     exit(1);
   }
-  for (final p in platforms) {
-    if (!_validPlatforms.contains(p)) {
+
+  // `all` is a shorthand for every supported platform. Accepted only on its
+  // own, because "all,web" has no meaning worth guessing at.
+  final List<String> platforms;
+  if (requested.contains(_allPlatforms)) {
+    if (requested.length > 1) {
       stderr.writeln(
-        'Error: Invalid platform "$p". Valid: ${_validPlatforms.join(', ')}',
+        'Error: "$_allPlatforms" cannot be combined with other platforms.',
       );
       exit(1);
     }
+    platforms = _validPlatforms.toList();
+  } else {
+    for (final p in requested) {
+      if (!_validPlatforms.contains(p)) {
+        stderr.writeln(
+          'Error: Invalid platform "$p". '
+          'Valid: ${_validPlatforms.join(', ')}, or "$_allPlatforms".',
+        );
+        exit(1);
+      }
+    }
+    platforms = requested;
   }
 
   final stateManagement = StateManagement.values.byName(
@@ -370,6 +391,7 @@ void _printUsage(ArgParser parser) {
   stdout.writeln(
     '  flutter_monorepo my_app --state bloc --platforms android,ios,web',
   );
+  stdout.writeln('  flutter_monorepo my_app --platforms all');
   stdout.writeln('  flutter_monorepo my_app --state cubit --no-git');
   stdout.writeln('  flutter_monorepo my_app --license mit --github');
   stdout.writeln('  flutter_monorepo doctor');

@@ -132,7 +132,7 @@ packages/network/test/                         # API client tests
 | `--http` | | `dio` | HTTP client: `dio`, `http`, `chopper` |
 | `--license` | | `proprietary` | License type: `proprietary`, `mit`, `apache-2.0`, `bsd-2-clause`, `bsd-3-clause`, `gpl-2.0`, `gpl-3.0`, `lgpl-2.1`, `mpl-2.0`, `unlicense`, `isc` |
 | `--locales` | `-l` | `en,ar` | Comma-separated locale codes |
-| `--platforms` | `-p` | `android,ios` | Comma-separated platforms |
+| `--platforms` | `-p` | `android,ios` | Comma-separated platforms, or `all` for every supported platform |
 | `--org` | `-o` | `com.example` | Organization identifier for Android/iOS bundle |
 | `--[no-]git` | | on | Initialize git repository with first commit |
 | `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, CI, code of conduct) |

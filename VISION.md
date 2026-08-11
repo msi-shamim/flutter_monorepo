@@ -44,8 +44,8 @@ EN/AR is niche. EN/ES or EN/FR covers far more projects globally.
 ```bash
 flutter_monorepo my_app --platforms android,ios    # default
 flutter_monorepo my_app --platforms android,ios,web
+flutter_monorepo my_app --platforms all
 ```
-Platforms must be listed explicitly; there is no `all` shorthand.
 Web and desktop are growing fast in 2026.
 
 ### `--git` — Auto Git Init
