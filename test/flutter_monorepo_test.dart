@@ -241,6 +241,23 @@ void main() {
           detectProjectConfig(dir.path)!.stateManagement, StateManagement.getx);
     });
 
+    test('cubit survives losing the files detection used to grep', () {
+      // Detection distinguished cubit from bloc by finding HydratedCubit in
+      // the blocs directory. With those files gone it fell back to bloc,
+      // which produced bloc workflows and a bloc SKILL.md for a cubit project.
+      final dir = skeleton('blocs');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      File('${dir.path}/$projectMarkerFile').writeAsStringSync(
+          root.projectMarker(ProjectConfig(
+        name: 'my_app',
+        org: 'com.example',
+        stateManagement: StateManagement.cubit,
+      )));
+
+      expect(detectProjectConfig(dir.path)!.stateManagement,
+          StateManagement.cubit);
+    });
+
     test('a marker outranks the layout entirely', () {
       final dir = skeleton('controllers');
       addTearDown(() => dir.deleteSync(recursive: true));
