@@ -2,7 +2,7 @@ name: flutter_monorepo
 description: >-
   Bootstrap a production-ready Flutter monorepo in one command. Choose state
   management (GetX/Riverpod/Bloc/Cubit), HTTP client, locales, and platforms.
-version: 1.4.0
+version: 1.5.0
 homepage: https://github.com/msi-shamim/flutter_monorepo
 repository: https://github.com/msi-shamim/flutter_monorepo
 issue_tracker: https://github.com/msi-shamim/flutter_monorepo/issues

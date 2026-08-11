@@ -4,7 +4,7 @@
 /// `flutter_monorepo --version`. It must stay in sync with the `version:`
 /// field in `pubspec.yaml` — a test asserts the two match, so bumping one
 /// without the other fails the suite.
-const packageVersion = '1.4.0';
+const packageVersion = '1.5.0';
 
 /// The Dart SDK constraint declared by every generated pubspec.
 ///

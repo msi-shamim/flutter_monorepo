@@ -134,10 +134,11 @@ and shared fixtures for core tests.
 | **v1.2** | AI Agent Skills (`.claude/skills/`), smart `doctor --fix` | AI-assisted development |
 | **v1.3** | `--license` (11 types), `--github` (community files), README/LICENSE/CONTRIBUTING | Top-tier GitHub repo |
 | **v1.4** | Audit fixes: working dependency resolution, honest exit codes, project marker file, `ARCHITECTURE.md`, starter tests, green CI | Generated projects actually build |
+| **v1.5** | `--storage`, `--ci`, `--test`, `--platforms all`, 32 component themes, boot tests | Generated apps verified to run |
 
 ---
 
-## Current State (v1.4.0)
+## Current State (v1.5.0)
 
 Shipped with:
 - Multi-framework support: GetX, Riverpod, Bloc, Cubit (`--state`)
@@ -150,6 +151,9 @@ Shipped with:
 - Auto-generated README.md, LICENSE, and CONTRIBUTING.md
 - 4 shared packages (core, ui, network, l10n) — all framework-agnostic
 - Full Material 3 theme (light + dark, 32 component themes)
+- Pluggable persistence via `KeyValueStore` in core (`--storage`)
+- CI pipelines for GitHub Actions or GitLab (`--ci`)
+- Optional integration_test suite and shared fixtures (`--test full`)
 - Responsive design utilities
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>

@@ -1,3 +1,71 @@
+## 1.5.0
+
+Four new options, and the first release in which a generated app is verified
+to actually run rather than merely to compile.
+
+### Added
+
+- **`--storage get_storage|shared_prefs|hive`** — persistence now goes through
+  a `KeyValueStore` interface in `packages/core`, with one implementation in
+  the app. Nothing in the theme or locale state names a storage package, so
+  changing backend is an edit to a single file. Bloc and Cubit hydrate through
+  an adapter onto the same backend instead of running `HydratedStorage`
+  alongside it. Omitting the flag keeps each framework's original backend.
+  `hive` resolves `hive_ce`: `hive` itself declares `sdk <3.0.0` and has not
+  been published since 2022, so it cannot resolve on Dart 3.
+- **`--ci none|github|gitlab`** — CI was previously available only as part of
+  `--github`, and GitLab was not supported at all. The GitLab pipeline mirrors
+  the Actions workflow step for step. `--github` still implies GitHub Actions,
+  so existing invocations are unchanged; an explicit `--ci` wins.
+- **`--test unit|full`** — `full` adds an `integration_test` suite that drives
+  the real app entrypoint, plus shared fixtures for core tests. It is
+  deliberately not added to the generated CI, which has no device to run it
+  on.
+- **`--platforms all`** — shorthand for every supported platform. Documented
+  previously but rejected by the parser.
+- **A boot test in every generated project.** The app starter test now pumps
+  the real app, so it exercises what matters: the app builds, resolves its
+  theme and locale state, routes to the initial screen and renders a frame.
+
+### Fixed
+
+- **Widget tests could not pump the generated app.** Theme and locale state
+  read persistent storage as they build, and storage plugins are not
+  registered under `flutter test`, so the first widget test anyone wrote
+  failed on the platform instance before rendering — with pre-created test
+  directories inviting them to try. Each project now generates
+  `test/flutter_test_config.dart`, which Flutter runs automatically and which
+  installs an in-memory substitute for the chosen backend.
+- **Four defects in the generated AI agent skills**, each of which sent the
+  developer to a command or path that could not work: `dart run
+  flutter_monorepo doctor` in a project that does not depend on the CLI,
+  `dart test` against the two Flutter-dependent packages, a `--fix`
+  description left stale by the 1.4.0 doctor changes, and
+  `packages/core/states/` missing its `lib/` segment.
+
+### Changed
+
+- **32 component themes**, up from 24 — adds listTile, expansionTile,
+  popupMenu, slider, segmentedButton, searchBar, datePicker and timePicker to
+  both light and dark, using the existing shape and colour tokens.
+- Riverpod restores theme and locale synchronously during construction rather
+  than through an async load after the first frame.
+- The marker file records the CI provider, test scope and storage backend.
+  Projects generated before 1.5.0 fall back to `none`, `unit` and their
+  framework default.
+
+### Internal
+
+- An integration test generates a real monorepo per state management choice
+  and drives it through generate, analyze, format, its tests including the
+  boot test, and `doctor`. Confirmed to fail when the 1.3.0 `intl` regression
+  is reintroduced.
+- The repository has CI of its own for the first time, and is `dart format`
+  clean.
+- The unit suite now fails if generated guidance names a package path without
+  its `lib/` segment, runs `dart test` against a Flutter package, or invokes
+  the CLI as a project dependency.
+
 ## 1.4.0
 
 Generated projects did not build. Version resolution emitted constraints the
