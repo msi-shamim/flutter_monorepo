@@ -27,8 +27,16 @@ class Generator {
   /// Absolute path where the monorepo will be created.
   final String rootPath;
 
+  /// Steps that failed during the run, as user-facing descriptions.
+  final _failures = <String>[];
+
   /// Runs the full generation pipeline.
-  Future<void> run() async {
+  ///
+  /// Returns `true` when every step succeeded. A `false` return means the
+  /// project was written but is not in a usable state — the caller is expected
+  /// to exit non-zero. Only [_createFlutterProject] throws, because nothing
+  /// meaningful can be generated without it.
+  Future<bool> run() async {
     await _resolveVersions();
     await _createFlutterProject();
     _createDirectories();
@@ -45,6 +53,10 @@ class Generator {
     await _analyze();
     await _initializeGit();
 
+    return _failures.isEmpty ? _reportSuccess() : _reportFailure();
+  }
+
+  bool _reportSuccess() {
     stdout.writeln('');
     stdout.writeln('╔══════════════════════════════════════════════════╗');
     stdout.writeln('║  ${config.pascal} monorepo created successfully!');
@@ -53,6 +65,24 @@ class Generator {
     stdout.writeln('║  cd ${config.app} && flutter run');
     stdout.writeln('╚══════════════════════════════════════════════════╝');
     stdout.writeln('');
+    return true;
+  }
+
+  bool _reportFailure() {
+    stderr.writeln('');
+    stderr.writeln('╔══════════════════════════════════════════════════╗');
+    stderr.writeln('║  ${config.pascal} monorepo is INCOMPLETE');
+    stderr.writeln('╠══════════════════════════════════════════════════╣');
+    for (final failure in _failures) {
+      stderr.writeln('║  ✗ $failure');
+    }
+    stderr.writeln('╚══════════════════════════════════════════════════╝');
+    stderr.writeln('');
+    stderr.writeln('The project was written to $rootPath but is not ready to');
+    stderr.writeln('run. Fix the issues above, or delete the directory and');
+    stderr.writeln('re-run the command.');
+    stderr.writeln('');
+    return false;
   }
 
   // ── Version resolution ───────────────────────────────────
@@ -318,7 +348,8 @@ class Generator {
       runInShell: true,
     );
     if (result.exitCode != 0) {
-      stdout.writeln('  Warning: dart pub get had issues: ${result.stderr}');
+      stderr.writeln(result.stderr);
+      _fail('dart pub get failed — dependencies are unresolved');
     }
   }
 
@@ -330,7 +361,10 @@ class Generator {
       runInShell: true,
     );
     if (result.exitCode != 0) {
-      stdout.writeln('  (gen-l10n will run on first build)');
+      stderr.writeln(result.stderr);
+      // The app package does not set `generate: true`, so building the app
+      // will not produce these files later — the failure is terminal.
+      _fail('flutter gen-l10n failed — AppLocalizations was not generated');
     }
   }
 
@@ -344,19 +378,29 @@ class Generator {
     stdout.writeln(result.stdout);
     if (result.exitCode != 0) {
       stdout.writeln(result.stderr);
+      _fail('dart analyze reported problems in the generated project');
     }
   }
 
   Future<void> _initializeGit() async {
     if (!config.gitInit) return;
     _log('Initializing git repository...');
-    await Process.run('git', ['init'], workingDirectory: rootPath, runInShell: true);
-    await Process.run('git', ['add', '.'], workingDirectory: rootPath, runInShell: true);
-    await Process.run(
-      'git', ['commit', '-m', 'Initial commit: ${config.pascal} monorepo'],
-      workingDirectory: rootPath,
-      runInShell: true,
-    );
+    for (final step in [
+      ['init'],
+      ['add', '.'],
+      ['commit', '-m', 'Initial commit: ${config.pascal} monorepo'],
+    ]) {
+      final result = await Process.run(
+        'git', step,
+        workingDirectory: rootPath,
+        runInShell: true,
+      );
+      if (result.exitCode != 0) {
+        stderr.writeln(result.stderr);
+        _fail('git ${step.first} failed — the repository is not initialized');
+        return;
+      }
+    }
   }
 
   // ── Helpers ─────────────────────────────────────────────
@@ -371,4 +415,6 @@ class Generator {
   }
 
   void _log(String message) => stdout.writeln('→ $message');
+
+  void _fail(String description) => _failures.add(description);
 }

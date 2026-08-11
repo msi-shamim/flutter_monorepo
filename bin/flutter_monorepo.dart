@@ -214,10 +214,14 @@ Future<void> _runCreate(List<String> arguments) async {
   final generator = Generator(config: config, rootPath: targetDir.path);
 
   try {
-    await generator.run();
+    final ok = await generator.run();
+    if (!ok) exit(1);
   } catch (e) {
     stderr.writeln('');
     stderr.writeln('Error: $e');
+    stderr.writeln('');
+    stderr.writeln('A partial project may remain at ${targetDir.path}.');
+    stderr.writeln('Delete it before re-running this command.');
     exit(1);
   }
 }
