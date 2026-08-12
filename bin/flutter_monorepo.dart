@@ -158,6 +158,12 @@ Future<void> _runCreate(List<String> arguments) async {
       help: 'License type for the project',
     )
     ..addOption(
+      'auth',
+      defaultsTo: AuthProvider.none.cliName,
+      allowed: AuthProvider.cliNames,
+      help: 'Auth scaffolding: none, custom, firebase, supabase',
+    )
+    ..addOption(
       'storage',
       allowed: StorageBackend.cliNames,
       help: 'Key-value storage backend (defaults to the framework default)',
@@ -331,6 +337,7 @@ Future<void> _runCreate(List<String> arguments) async {
     githubFiles: githubFiles,
     ci: ci,
     flavors: args['flavor'] as bool,
+    auth: AuthProvider.fromCliName(args['auth'] as String),
     testScope: TestScope.fromCliName(args['test'] as String),
     storage: args.wasParsed('storage')
         ? StorageBackend.fromCliName(args['storage'] as String)

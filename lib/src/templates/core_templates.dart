@@ -93,7 +93,8 @@ abstract interface class KeyValueStore {
 }
 ''';
 
-String coreBarrel(ProjectConfig c) => '''
+String coreBarrel(ProjectConfig c) =>
+    '''
 // ── Exceptions ───────────────────────────────────────────
 export 'exceptions/app_exception.dart';
 
@@ -108,6 +109,11 @@ export 'usecases/use_case.dart';
 
 // ── Storage ──────────────────────────────────────────────
 export 'storage/key_value_store.dart';
+${c.auth == AuthProvider.none ? '' : """
+// ── Auth ─────────────────────────────────────────────────
+export 'models/auth_user.dart';
+export 'repositories/auth_repository.dart';
+"""}
 
 // ── Utils ────────────────────────────────────────────────
 export 'utils/result.dart';
@@ -118,7 +124,8 @@ export 'extensions/date_extensions.dart';
 export 'extensions/list_extensions.dart';
 ''';
 
-String appException() => '''
+String appException(ProjectConfig c) =>
+    '''
 sealed class AppException implements Exception {
   const AppException(this.message, {this.code});
   final String message;
@@ -160,7 +167,15 @@ class NetworkException extends AppException {
 class TimeoutException extends AppException {
   const TimeoutException([super.message = 'Request timed out']);
 }
-''';
+${c.auth == AuthProvider.none ? '' : """
+/// A sign-in, sign-up or sign-out failure.
+///
+/// [code] carries the provider's own code when there is one, so callers can
+/// branch without parsing messages.
+class AuthException extends AppException {
+  const AuthException(super.message, {super.code});
+}
+"""}''';
 
 String baseModel() => r'''
 abstract class BaseModel {

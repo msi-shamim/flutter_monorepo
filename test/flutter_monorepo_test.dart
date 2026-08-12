@@ -966,7 +966,7 @@ void main() {
 
     test('no core source file imports Flutter', () {
       final sources = <String>[
-        core.appException(),
+        core.appException(config),
         core.baseModel(),
         core.baseRepository(),
         core.useCase(config),

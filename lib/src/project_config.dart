@@ -113,6 +113,48 @@ enum StorageBackend {
   };
 }
 
+/// Authentication provider scaffolded into the project.
+enum AuthProvider {
+  /// No auth scaffolding.
+  none,
+
+  /// Token-based auth against your own API, persisted via the app's store.
+  custom,
+
+  /// Firebase Authentication.
+  firebase,
+
+  /// Supabase Auth.
+  supabase;
+
+  /// CLI-friendly identifier used in the `--auth` flag.
+  String get cliName => name;
+
+  /// The pub.dev packages this provider needs, if any.
+  List<String> get packages => switch (this) {
+    none || custom => const [],
+    firebase => const ['firebase_core', 'firebase_auth'],
+    supabase => const ['supabase_flutter'],
+  };
+
+  /// All valid `--auth` identifiers, in declaration order.
+  static List<String> get cliNames =>
+      values.map((e) => e.cliName).toList(growable: false);
+
+  /// Parse from CLI string.
+  ///
+  /// Throws an [ArgumentError] listing the valid identifiers when [name]
+  /// matches no provider.
+  static AuthProvider fromCliName(String name) => values.firstWhere(
+    (e) => e.cliName == name,
+    orElse: () => throw ArgumentError.value(
+      name,
+      'name',
+      'Unknown auth provider. Valid values: ${cliNames.join(', ')}',
+    ),
+  );
+}
+
 /// How much test scaffolding the generator writes.
 enum TestScope {
   /// Starter unit and widget tests only.
@@ -259,6 +301,7 @@ class ProjectConfig {
     this.ci = CiProvider.none,
     this.testScope = TestScope.unit,
     this.flavors = false,
+    this.auth = AuthProvider.none,
     StorageBackend? storage,
   }) : storage = storage ?? StorageBackend.defaultFor(stateManagement),
        app = '${name}_app',
@@ -303,6 +346,9 @@ class ProjectConfig {
 
   /// Whether dev/staging/prod build flavors are generated.
   final bool flavors;
+
+  /// Authentication provider scaffolded into the project.
+  final AuthProvider auth;
 
   /// Backend behind the generated `KeyValueStore`.
   final StorageBackend storage;
@@ -361,6 +407,7 @@ class ProjectConfig {
     }
     pkgs.add(storage.package);
     if (storage == StorageBackend.hive) pkgs.add('hive_ce_flutter');
+    pkgs.addAll(auth.packages);
     return pkgs;
   }
 

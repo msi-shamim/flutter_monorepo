@@ -1,6 +1,7 @@
 import '../../project_config.dart';
 import '../../version.dart';
 import '../storage_templates.dart';
+import '../auth_templates.dart';
 import '../flavor_helpers.dart';
 import 'app_template_strategy.dart';
 
@@ -30,7 +31,7 @@ dependencies:
   cupertino_icons: ${c.versions['cupertino_icons']}
   flutter_riverpod: ${c.versions['flutter_riverpod']}
   go_router: ${c.versions['go_router']}
-${storageDependency(c)}  # Pre-wired workspace packages. core and network are not imported by the
+${storageDependency(c)}${authDependency(c)}  # Pre-wired workspace packages. core and network are not imported by the
   # generated screens yet; they are declared so feature code can import
   # them without editing this pubspec first.
   ${c.core}:

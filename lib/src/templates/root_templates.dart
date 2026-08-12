@@ -42,6 +42,7 @@ ci: ${c.ci.cliName}
 test: ${c.testScope.cliName}
 storage: ${c.storage.cliName}
 flavors: ${c.flavors}
+auth: ${c.auth.cliName}
 generator_version: $packageVersion
 ''';
 

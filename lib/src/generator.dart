@@ -15,6 +15,7 @@ import 'templates/github_templates.dart' as github;
 import 'templates/ci_templates.dart' as ci;
 import 'templates/storage_templates.dart' as storage;
 import 'templates/flavor_templates.dart' as flavor;
+import 'templates/auth_templates.dart' as auth;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -53,6 +54,7 @@ class Generator {
     _writeAppCode();
     _writeSkills();
     _writeFlavors();
+    _writeAuth();
     await _resolveDependencies();
     await _generateL10n();
     await _formatCode();
@@ -256,7 +258,7 @@ class Generator {
     _write('packages/core/lib/${config.core}.dart', core.coreBarrel(config));
     _write(
       'packages/core/lib/exceptions/app_exception.dart',
-      core.appException(),
+      core.appException(config),
     );
     _write('packages/core/lib/models/base_model.dart', core.baseModel());
     _write(
@@ -506,6 +508,47 @@ class Generator {
       '.claude/skills/monorepo-doctor/SKILL.md',
       skills.monrepoDoctorSkill(config),
     );
+  }
+
+  // ── Auth ────────────────────────────────────────────────
+  void _writeAuth() {
+    if (config.auth == AuthProvider.none) return;
+    _log('Writing auth scaffolding (${config.auth.cliName})...');
+
+    // Contract in core, implementation in the app — the same split the
+    // storage backend uses.
+    _write('packages/core/lib/models/auth_user.dart', auth.authUser(config));
+    _write(
+      'packages/core/lib/repositories/auth_repository.dart',
+      auth.authRepository(config),
+    );
+
+    _write(
+      '${config.app}/lib/app/auth/${auth.authImplFileName(config)}',
+      auth.authImpl(config),
+    );
+    _write('${config.app}/lib/app/auth/auth.dart', auth.authSession(config));
+    _write(
+      '${config.app}/lib/screens/login/login_screen.dart',
+      auth.loginScreen(config),
+    );
+    _write('AUTH.md', auth.authDoc(config));
+
+    switch (config.auth) {
+      case AuthProvider.firebase:
+        _write(
+          '${config.app}/lib/app/auth/firebase_options.dart',
+          auth.firebaseOptions(config),
+        );
+      case AuthProvider.supabase:
+        _write(
+          '${config.app}/lib/app/auth/supabase_config.dart',
+          auth.supabaseConfig(config),
+        );
+      case AuthProvider.none:
+      case AuthProvider.custom:
+        break;
+    }
   }
 
   // ── Build flavors ───────────────────────────────────────

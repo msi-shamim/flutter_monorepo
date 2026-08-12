@@ -139,6 +139,7 @@ packages/network/test/                         # API client tests
 | `--ci` | | `none` | CI pipeline: `none`, `github` (Actions), `gitlab`. `--github` implies `github` |
 | `--test` | | `unit` | Test scaffolding: `unit`, or `full` (adds an `integration_test` suite and shared fixtures) |
 | `--storage` | | framework default | Key-value backend: `get_storage`, `shared_prefs`, `hive` (hive_ce) |
+| `--auth` | | `none` | Auth scaffolding: `none`, `custom` (token against your API), `firebase`, `supabase` |
 | `--flavor` | | off | Generate dev/staging/prod build flavors (Android wired; iOS needs manual Xcode steps) |
 | `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, code of conduct) |
 | `--help` | `-h` | | Show help message |

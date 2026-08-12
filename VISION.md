@@ -13,9 +13,8 @@ flutter_monorepo my_app \
   --auth supabase
 ```
 
-> **Note:** every option above ships today except `--auth`, which is still
-> planned. Sections below are grouped by what is implemented; anything under
-> "Planned" is rejected by the current CLI.
+> **Note:** every option above ships today. Sections below are grouped by what
+> is implemented; anything under "Planned" is rejected by the current CLI.
 
 No other pub.dev package does this comprehensively.
 
@@ -92,6 +91,17 @@ flavored APK; iOS needs the Xcode scheme steps recorded in FLAVORS.md.
 
 ---
 
+### `--auth` — Auth Scaffolding
+```bash
+flutter_monorepo my_app --auth firebase
+flutter_monorepo my_app --auth supabase
+flutter_monorepo my_app --auth custom       # token against your own API
+flutter_monorepo my_app --auth none         # default
+```
+An `AuthRepository` contract in core, one implementation in the app, a login
+screen, and `AUTH.md` covering the per-provider setup. The route guard is
+generated but left disabled until the sign-in path is finished.
+
 ### `--test` — Testing Setup
 ```bash
 flutter_monorepo my_app --test unit        # unit + widget tests (default)
@@ -109,14 +119,6 @@ and shared fixtures for core tests.
 
 These are rejected by the current CLI.
 
-### `--auth` — Auth Scaffolding
-```bash
-flutter_monorepo my_app --auth firebase
-flutter_monorepo my_app --auth supabase
-flutter_monorepo my_app --auth custom       # just interfaces
-flutter_monorepo my_app --auth none         # default
-```
-Generates login/register screens, auth controller, token storage, route guards wired up.
 
 ### `--template` — Project Templates
 ```bash
@@ -159,6 +161,7 @@ Shipped with:
 - CI pipelines for GitHub Actions or GitLab (`--ci`)
 - Optional integration_test suite and shared fixtures (`--test full`)
 - Build flavors for dev/staging/prod (`--flavor`)
+- Auth scaffolding behind an `AuthRepository` contract (`--auth`)
 - Responsive design utilities
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>

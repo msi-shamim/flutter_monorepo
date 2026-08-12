@@ -8,6 +8,7 @@ import 'templates/license_templates.dart' as license;
 import 'templates/github_templates.dart' as github;
 import 'templates/ci_templates.dart' as ci;
 import 'templates/flavor_templates.dart' as flavor;
+import 'templates/auth_templates.dart' as auth;
 
 /// Diagnoses a generated monorepo's structure integrity.
 ///
@@ -98,6 +99,22 @@ class Doctor {
         );
       case CiProvider.gitlab:
         _restorableFiles['.gitlab-ci.yml'] = ci.gitlabCi(config);
+    }
+
+    if (config.auth != AuthProvider.none) {
+      _restorableFiles['AUTH.md'] = auth.authDoc(config);
+      _restorableFiles['packages/core/lib/models/auth_user.dart'] = auth
+          .authUser(config);
+      _restorableFiles['packages/core/lib/repositories/auth_repository.dart'] =
+          auth.authRepository(config);
+      _restorableFiles['${config.app}/lib/app/auth/auth.dart'] = auth
+          .authSession(config);
+      _restorableFiles['${config.app}/lib/app/auth/'
+          '${auth.authImplFileName(config)}'] = auth.authImpl(
+        config,
+      );
+      _restorableFiles['${config.app}/lib/screens/login/login_screen.dart'] =
+          auth.loginScreen(config);
     }
 
     if (config.flavors) {
@@ -308,6 +325,9 @@ class Doctor {
     if (c.flavors) {
       dirs.add('${c.app}/lib/app/config');
     }
+    if (c.auth != AuthProvider.none) {
+      dirs.addAll(['${c.app}/lib/app/auth', '${c.app}/lib/screens/login']);
+    }
     if (c.testScope == TestScope.full) {
       dirs.addAll(['${c.app}/integration_test', 'packages/core/test/helpers']);
     }
@@ -433,6 +453,17 @@ class Doctor {
         files.add('.github/workflows/ci.yml');
       case CiProvider.gitlab:
         files.add('.gitlab-ci.yml');
+    }
+
+    if (c.auth != AuthProvider.none) {
+      files.addAll([
+        'AUTH.md',
+        'packages/core/lib/models/auth_user.dart',
+        'packages/core/lib/repositories/auth_repository.dart',
+        '${c.app}/lib/app/auth/auth.dart',
+        '${c.app}/lib/app/auth/${auth.authImplFileName(c)}',
+        '${c.app}/lib/screens/login/login_screen.dart',
+      ]);
     }
 
     if (c.flavors) {

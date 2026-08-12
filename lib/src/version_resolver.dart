@@ -31,6 +31,10 @@ class VersionResolver {
     'hive_ce': '^2.19.3',
     'hive_ce_flutter': '^2.3.4',
     'path_provider': '^2.1.5',
+    // Auth
+    'firebase_core': '^4.1.1',
+    'firebase_auth': '^6.1.0',
+    'supabase_flutter': '^2.9.1',
     // L10n
     'intl': '^0.20.2',
     // Icons
