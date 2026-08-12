@@ -13,15 +13,15 @@ flutter_monorepo my_app \
   --auth supabase
 ```
 
-> **Note:** the command above is the target state. `--ci`, `--flavor` and
-> `--auth` are not implemented yet — see the roadmap below for what ships
-> today. Everything marked "Planned" is rejected by the current CLI.
+> **Note:** every option above ships today except `--auth`, which is still
+> planned. Sections below are grouped by what is implemented; anything under
+> "Planned" is rejected by the current CLI.
 
 No other pub.dev package does this comprehensively.
 
 ---
 
-## v1.0 — Core Options (5x audience)
+## Shipped — Core Options
 
 ### `--state` — State Management Choice
 ```bash
@@ -56,8 +56,6 @@ flutter_monorepo my_app --no-git
 
 ---
 
-## Shipped — HTTP Client
-
 ### `--http` — HTTP Client Choice
 ```bash
 flutter_monorepo my_app --http dio          # default
@@ -65,9 +63,7 @@ flutter_monorepo my_app --http http
 flutter_monorepo my_app --http chopper
 ```
 
-## Planned — Production-Ready (not implemented)
-
-### `--storage` — Local Persistence Choice — **shipped in v1.5**
+### `--storage` — Local Persistence Choice
 ```bash
 flutter_monorepo my_app --storage get_storage
 flutter_monorepo my_app --storage shared_prefs
@@ -77,7 +73,7 @@ Persistence goes through a `KeyValueStore` interface in `packages/core`, so
 the backend is a wiring change in one file. Omitting the flag keeps each
 framework's original backend.
 
-### `--ci` — CI/CD Templates — **shipped in v1.5**
+### `--ci` — CI/CD Templates
 ```bash
 flutter_monorepo my_app --ci github       # GitHub Actions
 flutter_monorepo my_app --ci gitlab
@@ -86,7 +82,7 @@ flutter_monorepo my_app --ci none         # default
 Generates a pipeline that analyzes, checks formatting and runs every
 package's tests. `--github` implies `--ci github`.
 
-### `--flavor` — Build Flavors (dev/staging/prod) — **shipped in v1.6**
+### `--flavor` — Build Flavors (dev/staging/prod)
 ```bash
 flutter_monorepo my_app --flavor
 ```
@@ -96,7 +92,22 @@ flavored APK; iOS needs the Xcode scheme steps recorded in FLAVORS.md.
 
 ---
 
-## Planned — Full Scaffolding Platform (not implemented)
+### `--test` — Testing Setup
+```bash
+flutter_monorepo my_app --test unit        # unit + widget tests (default)
+flutter_monorepo my_app --test full        # adds integration_test + fixtures
+```
+Every project gets starter unit and widget tests. `full` additionally
+generates an `integration_test` suite that drives the real app on a device,
+and shared fixtures for core tests.
+
+---
+
+---
+
+## Planned — not implemented
+
+These are rejected by the current CLI.
 
 ### `--auth` — Auth Scaffolding
 ```bash
@@ -116,16 +127,6 @@ flutter_monorepo my_app --template dashboard
 ```
 Pre-built screen sets with navigation, bottom tabs, drawers.
 
-### `--test` — Testing Setup — **shipped in v1.5**
-```bash
-flutter_monorepo my_app --test unit        # unit + widget tests (default)
-flutter_monorepo my_app --test full        # adds integration_test + fixtures
-```
-Every project gets starter unit and widget tests. `full` additionally
-generates an `integration_test` suite that drives the real app on a device,
-and shared fixtures for core tests.
-
----
 
 ## Release Roadmap
 
@@ -137,10 +138,11 @@ and shared fixtures for core tests.
 | **v1.3** | `--license` (11 types), `--github` (community files), README/LICENSE/CONTRIBUTING | Top-tier GitHub repo |
 | **v1.4** | Audit fixes: working dependency resolution, honest exit codes, project marker file, `ARCHITECTURE.md`, starter tests, green CI | Generated projects actually build |
 | **v1.5** | `--storage`, `--ci`, `--test`, `--platforms all`, 32 component themes, boot tests | Generated apps verified to run |
+| **v1.6** | `--flavor` (dev/staging/prod) | Multiple environments side by side |
 
 ---
 
-## Current State (v1.5.0)
+## Current State (v1.6.0)
 
 Shipped with:
 - Multi-framework support: GetX, Riverpod, Bloc, Cubit (`--state`)
@@ -156,6 +158,7 @@ Shipped with:
 - Pluggable persistence via `KeyValueStore` in core (`--storage`)
 - CI pipelines for GitHub Actions or GitLab (`--ci`)
 - Optional integration_test suite and shared fixtures (`--test full`)
+- Build flavors for dev/staging/prod (`--flavor`)
 - Responsive design utilities
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>

@@ -1,3 +1,39 @@
+## 1.6.0
+
+### Added
+
+- **`--flavor`** — generates `dev`, `staging` and `prod` environments, each
+  with its own entrypoint, application id and display name, so all three
+  install side by side on one device. Per-environment values live in a single
+  enum, and the entrypoint records which environment is running.
+
+  `lib/main.dart` keeps the app and gains a `bootstrap` the per-flavor
+  entrypoints call. Without the flag the entrypoint is exactly the plain
+  `main()` it has always been — a project that does not use flavors carries no
+  trace of them.
+
+  **Android is fully wired and verified**: product flavors on an `env`
+  dimension, `applicationIdSuffix` for dev and staging, and a per-flavor
+  `app_name` resource that the manifest label points at. Confirmed by building
+  a flavored APK.
+
+  **iOS ships an xcconfig per flavor but needs manual finishing.** Xcode
+  schemes cannot be created from files on disk, so `FLAVORS.md` records the
+  steps. Those files were produced on a machine that cannot build for iOS, so
+  unlike the Android side they are a starting point rather than a verified
+  configuration.
+
+  Patching the Gradle file that `flutter create` produced is version
+  sensitive, so a missing anchor is reported as a generation failure rather
+  than skipped silently.
+
+### Fixed
+
+- VISION grouped options under "Planned — not implemented" headings that
+  contained options which had since shipped, and its opening note listed
+  `--ci` and `--flavor` as unimplemented. Sections are now grouped by what is
+  actually implemented, leaving only `--auth` and `--template` as planned.
+
 ## 1.5.0
 
 Four new options, and the first release in which a generated app is verified
