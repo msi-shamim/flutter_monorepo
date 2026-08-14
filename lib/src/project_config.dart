@@ -113,6 +113,41 @@ enum StorageBackend {
   };
 }
 
+/// Pre-built screen set the project starts from.
+enum ProjectTemplate {
+  /// Home screen only.
+  blank,
+
+  /// Product catalogue and detail.
+  ecommerce,
+
+  /// Activity feed and profile.
+  social,
+
+  /// Metrics overview and detail.
+  dashboard;
+
+  /// CLI-friendly identifier used in the `--template` flag.
+  String get cliName => name;
+
+  /// All valid `--template` identifiers, in declaration order.
+  static List<String> get cliNames =>
+      values.map((e) => e.cliName).toList(growable: false);
+
+  /// Parse from CLI string.
+  ///
+  /// Throws an [ArgumentError] listing the valid identifiers when [name]
+  /// matches no template.
+  static ProjectTemplate fromCliName(String name) => values.firstWhere(
+    (e) => e.cliName == name,
+    orElse: () => throw ArgumentError.value(
+      name,
+      'name',
+      'Unknown template. Valid values: ${cliNames.join(', ')}',
+    ),
+  );
+}
+
 /// Authentication provider scaffolded into the project.
 enum AuthProvider {
   /// No auth scaffolding.
@@ -302,6 +337,7 @@ class ProjectConfig {
     this.testScope = TestScope.unit,
     this.flavors = false,
     this.auth = AuthProvider.none,
+    this.template = ProjectTemplate.blank,
     StorageBackend? storage,
   }) : storage = storage ?? StorageBackend.defaultFor(stateManagement),
        app = '${name}_app',
@@ -346,6 +382,9 @@ class ProjectConfig {
 
   /// Whether dev/staging/prod build flavors are generated.
   final bool flavors;
+
+  /// Pre-built screen set the project starts from.
+  final ProjectTemplate template;
 
   /// Authentication provider scaffolded into the project.
   final AuthProvider auth;

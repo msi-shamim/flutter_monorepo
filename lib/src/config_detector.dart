@@ -108,6 +108,12 @@ ProjectConfig? _readMarker(String rootPath) {
     auth:
         _parseEnum(_extractYamlValue(content, 'auth'), AuthProvider.values) ??
         AuthProvider.none,
+    template:
+        _parseEnum(
+          _extractYamlValue(content, 'template'),
+          ProjectTemplate.values,
+        ) ??
+        ProjectTemplate.blank,
   );
 }
 

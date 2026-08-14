@@ -158,6 +158,12 @@ Future<void> _runCreate(List<String> arguments) async {
       help: 'License type for the project',
     )
     ..addOption(
+      'template',
+      defaultsTo: ProjectTemplate.blank.cliName,
+      allowed: ProjectTemplate.cliNames,
+      help: 'Starter screens: blank, ecommerce, social, dashboard',
+    )
+    ..addOption(
       'auth',
       defaultsTo: AuthProvider.none.cliName,
       allowed: AuthProvider.cliNames,
@@ -338,6 +344,7 @@ Future<void> _runCreate(List<String> arguments) async {
     ci: ci,
     flavors: args['flavor'] as bool,
     auth: AuthProvider.fromCliName(args['auth'] as String),
+    template: ProjectTemplate.fromCliName(args['template'] as String),
     testScope: TestScope.fromCliName(args['test'] as String),
     storage: args.wasParsed('storage')
         ? StorageBackend.fromCliName(args['storage'] as String)

@@ -43,6 +43,7 @@ test: ${c.testScope.cliName}
 storage: ${c.storage.cliName}
 flavors: ${c.flavors}
 auth: ${c.auth.cliName}
+template: ${c.template.cliName}
 generator_version: $packageVersion
 ''';
 
@@ -170,7 +171,6 @@ linter:
     - avoid_empty_else
     - avoid_print
     - avoid_relative_lib_imports
-    - avoid_returning_null_for_future
     - avoid_slow_async_io
     - avoid_type_to_string
     - avoid_types_as_parameter_names

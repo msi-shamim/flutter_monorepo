@@ -1,4 +1,5 @@
 import '../project_config.dart';
+import 'project_templates.dart';
 import '../version.dart';
 
 String corePubspec(ProjectConfig c) =>
@@ -100,6 +101,7 @@ export 'exceptions/app_exception.dart';
 
 // ── Models ───────────────────────────────────────────────
 export 'models/base_model.dart';
+${templateModelExports(c)}
 
 // ── Repositories ─────────────────────────────────────────
 export 'repositories/base_repository.dart';

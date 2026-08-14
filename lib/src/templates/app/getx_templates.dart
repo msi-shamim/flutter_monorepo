@@ -1,6 +1,7 @@
 import '../../project_config.dart';
 import '../../version.dart';
 import '../storage_templates.dart';
+import '../project_templates.dart';
 import '../auth_templates.dart';
 import '../flavor_helpers.dart';
 import 'app_template_strategy.dart';
@@ -231,12 +232,13 @@ class AuthMiddleware extends GetMiddleware {
 ''';
 
   @override
-  String appPages(ProjectConfig c) => '''
+  String appPages(ProjectConfig c) =>
+      '''
 import 'package:get/get.dart';
 
 import '../../screens/home/home_binding.dart';
 import '../../screens/home/home_screen.dart';
-import 'app_routes.dart';
+${templateScreenImports(c, prefix: '../../screens/')}import 'app_routes.dart';
 
 abstract final class AppPages {
   static const initial = AppRoutes.home;
@@ -247,7 +249,7 @@ abstract final class AppPages {
       page: () => const HomeScreen(),
       binding: HomeBinding(),
     ),
-  ];
+${templateGetPages(c)}  ];
 }
 ''';
 

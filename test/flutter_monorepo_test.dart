@@ -1006,7 +1006,7 @@ void main() {
     });
 
     test('appRoutes is framework-agnostic', () {
-      final routes = appRoutes();
+      final routes = appRoutes(config);
       expect(routes, contains("static const String home = '/home'"));
       expect(routes, isNot(contains('GetX')));
       expect(routes, isNot(contains('Riverpod')));

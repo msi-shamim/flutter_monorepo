@@ -16,6 +16,7 @@ import 'templates/ci_templates.dart' as ci;
 import 'templates/storage_templates.dart' as storage;
 import 'templates/flavor_templates.dart' as flavor;
 import 'templates/auth_templates.dart' as auth;
+import 'templates/project_templates.dart' as tpl;
 
 /// Orchestrates the generation of a complete Flutter monorepo.
 ///
@@ -55,6 +56,7 @@ class Generator {
     _writeSkills();
     _writeFlavors();
     _writeAuth();
+    _writeTemplate();
     await _resolveDependencies();
     await _generateL10n();
     await _formatCode();
@@ -393,7 +395,7 @@ class Generator {
 
     _write('${config.app}/pubspec.yaml', tmpl.appPubspec(config));
     _write('${config.app}/lib/main.dart', tmpl.mainDart(config));
-    _write('${config.app}/lib/app/routes/app_routes.dart', appRoutes());
+    _write('${config.app}/lib/app/routes/app_routes.dart', appRoutes(config));
 
     // Routing
     _writeIfNotEmpty(
@@ -508,6 +510,19 @@ class Generator {
       '.claude/skills/monorepo-doctor/SKILL.md',
       skills.monrepoDoctorSkill(config),
     );
+  }
+
+  // ── Starter template ────────────────────────────────────
+  void _writeTemplate() {
+    if (config.template == ProjectTemplate.blank) return;
+    _log('Writing ${config.template.cliName} starter screens...');
+
+    tpl.templateModels(config).forEach((name, content) {
+      _write('packages/core/lib/models/$name', content);
+    });
+    tpl.templateScreens(config).forEach((path, content) {
+      _write('${config.app}/lib/screens/$path', content);
+    });
   }
 
   // ── Auth ────────────────────────────────────────────────

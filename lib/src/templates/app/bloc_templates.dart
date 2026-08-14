@@ -1,6 +1,7 @@
 import '../../project_config.dart';
 import '../../version.dart';
 import '../storage_templates.dart';
+import '../project_templates.dart';
 import '../auth_templates.dart';
 import '../flavor_helpers.dart';
 import 'app_template_strategy.dart';
@@ -200,11 +201,12 @@ ${localeConstants(c)}
   String appPages(ProjectConfig c) => ''; // Bloc uses GoRouter
 
   @override
-  String appRouter(ProjectConfig c) => '''
+  String appRouter(ProjectConfig c) =>
+      '''
 import 'package:go_router/go_router.dart';
 
 import '../../screens/home/home_screen.dart';
-import '../routes/app_routes.dart';
+${templateScreenImports(c, prefix: '../../screens/')}import '../routes/app_routes.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppRoutes.home,
@@ -213,7 +215,7 @@ final appRouter = GoRouter(
       path: AppRoutes.home,
       builder: (context, state) => const HomeScreen(),
     ),
-  ],
+${templateGoRoutes(c)}  ],
   // TODO: Add redirect for auth guard
   // redirect: (context, state) {
   //   final isLoggedIn = context.read<AuthBloc>().state.isLoggedIn;

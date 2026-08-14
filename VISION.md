@@ -102,6 +102,17 @@ An `AuthRepository` contract in core, one implementation in the app, a login
 screen, and `AUTH.md` covering the per-provider setup. The route guard is
 generated but left disabled until the sign-in path is finished.
 
+### `--template` — Project Templates
+```bash
+flutter_monorepo my_app --template blank          # default
+flutter_monorepo my_app --template ecommerce
+flutter_monorepo my_app --template social
+flutter_monorepo my_app --template dashboard
+```
+Adds a model in core and two wired screens with routes registered. The screens
+are plain widgets taking their data as parameters, so they work with any state
+management and the sample data is trivial to replace.
+
 ### `--test` — Testing Setup
 ```bash
 flutter_monorepo my_app --test unit        # unit + widget tests (default)
@@ -115,19 +126,10 @@ and shared fixtures for core tests.
 
 ---
 
-## Planned — not implemented
+## Planned
 
-These are rejected by the current CLI.
+Nothing outstanding — every option in this document ships today.
 
-
-### `--template` — Project Templates
-```bash
-flutter_monorepo my_app --template blank          # default
-flutter_monorepo my_app --template ecommerce
-flutter_monorepo my_app --template social
-flutter_monorepo my_app --template dashboard
-```
-Pre-built screen sets with navigation, bottom tabs, drawers.
 
 
 ## Release Roadmap
@@ -162,6 +164,7 @@ Shipped with:
 - Optional integration_test suite and shared fixtures (`--test full`)
 - Build flavors for dev/staging/prod (`--flavor`)
 - Auth scaffolding behind an `AuthRepository` contract (`--auth`)
+- Starter screen sets for ecommerce, social and dashboard (`--template`)
 - Responsive design utilities
 - Centralized asset management
 - Sealed exception hierarchy + Result<T>

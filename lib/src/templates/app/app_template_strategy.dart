@@ -1,5 +1,6 @@
 import '../../project_config.dart';
 import '../storage_templates.dart';
+import '../project_templates.dart';
 
 /// Interface for state-management-specific app templates.
 ///
@@ -65,7 +66,8 @@ String integrationTestDependency(ProjectConfig c) =>
     : '';
 
 /// Framework-agnostic route constants — same for all state managers.
-String appRoutes() => '''
+String appRoutes(ProjectConfig c) =>
+    '''
 abstract final class AppRoutes {
   static const String home = '/home';
 
@@ -73,7 +75,7 @@ abstract final class AppRoutes {
   /// before enabling the guard, or it will redirect to a route that
   /// does not exist.
   static const String login = '/login';
-}
+${templateRouteConstants(c)}}
 ''';
 
 /// Starter test for the app package, valid for every state management choice.
