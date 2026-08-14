@@ -23,12 +23,16 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Complete documentation** — `ARCHITECTURE.md` + `PACKAGE.md` for every generated package
 - **Auto git init** — initializes repository with first commit (optional)
 - **Project metadata** — auto-generated `README.md`, `LICENSE`, and `CONTRIBUTING.md` with 11 license types via `--license` (default: proprietary)
+- **Pluggable persistence** — `--storage` picks `get_storage`, `shared_prefs` or `hive_ce` behind a `KeyValueStore` interface in core, so the backend is a one-file change
+- **Auth scaffolding** — `--auth` generates an `AuthRepository` contract, a provider implementation (`custom`, `firebase` or `supabase`), a login screen and `AUTH.md`
+- **Build flavors** — `--flavor` generates `dev`/`staging`/`prod` with their own entrypoints, application ids and display names
+- **Starter templates** — `--template ecommerce|social|dashboard` adds a core model and two wired screens with routes registered
 - **CI pipelines** — `--ci github` or `--ci gitlab` generates a pipeline that analyzes, checks formatting and runs every package's tests
 - **GitHub community setup** — opt-in `--github` flag generates issue templates, PR template, code of conduct, and funding placeholder
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 - **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
 - **Test-during-development** — every workflow includes a test step; test directories are pre-created so tests are written alongside code, not bolted on later
-- **AI Agent Skills** — generates `.claude/skills/` with 4 ready-to-use skills for Claude Code (component design, screen design, business logic, monorepo doctor) that auto-adapt to your chosen state management framework
+- **AI Agent Skills** — generates `.claude/skills/` with 4 ready-to-use skills for Claude Code (component design, screen design, business logic, monorepo doctor) that adapt to the project as generated — state management, storage backend, and auth and flavors when configured
 
 Before use, check the [CHANGELOG](CHANGELOG.md) to ensure you have the latest features.
 
@@ -80,10 +84,16 @@ flutter_monorepo my_app --license mit --github
 flutter_monorepo my_app \
   --state riverpod \
   --http dio \
+  --storage hive \
+  --auth supabase \
+  --template dashboard \
+  --flavor \
+  --test full \
   --license mit \
   --locales en,es,fr,de \
-  --platforms android,ios,web \
+  --platforms all \
   --org com.mycompany \
+  --ci github \
   --github
 ```
 
@@ -101,7 +111,9 @@ flutter_monorepo doctor
 flutter_monorepo doctor --fix
 ```
 
-The doctor auto-detects your project's state management, HTTP client, and locales from existing files — no flags needed. It checks all 95+ expected directories and files, then reports what's present (✓) and what's missing (✗).
+The doctor reads `.flutter_monorepo.yaml`, the marker written at generation time, so it knows exactly how the project was created rather than inferring it — no flags needed. Projects generated before the marker existed fall back to inspecting the tree. It checks every expected directory and file for that configuration (110+, depending on the options used) and reports what's present (✓) and what's missing (✗).
+
+`doctor --fix` restores anything it has a template for. A file it cannot restore is reported and left absent on purpose: writing an empty placeholder would satisfy the next check and hide the problem.
 
 ### Development Workflows
 
@@ -129,24 +141,32 @@ packages/network/test/                         # API client tests
 
 | Option | Short | Default | Description |
 |--------|-------|---------|-------------|
+| **Project identity** | | | |
+| `--org` | `-o` | `com.example` | Organization identifier for Android/iOS bundle ids |
+| `--license` | | `proprietary` | `proprietary`, `mit`, `apache-2.0`, `bsd-2-clause`, `bsd-3-clause`, `gpl-2.0`, `gpl-3.0`, `lgpl-2.1`, `mpl-2.0`, `unlicense`, `isc` |
+| **Architecture** | | | |
 | `--state` | `-s` | `getx` | State management: `getx`, `riverpod`, `bloc`, `cubit` |
 | `--http` | | `dio` | HTTP client: `dio`, `http`, `chopper` |
-| `--license` | | `proprietary` | License type: `proprietary`, `mit`, `apache-2.0`, `bsd-2-clause`, `bsd-3-clause`, `gpl-2.0`, `gpl-3.0`, `lgpl-2.1`, `mpl-2.0`, `unlicense`, `isc` |
-| `--locales` | `-l` | `en,ar` | Comma-separated locale codes |
-| `--platforms` | `-p` | `android,ios` | Comma-separated platforms, or `all` for every supported platform |
-| `--org` | `-o` | `com.example` | Organization identifier for Android/iOS bundle |
-| `--[no-]git` | | on | Initialize git repository with first commit |
-| `--ci` | | `none` | CI pipeline: `none`, `github` (Actions), `gitlab`. `--github` implies `github` |
-| `--test` | | `unit` | Test scaffolding: `unit`, or `full` (adds an `integration_test` suite and shared fixtures) |
-| `--storage` | | framework default | Key-value backend: `get_storage`, `shared_prefs`, `hive` (hive_ce) |
+| `--storage` | | framework default | Backend behind core's `KeyValueStore`: `get_storage`, `shared_prefs`, `hive` (resolves `hive_ce`) |
+| `--auth` | | `none` | Auth behind core's `AuthRepository`: `none`, `custom` (token against your own API), `firebase`, `supabase` |
+| **Reach** | | | |
+| `--platforms` | `-p` | `android,ios` | Comma-separated, or `all` for every supported platform |
+| `--locales` | `-l` | `en,ar` | Comma-separated locale codes; region variants such as `pt_BR` are supported |
+| `--flavor` | | off | Generate `dev`/`staging`/`prod` build flavors (Android wired; iOS needs manual Xcode steps — see `FLAVORS.md`) |
+| **Starting point** | | | |
 | `--template` | | `blank` | Starter screens: `blank`, `ecommerce`, `social`, `dashboard` |
-| `--auth` | | `none` | Auth scaffolding: `none`, `custom` (token against your API), `firebase`, `supabase` |
-| `--flavor` | | off | Generate dev/staging/prod build flavors (Android wired; iOS needs manual Xcode steps) |
-| `--[no-]github` | | off | Generate GitHub community files (issue/PR templates, code of conduct) |
+| `--test` | | `unit` | Test scaffolding: `unit`, or `full` (adds an `integration_test` suite and shared fixtures) |
+| **Repository** | | | |
+| `--ci` | | `none` | CI pipeline: `none`, `github` (Actions), `gitlab`. `--github` implies `github`; an explicit `--ci` wins |
+| `--[no-]github` | | off | GitHub community files (issue/PR templates, code of conduct, funding) |
+| `--[no-]git` | | on | Initialise a git repository with a first commit |
+| **Information** | | | |
 | `--help` | `-h` | | Show help message |
 | `--version` | | | Show version |
 
-You can use `--no-git` to skip git initialization, or `--github` to include GitHub community files.
+Every option is optional and independent. `flutter_monorepo my_app` with no
+flags produces a working GetX + Dio project; each flag changes one decision
+without affecting the others.
 
 | Command | Description |
 |---------|-------------|
@@ -159,14 +179,14 @@ You can use `--no-git` to skip git initialization, or `--github` to include GitH
 
 ## State Management
 
-Each framework generates a complete, working app layer with theme switching, locale switching, persistence, and routing:
+Each framework generates a complete, working app layer with theme switching, locale switching, persistence and routing. The persistence column is only the default — every framework works with any `--storage` backend, because they all go through the same `KeyValueStore` interface:
 
-| Framework | Dependencies | Routing | Persistence | Screen Pattern |
+| Framework | Dependencies | Routing | Default `--storage` | Screen Pattern |
 |-----------|-------------|---------|-------------|----------------|
-| **GetX** | get, get_storage | GetX pages | GetStorage | `GetView` + `Obx` |
-| **Riverpod** | flutter_riverpod, go_router, shared_preferences | GoRouter | SharedPreferences | `ConsumerWidget` + `ref.watch` |
-| **Bloc** | flutter_bloc, hydrated_bloc, go_router | GoRouter | HydratedBloc | `BlocBuilder` |
-| **Cubit** | flutter_bloc, hydrated_bloc, go_router | GoRouter | HydratedCubit | `BlocBuilder` |
+| **GetX** | get | GetX pages | `get_storage` | `GetView` + `Obx` |
+| **Riverpod** | flutter_riverpod, go_router | GoRouter | `shared_prefs` | `ConsumerWidget` + `ref.watch` |
+| **Bloc** | flutter_bloc, hydrated_bloc, go_router | GoRouter | `hive` | `BlocBuilder` |
+| **Cubit** | flutter_bloc, hydrated_bloc, go_router | GoRouter | `hive` | `BlocBuilder` |
 
 ## HTTP Client
 
@@ -175,7 +195,7 @@ All three HTTP clients generate the same `ApiClient` API surface — every metho
 | Client | Package | Interceptor Pattern | Error Mapping |
 |--------|---------|-------------------|---------------|
 | **Dio** | `dio` | `Interceptor` class | `DioException` -> `AppException` |
-| **http** | `http` | `BaseClient` wrapper | `ClientException` / `SocketException` -> `AppException` |
+| **http** | `http` | `BaseClient` wrapper | `ClientException` -> `AppException` |
 | **Chopper** | `chopper` | `Interceptor` interface (chain) | `Exception` -> `AppException` |
 
 ## Localization
