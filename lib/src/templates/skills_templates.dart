@@ -472,6 +472,24 @@ with dependency inversion.
 
 $wiringExample
 
+## Persistence
+
+Never call a storage package directly. The project persists through
+`KeyValueStore`, an interface in `packages/core`, with one implementation in
+`${c.app}/lib/app/storage/`. The backend is ${c.storage.cliName}.
+
+```dart
+import '../storage/app_store.dart';
+
+appStore.write('key', value);
+final value = appStore.read<int>('key');   // synchronous
+```
+
+`read` is synchronous because the store loads during bootstrap, so state can
+be restored during construction rather than after a frame. Naming a storage
+package anywhere outside `${c.app}/lib/app/storage/` is a defect: it defeats
+the one place the backend is chosen.
+${authSkillSection(c)}${environmentSkillSection(c)}
 ## Error handling pattern
 
 All repository methods return Result<T>:
@@ -559,6 +577,8 @@ missing directories or files.
 
 - Root: .flutter_monorepo.yaml (generation marker), README.md, ARCHITECTURE.md,
   LICENSE, CONTRIBUTING.md, .gitignore, analysis_options.yaml
+- Storage: core KeyValueStore + the app implementation
+${c.auth == AuthProvider.none ? '' : '- Auth: AUTH.md, core AuthRepository and AuthUser, the app implementation, login screen\n'}${c.flavors ? '- Flavors: FLAVORS.md, app_environment.dart, one entrypoint per flavor\n' : ''}${c.template == ProjectTemplate.blank ? '' : '- Template: the ${c.template.cliName} screens and their core model\n'}
 - All pubspec.yaml, PACKAGE.md, barrel exports
 - Core: app_exception, base_model, base_repository, use_case, result, extensions
 - UI: app_icons, app_images, app_fonts, breakpoints, responsive, theme files
@@ -579,5 +599,63 @@ When doctor reports missing items:
    an empty placeholder would satisfy the next check and hide the problem. Restore it from git.
 4. `--fix` never overwrites a file that already exists, so local edits are safe.
 5. If many items are missing — consider re-running the generator or checking git history.
+''';
+}
+
+/// Auth guidance for the business-logic skill, when a provider is configured.
+///
+/// Conditional so a project without `--auth` is not told about an interface it
+/// does not have — the skills describe the project as generated, not the tool's
+/// full option set.
+String authSkillSection(ProjectConfig c) {
+  if (c.auth == AuthProvider.none) return '';
+
+  return '''
+
+## Authentication
+
+Auth goes through `AuthRepository` in `packages/core`, implemented in
+`${c.app}/lib/app/auth/` against ${c.auth.cliName}. Screens and guards depend
+on the interface, never on a provider SDK.
+
+```dart
+import '../../app/auth/auth.dart';
+
+final result = await authRepository.signIn(email: email, password: password);
+result.when(
+  success: (user) => /* navigate */,
+  failure: (e) => /* show e.message */,
+);
+```
+
+- `authRepository.currentUser` is the signed-in user, or null.
+- `authRepository.authStateChanges()` emits on sign-in and sign-out; a route
+  guard should listen to this rather than polling.
+- Failures arrive as `AuthException` inside a `Failure`, never as a throw.
+
+The route guard is generated but disabled. See AUTH.md before enabling it —
+turning it on before sign-in works locks you out of the app.
+''';
+}
+
+/// Environment guidance, when the project was generated with `--flavor`.
+String environmentSkillSection(ProjectConfig c) {
+  if (!c.flavors) return '';
+
+  return '''
+
+## Environments
+
+This project builds as dev, staging and prod. Per-environment values live in
+`${c.app}/lib/app/config/app_environment.dart`; read them through `appEnv`:
+
+```dart
+final client = ApiClient(baseUrl: appEnv.apiBaseUrl);
+if (appEnv.isDebugBuild) enableVerboseLogging();
+```
+
+Add a new setting as a getter on `AppEnvironment` with a value per
+environment, rather than branching on the environment at the call site. Run a
+flavor with `flutter run --flavor dev -t lib/main_dev.dart`; see FLAVORS.md.
 ''';
 }
