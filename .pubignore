@@ -1,0 +1,13 @@
+# Published-package exclusions. This does not affect the git repository.
+
+# The GitHub Pages site. It must stay at docs/ for Pages to serve it, but pub's
+# layout convention reserves doc/ and warns on the plural — and the site is of
+# no use to someone consuming the package from pub.dev.
+docs/
+
+# Internal roadmap, tracked in git but not part of the published package.
+VISION.md
+
+# Audit and CI scaffolding for this repository itself.
+.github/
+test/integration/
