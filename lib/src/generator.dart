@@ -493,6 +493,7 @@ class Generator {
   // ── AI Agent Skills ──────────────────────────────────────
   void _writeSkills() {
     _log('Writing AI agent skills...');
+    _write('AGENTS.md', skills.agentsMd(config));
     _write('.claude/settings.json', skills.claudeSettings());
     _write(
       '.claude/skills/component-design/SKILL.md',

@@ -69,6 +69,7 @@ class Doctor {
       ),
       'README.md': root.readmeMd(config),
       'ARCHITECTURE.md': root.architectureMd(config),
+      'AGENTS.md': skills.agentsMd(config),
       'LICENSE': license.licenseText(config),
       'CONTRIBUTING.md': root.contributingMd(config),
       '.gitignore': root.rootGitignore(),
@@ -345,6 +346,7 @@ class Doctor {
       'analysis_options.yaml',
       'README.md',
       'ARCHITECTURE.md',
+      'AGENTS.md',
       'LICENSE',
       'CONTRIBUTING.md',
       // AI agent skills

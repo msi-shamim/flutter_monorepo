@@ -277,6 +277,26 @@ This monorepo follows a **layered architecture** with clear package boundaries:
 - **l10n** \u2014 Localization package with ARB files, formatters, and RTL support.
 - **${c.app}** \u2014 The main Flutter application wiring everything together with ${c.stateManagement.name} state management.
 
+## Working with AI agents
+
+This project ships instructions so an agent respects its boundaries instead of
+guessing at them.
+
+| File | Read by |
+|------|---------|
+| [AGENTS.md](AGENTS.md) | Codex and other tools following the `AGENTS.md` convention |
+| `.claude/skills/` | Claude Code — four task skills, discovered automatically |
+| `.claude/settings.json` | Claude Code — pre-approves the read-only and test commands |
+
+`AGENTS.md` carries the rules that matter regardless of tool: the package
+boundaries, `Result<T>` instead of throwing, persistence through
+`KeyValueStore`${c.auth == AuthProvider.none ? '' : ', auth through `AuthRepository`'}, and no hardcoded
+user-facing strings. Point any other assistant at that file.
+
+The Claude skills go further, with per-framework instructions and checklists
+for building a component, building a screen, and wiring business logic. They
+need no setup — Claude Code finds them in `.claude/skills/`.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

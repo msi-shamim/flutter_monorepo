@@ -602,6 +602,92 @@ When doctor reports missing items:
 ''';
 }
 
+/// `AGENTS.md` — cross-agent instructions at the project root.
+///
+/// Codex reads this convention, as do a growing number of other tools. It
+/// carries the same architectural rules the Claude skills encode, so an agent
+/// that does not read `.claude/skills/` still gets the boundaries that make
+/// this layout work. Deliberately one file rather than a per-tool set:
+/// four near-identical config files would drift apart independently.
+String agentsMd(ProjectConfig c) {
+  final stateDir = switch (c.stateManagement) {
+    StateManagement.getx => 'controllers',
+    StateManagement.riverpod => 'providers',
+    StateManagement.bloc || StateManagement.cubit => 'blocs',
+  };
+
+  return '''
+# Agent instructions
+
+${c.pascal} is a Flutter monorepo: one app package and four shared packages.
+These are the rules that keep the layout working. They apply to any change,
+by a person or an agent.
+
+## Package boundaries
+
+| Package | Holds | May import |
+|---------|-------|------------|
+| `packages/core` | Models, rules, use cases, `Result<T>`, exceptions${c.auth == AuthProvider.none ? '' : ', `AuthRepository`'} | **Pure Dart only — never Flutter** |
+| `packages/ui` | Theme, spacing, typography, responsive helpers, shared widgets | Flutter, `${c.core}` |
+| `packages/network` | HTTP client (${c.httpClient.name}), interceptors, repositories | `${c.core}` |
+| `packages/l10n` | ARB files, generated localizations, formatters | Flutter, `intl` |
+| `${c.app}` | Screens, ${c.stateManagement.name} state, routing, DI | Everything above |
+
+Adding a Flutter import to `packages/core` breaks the one invariant this
+project is built on: it is what lets the rules be tested with `dart test`,
+with no widget binding and no mocking of framework types.
+
+## Non-negotiables
+
+- **Failures are values, not throws.** Repository methods return `Result<T>`;
+  callers use `.when(success:, failure:)`. Exceptions extend `AppException`.
+- **Persistence goes through `KeyValueStore`.** Use `appStore` from
+  `${c.app}/lib/app/storage/app_store.dart`. Never import a storage package
+  outside that directory — the backend (${c.storage.cliName}) is chosen in one
+  place on purpose.
+${c.auth == AuthProvider.none ? '' : '- **Auth goes through `AuthRepository`.** Use `authRepository` from `${c.app}/lib/app/auth/auth.dart`. Never import a provider SDK (${c.auth.cliName}) outside that directory. See AUTH.md.\n'}${c.flavors ? '- **Environment values come from `appEnv`**, not from branching on the build. Add a getter to `AppEnvironment` instead. See FLAVORS.md.\n' : ''}- **No hardcoded user-facing strings.** Everything goes through `AppLocalizations`; add the key to every ARB file in `packages/l10n/lib/l10n/arb/`.
+- **Widgets in `packages/ui` take data as parameters** and import no state
+  management. That is what makes them reusable across screens.
+
+## Where things go
+
+```
+packages/core/lib/models/        # data shapes
+packages/core/lib/rules/         # business rules, pure Dart
+packages/core/lib/repositories/  # interfaces only
+packages/network/lib/repositories/  # implementations of those interfaces
+packages/ui/lib/widgets/         # reusable widgets
+${c.app}/lib/app/$stateDir/${' ' * (24 - stateDir.length)}# app-wide state
+${c.app}/lib/screens/<name>/     # one folder per screen
+```
+
+## Verifying a change
+
+```bash
+dart analyze                          # must be clean
+dart format .
+dart test packages/core/test          # pure Dart
+flutter test packages/ui/test
+flutter test packages/network/test
+flutter test ${c.app}/test
+```
+
+`flutter_monorepo doctor` checks the structure is intact. The CLI is a global
+tool — `dart pub global activate flutter_monorepo` — not a dependency of this
+project, so `dart run flutter_monorepo` will not work.
+
+## Claude Code
+
+`.claude/skills/` holds four task-specific skills that Claude Code discovers
+automatically: component design, screen design, business logic and the
+monorepo doctor. They go further than this file, with per-framework
+instructions and checklists. `.claude/settings.json` pre-approves the
+read-only and test commands above.
+
+Everything in this file applies regardless of which agent is being used.
+''';
+}
+
 /// Auth guidance for the business-logic skill, when a provider is configured.
 ///
 /// Conditional so a project without `--auth` is not told about an interface it

@@ -32,7 +32,7 @@ A Dart CLI tool that bootstraps a **production-ready Flutter monorepo** in one c
 - **Monorepo doctor** — `doctor` command to verify structure integrity, report missing items, and auto-fix with `--fix`
 - **Development workflows** — `workflow` command with step-by-step guides for building components, screens, and business logic
 - **Test-during-development** — every workflow includes a test step; test directories are pre-created so tests are written alongside code, not bolted on later
-- **AI Agent Skills** — generates `.claude/skills/` with 4 ready-to-use skills for Claude Code (component design, screen design, business logic, monorepo doctor) that adapt to the project as generated — state management, storage backend, and auth and flavors when configured
+- **AI agent instructions** — every project gets an `AGENTS.md` (the convention Codex and others read) plus `.claude/skills/` with 4 task skills for Claude Code, all adapting to the project as generated — state management, storage backend, and auth and flavors when configured
 
 Before use, check the [CHANGELOG](CHANGELOG.md) to ensure you have the latest features.
 
@@ -176,6 +176,25 @@ without affecting the others.
 | `workflow a` | Component Design Flow (widget + companion state) |
 | `workflow b` | Screen Design Flow (adapts to GetX/Riverpod/Bloc/Cubit) |
 | `workflow c` | Business Logic Flow (adapts wiring step per framework) |
+
+## Working with AI Agents
+
+Generated projects carry their own agent instructions, so an assistant follows
+the architecture instead of guessing at it.
+
+| File | Read by | Contents |
+|------|---------|----------|
+| `AGENTS.md` | Codex and other tools following the convention | Package boundaries, `Result<T>` over throwing, persistence via `KeyValueStore`, auth via `AuthRepository`, localization rules, and the commands that verify a change |
+| `.claude/skills/` | Claude Code (discovered automatically) | Four task skills — component design, screen design, business logic, monorepo doctor — with per-framework instructions and checklists |
+| `.claude/settings.json` | Claude Code | Pre-approves the read-only and test commands so routine work needs no prompting |
+
+Both adapt to the project as generated: a project without `--auth` is never
+told about an interface it does not have, and the storage guidance names the
+backend actually in use.
+
+There is one instruction file rather than one per tool. Four near-identical
+configs would drift apart independently, and `AGENTS.md` is the convention
+with real cross-tool traction.
 
 ## State Management
 
