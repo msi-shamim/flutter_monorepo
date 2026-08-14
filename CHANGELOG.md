@@ -1,3 +1,41 @@
+## 1.7.0
+
+The last two roadmap options ship, so every flag VISION has ever described now
+exists.
+
+### Added
+
+- **`--auth none|custom|firebase|supabase`** — an `AuthRepository` contract in
+  `packages/core`, one implementation in the app, a login screen, and
+  `AUTH.md` covering the per-provider setup. Screens and guards depend on the
+  contract, never on a provider SDK.
+
+  `custom` is complete apart from two marked network calls: token persistence
+  through the project's `KeyValueStore`, restore on launch and sign-in
+  broadcasting all work as written. `firebase` and `supabase` generate against
+  placeholder credentials so the project builds and boots before the provider
+  is configured.
+
+  The route guard is generated but deliberately left disabled — enabling it
+  before the sign-in path is finished would lock you out of your own app.
+  `AUTH.md` says how to turn it on.
+
+  **Firebase needs `flutterfire configure` before an Android build.** That is
+  a property of Firebase, not of this tool, and `AUTH.md` states it plainly.
+  An Android build of the Firebase variant has not been verified here.
+
+- **`--template blank|ecommerce|social|dashboard`** — adds a model to core and
+  two wired screens with routes registered. The screens are plain widgets
+  taking their data as parameters, so they work with any state management, and
+  the sample data is a clearly marked constant rather than a fake repository.
+
+### Fixed
+
+- The generated `analysis_options.yaml` listed `avoid_returning_null_for_future`,
+  **removed in Dart 3.3.0**. Every generated project warned on it for anyone on
+  a current SDK, and it would have failed the generated CI's `--fatal-infos`
+  step. Found when this machine's SDK moved to Dart 3.13.
+
 ## 1.6.0
 
 ### Added

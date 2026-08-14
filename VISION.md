@@ -143,10 +143,11 @@ Nothing outstanding — every option in this document ships today.
 | **v1.4** | Audit fixes: working dependency resolution, honest exit codes, project marker file, `ARCHITECTURE.md`, starter tests, green CI | Generated projects actually build |
 | **v1.5** | `--storage`, `--ci`, `--test`, `--platforms all`, 32 component themes, boot tests | Generated apps verified to run |
 | **v1.6** | `--flavor` (dev/staging/prod) | Multiple environments side by side |
+| **v1.7** | `--auth`, `--template` | Every roadmap option shipped |
 
 ---
 
-## Current State (v1.6.0)
+## Current State (v1.7.0)
 
 Shipped with:
 - Multi-framework support: GetX, Riverpod, Bloc, Cubit (`--state`)
