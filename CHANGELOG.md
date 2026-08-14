@@ -24,6 +24,14 @@ exists.
   a property of Firebase, not of this tool, and `AUTH.md` states it plainly.
   An Android build of the Firebase variant has not been verified here.
 
+- **`AGENTS.md` in every generated project** — the convention Codex and other
+  tools read, carrying the package boundaries, `Result<T>` over throwing,
+  persistence through `KeyValueStore`, auth through `AuthRepository`, and the
+  commands that verify a change. Config-aware, so a project without `--auth`
+  is not told about an interface it does not have. The generated README now
+  explains it, along with the Claude Code skills in `.claude/`, which
+  previously nothing mentioned.
+
 - **`--template blank|ecommerce|social|dashboard`** — adds a model to core and
   two wired screens with routes registered. The screens are plain widgets
   taking their data as parameters, so they work with any state management, and
